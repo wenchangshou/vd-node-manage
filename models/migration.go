@@ -25,3 +25,19 @@ func migration() error {
 	logging.G_Logger.Info("数据库初始化结束")
 	return err
 }
+func addDefaultSettings() {
+	defaultSettings := []Setting{
+		{
+			Name: "siteURL", Value: `http://localhost`, Type: "biasic",
+		},
+		{
+			Name: "siteName", Value: `vd-node-manage`, Type: "basic",
+		},
+		{
+			Name: "runModel", Value: "master", Type: "system",
+		},
+	}
+	for _, value := range defaultSettings {
+		DB.Where(Setting{Name: value.Name}).Create(&value)
+	}
+}

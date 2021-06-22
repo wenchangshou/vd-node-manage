@@ -5,7 +5,7 @@ import (
 
 	"github.com/go-ini/ini"
 	"github.com/go-playground/validator/v10"
-	"github.com/wenchangshou2/vd-node-manage/pkg/utils"
+	"github.com/wenchangshou2/vd-node-manage/pkg/util"
 	"github.com/wenchangshou2/zutil"
 )
 
@@ -59,7 +59,7 @@ func Init(path string) error {
 	var err error
 	if path == "" || !zutil.IsExist(path) {
 		// 创建初始配置文件
-		confContent := utils.Replace(map[string]string{
+		confContent := util.Replace(map[string]string{
 			"{SessionSecret}": zutil.RandStringRunes(64),
 			"{HashIDSalt}":    zutil.RandStringRunes(64),
 		}, defaultConf)

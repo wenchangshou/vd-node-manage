@@ -1,6 +1,9 @@
-package utils
+package util
 
-import "strings"
+import (
+	"math/rand"
+	"strings"
+)
 
 // Replace 根据替换表执行批量替换
 func Replace(table map[string]string, s string) string {
@@ -43,4 +46,12 @@ func SliceDifference(slice1, slice2 []string) []string {
 		}
 	}
 	return nn
+}
+func RandStringRunes(n int) string {
+	var letterRunes = []rune("1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+	}
+	return string(b)
 }
