@@ -6,6 +6,10 @@ var DatabaseConfig = &database{
 	DBFile: "vd.db",
 	Port:   3306,
 }
+var ServerConfig = &server{
+	Ip:   "127.0.0.1",
+	Port: 1111,
+}
 
 // CORSConfig 跨域配置
 var CORSConfig = &cors{

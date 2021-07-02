@@ -10,6 +10,8 @@ import (
 const (
 	UserID = iota
 	ProjectID
+	FileID
+	TaskID
 )
 
 var (

@@ -3,11 +3,11 @@ package serializer
 import (
 	"time"
 
-	"github.com/wenchangshou2/vd-node-manage/models"
+	"github.com/wenchangshou2/vd-node-manage/model"
 	"github.com/wenchangshou2/vd-node-manage/pkg/hashid"
 )
 
-func BuildUserResponse(user models.User) Response {
+func BuildUserResponse(user model.User) Response {
 	return Response{
 		Data: BuildUser(user),
 	}
@@ -29,7 +29,7 @@ type User struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
-func BuildUser(user models.User) User {
+func BuildUser(user model.User) User {
 	return User{
 		ID:        hashid.HashID(user.ID, hashid.UserID),
 		Status:    user.Status,

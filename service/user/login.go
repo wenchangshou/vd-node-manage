@@ -2,7 +2,7 @@ package user
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/wenchangshou2/vd-node-manage/models"
+	"github.com/wenchangshou2/vd-node-manage/model"
 	"github.com/wenchangshou2/vd-node-manage/pkg/serializer"
 	"github.com/wenchangshou2/vd-node-manage/pkg/util"
 )
@@ -14,14 +14,14 @@ type UserLoginService struct {
 }
 
 func (service *UserLoginService) Login(c *gin.Context) serializer.Response {
-	expectedUser, err := models.GetUserByUsername(service.UserName)
+	expectedUser, err := model.GetUserByUsername(service.UserName)
 	if err != nil {
 		return serializer.Err(serializer.CodeCredentialInvalid, "用户名和密码错误", err)
 	}
 	if authOk, _ := expectedUser.CheckPassword(service.Password); !authOk {
 		return serializer.Err(serializer.CodeCredentialInvalid, "用户名和密码错误", nil)
 	}
-	if expectedUser.Status == models.Baned || expectedUser.Status == models.OveruseBaned {
+	if expectedUser.Status == model.Baned || expectedUser.Status == model.OveruseBaned {
 		return serializer.Err(403, "该帐号未激活", err)
 	}
 	util.SetSession(c, map[string]interface{}{

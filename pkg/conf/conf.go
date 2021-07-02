@@ -2,6 +2,7 @@ package conf
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/go-ini/ini"
 	"github.com/go-playground/validator/v10"
@@ -11,7 +12,7 @@ import (
 
 //system 系统通用配置
 type system struct {
-	Mode          string `validate:"eq=standard|eq=mixing"`
+	Mode          string
 	Listen        string `validate:"required"`
 	Debug         bool
 	SessionSecret string
@@ -36,6 +37,10 @@ type cors struct {
 	AllowCredentials bool
 	ExposeHeaders    []string
 }
+type server struct {
+	Ip   string
+	Port uint
+}
 
 type log struct {
 	Name         string
@@ -53,6 +58,9 @@ const defaultConf = `
 Listen = ":8888"
 SessionSecret = {SessionSecret}
 HashIDSalt = {HashIDSalt}
+[Server]
+Ip = "127.0.0.1"
+Port = 1111
 `
 
 func Init(path string) error {
@@ -81,10 +89,12 @@ func Init(path string) error {
 		"Database": DatabaseConfig,
 		"System":   SystemConfig,
 		"CORS":     CORSConfig,
+		"Server":   ServerConfig,
 	}
 	for sectionName, sectionStruct := range sections {
 		err = mapSection(sectionName, sectionStruct)
 		if err != nil {
+			fmt.Printf("配置文件：%s,解析失败：%v", sectionName, err)
 			return errors.New("配置文件 " + sectionName + ",解析失败:" + err.Error())
 		}
 	}

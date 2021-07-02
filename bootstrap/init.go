@@ -2,7 +2,7 @@ package bootstrap
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/wenchangshou2/vd-node-manage/models"
+	"github.com/wenchangshou2/vd-node-manage/model"
 	"github.com/wenchangshou2/vd-node-manage/pkg/conf"
 	"github.com/wenchangshou2/vd-node-manage/pkg/logging"
 )
@@ -14,5 +14,5 @@ func Init(path string) {
 	if !conf.SystemConfig.Debug {
 		gin.SetMode(gin.ReleaseMode)
 	}
-	models.Init()
+	model.Init()
 }

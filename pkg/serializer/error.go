@@ -1,6 +1,8 @@
 package serializer
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+)
 
 // Response 基础序列化器
 type Response struct {
@@ -35,12 +37,18 @@ const (
 	CodeNoPermissionErr = 403
 	// CodeCredentialInvalid 凭证无效
 	CodeCredentialInvalid = 40001
+	// CodeUploadFailed 上传出错
+	CodeUploadFailed = 4002
 	// CodeDBError 数据库操作失败
 	CodeDBError = 50001
 	//CodeParamErr 各种奇奇怪怪的参数错误
 	CodeParamErr = 40001
 	// CodeCheckLogin 未登录
-	CodeCheckLogin = 401
+	CodeCheckLogin           = 401
+	CodeNoFindFileErr        = 40002
+	CodeNoFindProjectRelease = 40003
+	CodeJsonUnMarkshalErr    = 40004
+	CodeNoFoundComputerErr   = 40005
 )
 
 func ParamErr(msg string, err error) Response {

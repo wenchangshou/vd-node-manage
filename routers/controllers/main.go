@@ -3,7 +3,9 @@ package controllers
 import (
 	"encoding/json"
 
+	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/wenchangshou2/vd-node-manage/model"
 	"github.com/wenchangshou2/vd-node-manage/pkg/serializer"
 )
 
@@ -43,4 +45,13 @@ func ErrorResponse(err error) serializer.Response {
 		return serializer.ParamErr("JSON类型不匹配", err)
 	}
 	return serializer.ParamErr("参数错误", err)
+}
+
+func CurrentUser(c *gin.Context) *model.User {
+	if user, _ := c.Get("user"); user != nil {
+		if u, ok := user.(*model.User); ok {
+			return u
+		}
+	}
+	return nil
 }

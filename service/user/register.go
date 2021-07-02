@@ -2,7 +2,7 @@ package user
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/wenchangshou2/vd-node-manage/models"
+	"github.com/wenchangshou2/vd-node-manage/model"
 	"github.com/wenchangshou2/vd-node-manage/pkg/serializer"
 )
 
@@ -15,13 +15,13 @@ type UserRegisterService struct {
 func (service *UserRegisterService) Register(c *gin.Context) serializer.Response {
 
 	//创建新的用户对象
-	user := models.NewUser()
+	user := model.NewUser()
 	user.Username = service.UserName
 	user.SetPassword(service.Password)
-	user.Status = models.Active
-	if err := models.DB.Create(&user).Error; err != nil {
-		expectedUser, err := models.GetUserByUsername(service.UserName)
-		if expectedUser.Status == models.NotActivicated {
+	user.Status = model.Active
+	if err := model.DB.Create(&user).Error; err != nil {
+		expectedUser, err := model.GetUserByUsername(service.UserName)
+		if expectedUser.Status == model.NotActivicated {
 			user = expectedUser
 		} else {
 			return serializer.DBErr("此邮箱已存在", err)
