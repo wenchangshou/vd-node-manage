@@ -80,3 +80,14 @@ func GetPendingTaskByComputerId(computerId int) ([]Task, error) {
 	result := DB.Model(&Task{}).Where("computer_id = ? AND status != ?", computerId, Done).Find(&tasks)
 	return tasks, result.Error
 }
+func GetTaskListByCid(computerId int) ([]Task, error) {
+	var tasks []Task
+	result := DB.Debug().Model(&Task{}).Where("computer_id = ?", computerId).Find(&tasks)
+	return tasks, result.Error
+}
+
+// SetTaskStatus 设置任务的状态
+func SetTaskStatus(taskId uint, status uint) error {
+	result := DB.Model(&Task{}).Where("id = ? ", taskId).Update("status", status)
+	return result.Error
+}

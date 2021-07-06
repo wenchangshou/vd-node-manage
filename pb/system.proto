@@ -1,0 +1,14 @@
+syntax = "proto3";
+option go_package = "github.com/wenchangshou2/vd-node-manage/pb";
+service SystemManagement{
+	rpc ReportServerinfo (ReportRequest) returns (ReportResponse);
+}
+message ReportRequest {
+	string ip = 1;
+	string mac = 2;
+	string hostName = 3;
+}
+message ReportResponse {
+	int32 code=1;
+	string msg = 2;
+}

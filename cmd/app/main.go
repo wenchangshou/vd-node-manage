@@ -8,6 +8,7 @@ import (
 	"github.com/wenchangshou2/vd-node-manage/pkg/conf"
 	"github.com/wenchangshou2/vd-node-manage/pkg/discovery"
 	"github.com/wenchangshou2/vd-node-manage/pkg/logging"
+	"github.com/wenchangshou2/vd-node-manage/pkg/rpc"
 	"github.com/wenchangshou2/vd-node-manage/routers"
 	"github.com/wenchangshou2/zutil"
 )
@@ -27,6 +28,7 @@ func main() {
 		return
 	}
 	api := routers.InitRouter()
+	go rpc.InitRpc(":10051")
 	if err := api.Run(conf.SystemConfig.Listen); err != nil {
 		logging.G_Logger.Warn("无法监听[" + conf.SystemConfig.Listen + "]" + "," + err.Error())
 	}
