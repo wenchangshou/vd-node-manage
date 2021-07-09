@@ -6,11 +6,16 @@ import (
 )
 
 func UpdateComputer(c *gin.Context) {
-	var service computer.UpdateComputerServerInfo
+	var service computer.ComputerUpdateService
 	if err := c.ShouldBindJSON(&service); err == nil {
 		res := service.Update(c)
 		c.JSON(200, res)
 	} else {
 		c.JSON(200, ErrorResponse(err))
 	}
+}
+func ListComputer(c *gin.Context) {
+	var service computer.ComputerListService
+	res := service.List(c)
+	c.JSON(200, res)
 }

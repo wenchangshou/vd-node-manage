@@ -1,0 +1,17 @@
+syntax = "proto3";
+option go_package = "github.com/wenchangshou2/vd-node-manage/pb";
+import "google/protobuf/wrappers.proto";
+
+service ComputerManagement{
+	rpc addComputerResource(SetComputerResourceRequest)returns(google.protobuf.BoolValue);
+	rpc addComputerProject(SetComputerProjectRequest) returns (google.protobuf.BoolValue);
+}
+message SetComputerProjectRequest{
+	string mac = 1;
+	int32 projectID=2;
+	int32 projectReleaseID =3;
+}
+message SetComputerResourceRequest{
+	string mac  =1;
+	int32 resourceID=2;
+}

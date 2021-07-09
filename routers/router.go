@@ -1,6 +1,8 @@
 package routers
 
 import (
+	"net/http"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
@@ -27,6 +29,7 @@ func InitMasterRouter() *gin.Engine {
 	r := gin.Default()
 	InitCORS(r)
 	r.Use(gzip.Gzip(gzip.DefaultCompression, gzip.WithExcludedPaths([]string{"/api/"})))
+	r.StaticFS("/upload", http.Dir("./upload"))
 	v1 := r.Group("/api/v1")
 	v1.Use(middleware.Session(conf.SystemConfig.SessionSecret))
 	v1.Use(middleware.CurrentUser())
@@ -38,6 +41,7 @@ func InitMasterRouter() *gin.Engine {
 		user := v1.Group("user")
 		{
 			user.POST("session", controllers.UserLogin)
+
 			user.POST("",
 				controllers.UserRegister)
 		}
@@ -49,6 +53,7 @@ func InitMasterRouter() *gin.Engine {
 		{
 			client.PUT("", controllers.UpdateComputer)
 			client.GET("/:mac/task/pending", controllers.QueryUserPendingTask)
+			client.GET("", controllers.ListComputer)
 		}
 
 		projectRelease := v1.Group("projectRelease")
@@ -57,6 +62,10 @@ func InitMasterRouter() *gin.Engine {
 	auth := v1.Group("")
 	auth.Use(middleware.AuthRequired())
 	{
+		user := v1.Group("user")
+		{
+			user.GET("currentUser", controllers.GetCurrentUser)
+		}
 		project := auth.Group("project")
 		{
 			project.GET("", controllers.ListProjest)

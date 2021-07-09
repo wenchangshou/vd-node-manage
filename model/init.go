@@ -2,7 +2,6 @@ package model
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/wenchangshou2/vd-node-manage/pkg/conf"
@@ -41,10 +40,10 @@ func Init() error {
 	if err != nil {
 		panic("连接数据库不成功," + err.Error())
 	}
-	_db, err := db.DB()
-	_db.SetMaxIdleConns(50)
-	_db.SetMaxOpenConns(100)
-	_db.SetConnMaxLifetime(time.Second * 30)
+	// _db, err := db.DB()
+	// _db.SetMaxIdleConns(50)
+	// _db.SetMaxOpenConns(100)
+	// _db.SetConnMaxLifetime(time.Second * 30)
 	DB = db
 	err = migration()
 	if err != nil {

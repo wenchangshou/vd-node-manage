@@ -54,3 +54,12 @@ func GetComputerByMac(mac string) (Computer, error) {
 	result := DB.Model(&Computer{}).Where("mac = ?", mac).First(&computer)
 	return computer, result.Error
 }
+func ListComputer() ([]Computer, int64) {
+	var (
+		computers []Computer
+		total     int64
+	)
+	DB.Model(&Computer{}).Count(&total)
+	DB.Find(&computers)
+	return computers, total
+}

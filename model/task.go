@@ -46,7 +46,7 @@ func (task *Task) Add() (uint, error) {
 func AddTasks(computers []uint, action uint, options string, active bool) (interface{}, error) {
 	tx := DB.Begin()
 	ids := make([]uint, 0)
-	for computer, _ := range computers {
+	for computer := range computers {
 		task := Task{
 			Options:    options,
 			Action:     action,
@@ -83,6 +83,11 @@ func GetPendingTaskByComputerId(computerId int) ([]Task, error) {
 func GetTaskListByCid(computerId int) ([]Task, error) {
 	var tasks []Task
 	result := DB.Debug().Model(&Task{}).Where("computer_id = ?", computerId).Find(&tasks)
+	return tasks, result.Error
+}
+func GetTaskListByCidFilterStatus(computerId int, status int) ([]Task, error) {
+	var tasks []Task
+	result := DB.Debug().Model(&Task{}).Where("computer_id = ? AND status = ?", computerId, status).Find(&tasks)
 	return tasks, result.Error
 }
 

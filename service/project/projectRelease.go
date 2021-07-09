@@ -33,7 +33,7 @@ func (service *GetProjectReleaseService) Get() serializer.Response {
 
 func (service *ProjectReleaseCreateService) Create(c *gin.Context, user *model.User) serializer.Response {
 
-	file, err := model.GetFileById(int(service.FileId), user.ID)
+	file, err := model.GetFileByUidAndId(int(service.FileId), user.ID)
 	if err != nil {
 		return serializer.Err(serializer.CodeNoFindFileErr, "没有找到文件", err)
 	}

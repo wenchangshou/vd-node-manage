@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion7
 type TaskManagementClient interface {
 	GetTaskByComputerMac(ctx context.Context, in *GetTaskRequest, opts ...grpc.CallOption) (*TasksResponse, error)
 	SetTaskStatus(ctx context.Context, in *SetTaskStatusRequest, opts ...grpc.CallOption) (*wrapperspb.BoolValue, error)
+	SetTaskSchedule(ctx context.Context, in *SetTaskScheduleRequest, opts ...grpc.CallOption) (*wrapperspb.BoolValue, error)
 }
 
 type taskManagementClient struct {
@@ -49,12 +50,22 @@ func (c *taskManagementClient) SetTaskStatus(ctx context.Context, in *SetTaskSta
 	return out, nil
 }
 
+func (c *taskManagementClient) SetTaskSchedule(ctx context.Context, in *SetTaskScheduleRequest, opts ...grpc.CallOption) (*wrapperspb.BoolValue, error) {
+	out := new(wrapperspb.BoolValue)
+	err := c.cc.Invoke(ctx, "/TaskManagement/setTaskSchedule", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TaskManagementServer is the server API for TaskManagement service.
 // All implementations must embed UnimplementedTaskManagementServer
 // for forward compatibility
 type TaskManagementServer interface {
 	GetTaskByComputerMac(context.Context, *GetTaskRequest) (*TasksResponse, error)
 	SetTaskStatus(context.Context, *SetTaskStatusRequest) (*wrapperspb.BoolValue, error)
+	SetTaskSchedule(context.Context, *SetTaskScheduleRequest) (*wrapperspb.BoolValue, error)
 	mustEmbedUnimplementedTaskManagementServer()
 }
 
@@ -67,6 +78,9 @@ func (UnimplementedTaskManagementServer) GetTaskByComputerMac(context.Context, *
 }
 func (UnimplementedTaskManagementServer) SetTaskStatus(context.Context, *SetTaskStatusRequest) (*wrapperspb.BoolValue, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetTaskStatus not implemented")
+}
+func (UnimplementedTaskManagementServer) SetTaskSchedule(context.Context, *SetTaskScheduleRequest) (*wrapperspb.BoolValue, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetTaskSchedule not implemented")
 }
 func (UnimplementedTaskManagementServer) mustEmbedUnimplementedTaskManagementServer() {}
 
@@ -117,6 +131,24 @@ func _TaskManagement_SetTaskStatus_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TaskManagement_SetTaskSchedule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetTaskScheduleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TaskManagementServer).SetTaskSchedule(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/TaskManagement/setTaskSchedule",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TaskManagementServer).SetTaskSchedule(ctx, req.(*SetTaskScheduleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TaskManagement_ServiceDesc is the grpc.ServiceDesc for TaskManagement service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -131,6 +163,10 @@ var TaskManagement_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "setTaskStatus",
 			Handler:    _TaskManagement_SetTaskStatus_Handler,
+		},
+		{
+			MethodName: "setTaskSchedule",
+			Handler:    _TaskManagement_SetTaskSchedule_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

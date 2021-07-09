@@ -8,8 +8,8 @@ import (
 	"github.com/wenchangshou2/vd-node-manage/pkg/conf"
 	"github.com/wenchangshou2/vd-node-manage/pkg/discovery"
 	"github.com/wenchangshou2/vd-node-manage/pkg/logging"
-	"github.com/wenchangshou2/vd-node-manage/pkg/rpc"
 	"github.com/wenchangshou2/vd-node-manage/routers"
+	"github.com/wenchangshou2/vd-node-manage/rpc"
 	"github.com/wenchangshou2/zutil"
 )
 

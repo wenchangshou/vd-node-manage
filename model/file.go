@@ -14,6 +14,7 @@ type File struct {
 	SourceName string `gorm:"source_name"`
 	UserId     uint   `gorm:"user_id"`
 	Size       uint   `gorm:"size"`
+	Uuid       string `gorm:"uuid"`
 }
 
 func (file *File) TableName() string {
@@ -25,8 +26,15 @@ func (file *File) Create() (uint, error) {
 	}
 	return file.ID, nil
 }
-func GetFileById(id int, uid uint) (File, error) {
+func GetFileByUidAndId(id int, uid uint) (File, error) {
 	var file File
 	result := DB.Where("id = ? AND user_id = ?", id, uid).First(&file)
 	return file, result.Error
+}
+
+func GetFileById(id uint) (File, error) {
+	var file File
+	result := DB.Where("id = ? ", id).First(&file)
+	return file, result.Error
+
 }

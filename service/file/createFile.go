@@ -28,9 +28,10 @@ func (service *FileCreateService) Create(c *gin.Context, user *model.User) seria
 			return serializer.Err(serializer.CodeUploadFailed, "上错文件失败", err)
 		}
 		ext := filepath.Ext(_file.Filename)
-		newFileName := uuid.New().String() + ext
-		sourceName := "upload/" + newFileName
-		if err := c.SaveUploadedFile(_file, sourceName); err != nil {
+		uid := uuid.New().String()
+		newFileName := uid + ext
+		sourceName := newFileName
+		if err := c.SaveUploadedFile(_file, "upload/"+sourceName); err != nil {
 			return serializer.Err(serializer.CodeUploadFailed, "保存上传文件失败", err)
 		}
 		fileModel := model.File{
@@ -39,6 +40,7 @@ func (service *FileCreateService) Create(c *gin.Context, user *model.User) seria
 			Mode:       service.Mode,
 			Size:       uint(_file.Size),
 			UserId:     user.ID,
+			Uuid:       uid,
 		}
 		id, err = fileModel.Create()
 		if err != nil {
