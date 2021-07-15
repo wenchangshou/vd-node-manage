@@ -32,7 +32,7 @@ func NewFileManagementClient(cc grpc.ClientConnInterface) FileManagementClient {
 
 func (c *fileManagementClient) GetFileInfoByProjectReleaseID(ctx context.Context, in *wrapperspb.Int32Value, opts ...grpc.CallOption) (*GetFileInfoByProjectReleaseIDResponse, error) {
 	out := new(GetFileInfoByProjectReleaseIDResponse)
-	err := c.cc.Invoke(ctx, "/FileManagement/getFileInfoByProjectReleaseID", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/pb.FileManagement/getFileInfoByProjectReleaseID", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +77,7 @@ func _FileManagement_GetFileInfoByProjectReleaseID_Handler(srv interface{}, ctx 
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/FileManagement/getFileInfoByProjectReleaseID",
+		FullMethod: "/pb.FileManagement/getFileInfoByProjectReleaseID",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(FileManagementServer).GetFileInfoByProjectReleaseID(ctx, req.(*wrapperspb.Int32Value))
@@ -89,7 +89,7 @@ func _FileManagement_GetFileInfoByProjectReleaseID_Handler(srv interface{}, ctx 
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var FileManagement_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "FileManagement",
+	ServiceName: "pb.FileManagement",
 	HandlerType: (*FileManagementServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

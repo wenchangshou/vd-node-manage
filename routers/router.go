@@ -85,7 +85,9 @@ func InitMasterRouter() *gin.Engine {
 		}
 		task := v1.Group("task")
 		{
-			task.POST("", controllers.CreateTask)
+			task.POST("project", controllers.CreateProjectTask)
+			task.DELETE("project", controllers.DeleteProjectTask)
+			task.POST("resource", controllers.CreateResourceTask)
 		}
 	}
 	return r

@@ -33,3 +33,10 @@ func GetProjectReleaseByID(id uint) (ProjectRelease, error) {
 	result := DB.Debug().Model(ProjectRelease{}).Joins("File").Joins("Project").First(&projectRelease)
 	return projectRelease, result.Error
 }
+
+func GetProjectReleaseByIdAndProjectId(projectID uint, projectReleaseID uint) (ProjectRelease, error) {
+	var projectRelase ProjectRelease
+	result := DB.Debug().Model(ProjectRelease{}).Joins("File").Joins("Project").First(&projectRelase)
+	return projectRelase, result.Error
+
+}

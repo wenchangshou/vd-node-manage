@@ -1,10 +1,23 @@
 syntax = "proto3";
 option go_package = "github.com/wenchangshou2/vd-node-manage/pb";
+import "pb/file.proto";
 import "google/protobuf/wrappers.proto";
 
 service ComputerManagement{
 	rpc addComputerResource(SetComputerResourceRequest)returns(google.protobuf.BoolValue);
 	rpc addComputerProject(SetComputerProjectRequest) returns (google.protobuf.BoolValue);
+	rpc getComputerProject(getComputerProjectRequest)returns(getComputerProjectResponse);
+	rpc deleteComputerProject(google.protobuf.UInt32Value)returns (google.protobuf.BoolValue);
+	rpc deleteComputerResource(google.protobuf.UInt32Value)returns (google.protobuf.BoolValue);
+	rpc getComputerIdByMac(google.protobuf.StringValue) returns (google.protobuf.UInt32Value);
+}
+message getComputerProjectResponse{
+	uint32 id=1;
+	pb.File file=2;
+}
+message getComputerProjectRequest{
+	uint32 id=1;
+	uint32 computer_id = 2;
 }
 message SetComputerProjectRequest{
 	string mac = 1;

@@ -40,7 +40,12 @@ const (
 	// CodeUploadFailed 上传出错
 	CodeUploadFailed = 4002
 	// CodeDBError 数据库操作失败
-	CodeDBError = 50001
+	CodeDBError                 = 50001
+	CodeNotSupportOperator      = 50002
+	CodeNotFindComputerProject  = 50003
+	CodeNotFindProjectRelease   = 50004
+	CodeNotFindResource         = 50005
+	CodeNotFindComputerResource = 50006
 	//CodeParamErr 各种奇奇怪怪的参数错误
 	CodeParamErr = 40001
 	// CodeCheckLogin 未登录

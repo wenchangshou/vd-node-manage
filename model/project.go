@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/wenchangshou2/vd-node-manage/pkg/logging"
 	"gorm.io/gorm"
@@ -34,4 +35,26 @@ func (project *Project) Create() (uint, error) {
 func DeleteProjectByID(id, uid uint) error {
 	result := DB.Where("id = ? and user_id=?", id, uid).Delete(&Project{})
 	return result.Error
+}
+func GetProjects(Page int, size int, orderBy string, conditions map[string]string, searches map[string]string) ([]Project, int64) {
+	var res []Project
+	var total int64
+	tx := DB.Model(&Project{})
+	if orderBy != "" {
+		tx = tx.Order(orderBy)
+	}
+	for k, v := range conditions {
+		tx = tx.Where(k+" = ?", v)
+	}
+	if len(searches) > 0 {
+		search := ""
+		for k, v := range searches {
+			search += (k + " like '%" + v + "%' OR ")
+		}
+		search = strings.TrimSuffix(search, " OR ")
+		tx = tx.Where(search)
+	}
+	tx.Count(&total)
+	tx.Debug().Limit(size).Offset((Page - 1) * size).Find(&res)
+	return res, total
 }

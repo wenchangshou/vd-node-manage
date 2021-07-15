@@ -6,7 +6,8 @@ type Resource struct {
 	gorm.Model
 	Name     string `gorm:"name"`
 	Category string `gorm:"category"`
-	FileId   int    `gorm:"file_id"`
+	FileID   uint   `json:"_"`
+	File     File
 }
 
 func (resources *Resource) TableName() string {
@@ -20,6 +21,6 @@ func (resources *Resource) Create() (int, error) {
 }
 func GetResourceById(id uint) (*Resource, error) {
 	var resource *Resource
-	result := DB.Model(&Resource{}).First(&resource, id)
+	result := DB.Debug().Model(&Resource{}).Joins("File").Where("resources.id=?", id).First(&resource)
 	return resource, result.Error
 }

@@ -24,6 +24,12 @@ type InstallResourceOptions struct {
 	ResourceId uint `json:"resource_id"`
 }
 
+type DeleteprojectOptions struct {
+	Computers []uint `json:"computers" binding:"required"`
+	Options   string `json:"options"`
+	ID        uint   `json:"id"`
+}
+
 func (service AddTaskItemService) buildOptions() string {
 	return ""
 

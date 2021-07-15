@@ -17,10 +17,8 @@ func (server *ResourceServer) GetResourceDetailedInfo(ctx context.Context, id *w
 	if err != nil {
 		return nil, err
 	}
-	file, err := model.GetFileById(uint(resource.FileId))
-	if err != nil {
-		return nil, err
-	}
+	file := resource.File
+
 	response = &pb.GetResourceDetailedInfoResponse{
 		ID:       uint32(resource.ID),
 		Name:     resource.Name,

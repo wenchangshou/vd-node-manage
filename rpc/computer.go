@@ -41,3 +41,46 @@ func (server *ComputerServer) AddComputerProject(ctx context.Context, request *p
 		Value: err == nil && id > 0,
 	}, err
 }
+
+//GetComputerProject 获取计算机项目
+func (server *ComputerServer) GetComputerProject(ctx context.Context, request *pb.GetComputerProjectRequest) (response *pb.GetComputerProjectResponse, err error) {
+	computerProject, err := model.GetComputerProjectById(uint(request.ComputerId), uint(request.Id))
+	if err != nil {
+		return nil, err
+	}
+	projectRelease, err := model.GetProjectReleaseByID(computerProject.ProjectReleaseId)
+	if err != nil {
+		return nil, err
+	}
+	response = &pb.GetComputerProjectResponse{
+		Id: request.Id,
+		File: &pb.File{
+			ID:         int32(projectRelease.FileID),
+			Name:       projectRelease.File.Name,
+			SourceName: projectRelease.File.SourceName,
+			Size:       int64(projectRelease.File.Size),
+			Url:        "upload/" + projectRelease.File.SourceName,
+			Uuid:       projectRelease.File.Uuid,
+		},
+	}
+	return
+}
+func (server *ComputerServer) DeleteComputerProject(ctx context.Context, id *wrapperspb.UInt32Value) (status *wrapperspb.BoolValue, err error) {
+	err = model.DeleteComputerProjectById(id.GetValue())
+	return &wrapperspb.BoolValue{
+		Value: err == nil,
+	}, err
+}
+func (server *ComputerServer) DeleteComputerResource(ctx context.Context, id *wrapperspb.UInt32Value) (status *wrapperspb.BoolValue, err error) {
+	err = model.DeleteComputerResourceById(id.GetValue())
+	return &wrapperspb.BoolValue{
+		Value: err == nil,
+	}, err
+}
+
+func (server *ComputerServer) GetComputerByMac(ctx context.Context, mac wrapperspb.StringValue) (id *wrapperspb.UInt32Value, err error) {
+	computer, err := model.GetComputerByMac(mac.GetValue())
+	return &wrapperspb.UInt32Value{
+		Value: uint32(computer.ID),
+	}, err
+}

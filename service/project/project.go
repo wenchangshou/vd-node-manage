@@ -1,8 +1,6 @@
 package project
 
 import (
-	"strings"
-
 	"github.com/gin-gonic/gin"
 	"github.com/wenchangshou2/vd-node-manage/model"
 	"github.com/wenchangshou2/vd-node-manage/pkg/hashid"
@@ -41,25 +39,8 @@ func (service *ProjectCreateService) Create(c *gin.Context, user *model.User) se
 	}
 }
 func (service *ProjectListService) List(c *gin.Context, user *model.User) serializer.Response {
-	var res []model.Project
-	var total int64 = 0
-	tx := model.DB.Model(&model.Project{})
-	if service.OrderBy != "" {
-		tx = tx.Order(service.OrderBy)
-	}
-	for k, v := range service.Conditions {
-		tx = tx.Where(k+" = ?", v)
-	}
-	if len(service.Searches) > 0 {
-		search := ""
-		for k, v := range service.Searches {
-			search += (k + " like '%" + v + "%' OR ")
-		}
-		search = strings.TrimSuffix(search, " OR ")
-		tx = tx.Where(search)
-	}
-	tx.Count(&total)
-	tx.Limit(service.PageSize).Offset((service.Page - 1) * service.PageSize).Find((&res))
+	res, total := model.GetProjects(service.Page, service.PageSize, service.OrderBy, service.Conditions, service.Searches)
+
 	return serializer.Response{
 		Data: map[string]interface{}{
 			"total": total,
