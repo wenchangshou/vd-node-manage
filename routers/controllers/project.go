@@ -18,7 +18,7 @@ func CreateProject(c *gin.Context) {
 
 func ListProjest(c *gin.Context) {
 	var service project.ProjectListService
-	if err := c.ShouldBindJSON(&service); err == nil {
+	if err := c.Bind(&service); err == nil {
 		res := service.List(c, CurrentUser(c))
 		c.JSON(200, res)
 	} else {

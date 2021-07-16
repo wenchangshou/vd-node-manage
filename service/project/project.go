@@ -15,8 +15,8 @@ type ProjectCreateService struct {
 }
 
 type ProjectListService struct {
-	Page       int               `json:"page" binding:"min=1,required"`
-	PageSize   int               `json:"page_size" binding:"min=1,required"`
+	Page       uint              `uri:"page" json:"page" form:"page"`
+	PageSize   uint              `uri:"page_size" json:"page_size" form:"page_size"`
 	OrderBy    string            `json:"order_by"`
 	Conditions map[string]string `form:"conditions"`
 	Searches   map[string]string `form:"searches"`
@@ -39,7 +39,8 @@ func (service *ProjectCreateService) Create(c *gin.Context, user *model.User) se
 	}
 }
 func (service *ProjectListService) List(c *gin.Context, user *model.User) serializer.Response {
-	res, total := model.GetProjects(service.Page, service.PageSize, service.OrderBy, service.Conditions, service.Searches)
+
+	res, total := model.GetProjects(int(service.Page), int(service.PageSize), service.OrderBy, service.Conditions, service.Searches)
 
 	return serializer.Response{
 		Data: map[string]interface{}{
