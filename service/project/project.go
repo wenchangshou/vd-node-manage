@@ -21,6 +21,20 @@ type ProjectListService struct {
 	Conditions map[string]string `form:"conditions"`
 	Searches   map[string]string `form:"searches"`
 }
+type ProjectDetailService struct {
+	ID uint `form:"path" uri:"id"`
+}
+
+func (service *ProjectDetailService) Get() serializer.Response {
+
+	projectReleaseList, err := model.GetProjectReleaseListByProjectID(service.ID)
+	if err != nil {
+		return serializer.Err(serializer.CodeDBError, "获取项目版本列表失败", err)
+	}
+	return serializer.Response{
+		Data: projectReleaseList,
+	}
+}
 
 // Create 创建一个新的项目
 func (service *ProjectCreateService) Create(c *gin.Context, user *model.User) serializer.Response {

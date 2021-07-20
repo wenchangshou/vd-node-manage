@@ -40,3 +40,8 @@ func GetProjectReleaseByIdAndProjectId(projectID uint, projectReleaseID uint) (P
 	return projectRelase, result.Error
 
 }
+func GetProjectReleaseListByProjectID(id uint) ([]ProjectRelease, error) {
+	projectList := make([]ProjectRelease, 0)
+	result := DB.Debug().Model(ProjectRelease{}).Where("project_id = ?", id).Joins("File").Find(&projectList)
+	return projectList, result.Error
+}

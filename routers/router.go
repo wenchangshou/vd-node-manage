@@ -69,6 +69,7 @@ func InitMasterRouter() *gin.Engine {
 		project := auth.Group("project")
 		{
 			project.GET("", controllers.ListProjest)
+			project.GET(":id", controllers.GetProjectReleaseList)
 			project.POST("", controllers.CreateProject)
 		}
 		file := auth.Group("file")

@@ -25,3 +25,12 @@ func ListProjest(c *gin.Context) {
 		c.JSON(200, ErrorResponse(err))
 	}
 }
+func GetProjectReleaseList(c *gin.Context) {
+	var service project.ProjectDetailService
+	if err := c.ShouldBindUri(&service); err == nil {
+		res := service.Get()
+		c.JSON(200, res)
+	} else {
+		c.JSON(200, ErrorResponse(err))
+	}
+}
