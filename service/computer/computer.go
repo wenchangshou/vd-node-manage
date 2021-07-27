@@ -42,3 +42,49 @@ func (service *ComputerUpdateService) Update(c *gin.Context) serializer.Response
 	}
 	return serializer.Response{}
 }
+
+type ComputerGetDetailsService struct {
+	ID int `json:"id" form:"id" uri:"id"`
+}
+type ComputerGetDetailsForm struct {
+	model.Computer
+	Projects  []model.ProjectRelease
+	Resources []model.ComputerResource
+}
+
+func (service *ComputerGetDetailsService) Get(c *gin.Context) serializer.Response {
+	computerForm := ComputerGetDetailsForm{}
+	computer, err := model.GetComputerById(service.ID)
+	if err != nil {
+		return serializer.Err(serializer.CodeDBError, "获取计算机信息失败", err)
+	}
+	computerForm.Computer = computer
+	projects, err := model.GetComputerProjectByComputerID(int(computer.ID))
+	if err != nil {
+		return serializer.Err(serializer.CodeDBError, "获取计算机项目列表失败", err)
+	}
+	computerForm.Projects = projects
+	resources, err := model.GetComputerResourceByComputerId(int(computer.ID))
+	if err != nil {
+		return serializer.Err(serializer.CodeDBError, "获取计算机资源失败", err)
+	}
+	computerForm.Resources = resources
+	return serializer.Response{Data: map[string]interface{}{
+		"items": computerForm,
+	}}
+}
+
+type ComputerUpdateNameService struct {
+	ID   int    `json:"id"`
+	Name string `json:"name" form:"name" binding:"required"`
+}
+
+func (service *ComputerUpdateNameService) Update(c *gin.Context) serializer.Response {
+	data := make(map[string]interface{})
+	data["name"] = service.Name
+	err := model.UpdateComputerById(service.ID, data)
+	if err != nil {
+		return serializer.Err(serializer.CodeDBError, "设置计算机信息失败", err)
+	}
+	return serializer.Response{}
+}

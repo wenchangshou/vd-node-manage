@@ -38,6 +38,9 @@ func (computer *Computer) UpdateByMac() error {
 	data["last_online_time"] = time.Now()
 	return DB.Model(&Computer{}).Where("mac=?", computer.Mac).Updates(data).Error
 }
+func UpdateComputerById(id int, data map[string]interface{}) error {
+	return DB.Model(&Computer{}).Where("id = ?", id).Updates(data).Error
+}
 
 func (computer *Computer) Create() error {
 	_client := Computer{
@@ -54,6 +57,12 @@ func GetComputerByMac(mac string) (Computer, error) {
 	result := DB.Model(&Computer{}).Where("mac = ?", mac).First(&computer)
 	return computer, result.Error
 }
+func GetComputerById(id int) (Computer, error) {
+	var computer Computer
+	result := DB.Model(&Computer{}).First(&computer, id)
+	return computer, result.Error
+
+}
 func ListComputer() ([]Computer, int64) {
 	var (
 		computers []Computer
@@ -62,4 +71,8 @@ func ListComputer() ([]Computer, int64) {
 	DB.Model(&Computer{}).Count(&total)
 	DB.Find(&computers)
 	return computers, total
+}
+
+func GetComputerDetailsById(id int) {
+
 }

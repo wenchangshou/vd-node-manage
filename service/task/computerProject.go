@@ -1,7 +1,7 @@
 package task
 
 import (
-	"encoding/json"
+	"fmt"
 
 	"github.com/wenchangshou2/vd-node-manage/model"
 	"github.com/wenchangshou2/vd-node-manage/pkg/serializer"
@@ -20,7 +20,8 @@ type DeleteProjectOption struct {
 
 func (computerProject ComputerProject) install() serializer.Response {
 	for _, computer := range computerProject.Computers {
-		projectRelease, err := model.GetProjectReleaseByIdAndProjectId(computerProject.ProjectReleaseID, computerProject.ProjectID)
+		depend := 0
+		projectRelease, err := model.GetProjectReleaseByIdAndProjectId(computerProject.ProjectID, computerProject.ProjectReleaseID)
 		if err != nil {
 			return serializer.Err(serializer.CodeNotFindProjectRelease, "没有找到项目", err)
 		}
@@ -29,26 +30,24 @@ func (computerProject ComputerProject) install() serializer.Response {
 		options["project_id"] = computerProject.ProjectID
 		options["project_release_id"] = computerProject.ProjectReleaseID
 		options["File"] = projectRelease.File
-		str, _ := json.Marshal(options)
-		cp, err := model.GetComputerProjectById(computer, computerProject.ProjectID)
-		if err == nil && cp.ID > 0 {
-			task := model.NewTask(int(computer), model.DeleteProject, string(str), 0)
-			id, err := task.Add()
-			if err != nil {
-				return serializer.Err(serializer.CodeDBError, "添加任务失败", err)
-			}
-			task = model.NewTask(int(computer), model.InstallProjectAction, string(str), int(id))
-			_, err = task.Add()
-			if err != nil {
-				return serializer.Err(serializer.CodeDBError, "添加任务失败", err)
-			}
-		} else {
-			task := model.NewTask(int(computer), model.InstallProjectAction, string(str), 0)
-			_, err = task.Add()
-			if err != nil {
-				return serializer.Err(serializer.CodeDBError, "添加任务失败", err)
-			}
+		cp, err := model.GetComputerProjectByID(int(computer), computerProject.ProjectID)
+		task, err := model.AddTask(fmt.Sprintf("添加%s项目", projectRelease.Project.Name), computer)
+		if err != nil {
+			return serializer.Err(serializer.CodeDBError, "添加任务失败", err)
 		}
+		if err == nil && cp.ID > 0 {
+			_options := make(map[string]interface{})
+			_options["ID"] = cp.ID
+			_projectRelease, _ := model.GetProjectReleaseByID(cp.ProjectReleaseID)
+			_options["File"] = _projectRelease.File
+			task, err := model.AddTaskItem(task.ID, model.DeleteProject, _options, false, 0)
+			if err != nil {
+				return serializer.Err(serializer.CodeDBError, "添加任务失败", err)
+			}
+			depend = int(task.ID)
+		}
+		model.AddTaskItem(task.ID, model.InstallProjectAction, options, false, uint(depend))
+
 	}
 	return serializer.Response{
 		Code: 0,
@@ -70,25 +69,23 @@ func (computerProject ComputerProject) Add() serializer.Response {
 }
 func (computerProject ComputerProject) Delete() serializer.Response {
 	for _, computer := range computerProject.Computers {
-		computerProject, err := model.GetComputerProjectById(computer, computerProject.ProjectID)
+		computerProject, err := model.GetComputerProjectByID(int(computer), computerProject.ProjectID)
 		if err != nil || computerProject.ID == 0 {
 			return serializer.Err(serializer.CodeNotFindComputerProject, "没有找到对应的计算机项目", err)
 		}
-		projectRelease, err := model.GetProjectReleaseByID(computerProject.ProjectReleaseId)
+		projectRelease, err := model.GetProjectReleaseByID(computerProject.ProjectReleaseID)
 		if err != nil {
 			return serializer.Err(serializer.CodeNotFindProjectRelease, "没有找到对应的项目发布版本", err)
 		}
-		options := DeleteProjectOption{
-			Id:   uint32(projectRelease.ID),
-			File: &projectRelease.File,
-		}
-		jsonStr, _ := json.Marshal(options)
-		task := model.NewTask(int(computer), model.DeleteProject, string(jsonStr), 0)
-		_, err = task.Add()
+		options := make(map[string]interface{})
+		options["ID"] = projectRelease.ID
+		options["File"] = projectRelease.File
+
+		task, err := model.AddTask(fmt.Sprintf("删除%s项目", projectRelease.Project.Name), computer)
 		if err != nil {
 			return serializer.Err(serializer.CodeDBError, "创建任务失败", err)
 		}
-
+		model.AddTaskItem(task.ID, model.DeleteProject, options, false, 0)
 	}
 	return serializer.Response{
 		Code: 0,

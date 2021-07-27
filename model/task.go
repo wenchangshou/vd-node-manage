@@ -1,7 +1,9 @@
 package model
 
 import (
+	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/wenchangshou2/vd-node-manage/pkg/logging"
 	"gorm.io/gorm"
@@ -23,13 +25,23 @@ const (
 
 type Task struct {
 	gorm.Model
-	ComputerId int    `gorm:"computer_id"`
-	Options    string `gorm:"options"`
-	Action     uint   `gorm:"action"`
-	Status     int    `gorm:"status"`
-	Depend     int    `gorm:"depend"`
-	Schedule   int    `gorm:"schedule"`
+	Name       string `gorm:"name"`
 	Active     bool   `gorm:"active"`
+	ComputerId int    `gorm:"computer_id"`
+	Status     int    `gorm:"status"`
+}
+type TaskItem struct {
+	gorm.Model
+	TaskID   uint   `gorm:"task_id"`
+	Action   uint   `gorm:"action"`
+	Status   int    `gorm:"status"`
+	Depend   int    `gorm:"depend"`
+	Options  string `gorm:"options"`
+	Schedule int    `gorm:"schedule"`
+}
+
+func (taskItem *TaskItem) TableName() string {
+	return "task_items"
 }
 
 func (task *Task) TableName() string {
@@ -43,35 +55,30 @@ func (task *Task) Add() (uint, error) {
 	}
 	return task.ID, nil
 }
-func AddTasks(computers []uint, action uint, options string, active bool) (interface{}, error) {
-	tx := DB.Begin()
-	ids := make([]uint, 0)
-	for computer := range computers {
-		task := Task{
-			Options:    options,
-			Action:     action,
-			Status:     Initializes,
-			ComputerId: computer,
-			Active:     active,
-		}
 
-		id, err := task.Add()
-		if err != nil {
-			tx.Rollback()
-			return 0, err
-		}
-		ids = append(ids, id)
+// AddTaskItem 添加任务项
+func AddTaskItem(taskId uint, action uint, options map[string]interface{}, active bool, depend uint) (TaskItem, error) {
+	jsonStr, _ := json.Marshal(options)
+	taskItem := TaskItem{
+		TaskID:   taskId,
+		Action:   action,
+		Options:  string(jsonStr),
+		Schedule: 0,
+		Status:   Initializes,
+		Depend:   int(depend),
 	}
-	return ids, nil
+	result := DB.Model(&TaskItem{}).Create(&taskItem)
+	return taskItem, result.Error
 }
-func NewTask(computerid int, action int, option string, depend int) Task {
-	return Task{
-		ComputerId: computerid,
-		Action:     uint(action),
-		Status:     Initializes,
-		Options:    option,
-		Depend:     depend,
+
+func AddTask(name string, computerID uint) (Task, error) {
+	task := Task{
+		Name:       name,
+		Status:     0,
+		ComputerId: int(computerID),
 	}
+	result := DB.Model(&Task{}).Create(&task)
+	return task, result.Error
 }
 
 //GetPendingTaskByComputerId 获取待处理的任务
@@ -95,4 +102,42 @@ func GetTaskListByCidFilterStatus(computerId int, status int) ([]Task, error) {
 func SetTaskStatus(taskId uint, status uint) error {
 	result := DB.Model(&Task{}).Where("id = ? ", taskId).Update("status", status)
 	return result.Error
+}
+
+func GetTasks(page int, size int, orderBy string, conditions map[string]string, searches map[string]string) ([]Task, int64) {
+	var res []Task
+	var total int64
+	tx := DB.Model(&Task{})
+	if orderBy != "" {
+		tx = tx.Order(orderBy)
+	}
+	for k, v := range conditions {
+		tx = tx.Where(k+" = ?", v)
+	}
+	if len(searches) > 0 {
+		search := ""
+		for k, v := range searches {
+			search += (k + " like '%" + v + "%' OR ")
+		}
+		search = strings.TrimSuffix(search, " OR ")
+		tx = tx.Where(search)
+	}
+	tx.Count(&total)
+	tx.Debug().Limit(size).Offset((page - 1) * size).Find(&res)
+	return res, total
+}
+func GetTaskItemById(id int) ([]TaskItem, int64) {
+	var res []TaskItem
+	var total int64
+	result := DB.Model(&TaskItem{}).Where("task_id = ?", id).Find(&res)
+	result.Count(&total)
+	return res, total
+}
+func GetTasksByDependID(id int) ([]Task, int64) {
+
+	var res []Task
+	var total int64
+	result := DB.Model(&Task{}).Where("depend = ?", id).Find(&res)
+	result.Count(&total)
+	return res, total
 }

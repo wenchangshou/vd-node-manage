@@ -9,9 +9,10 @@ import (
 type ComputerProject struct {
 	gorm.Model
 	ComputerId       uint `gorm:"computer_id"`
-	ProjectId        uint `gorm:"project_id"`
-	ProjectReleaseId uint `gorm:"project_release_id"`
+	ProjectID        uint
+	ProjectReleaseID uint
 	Status           uint `gorm:"status"`
+	ProjectRelease   ProjectRelease
 }
 
 func (cp *ComputerProject) Create() (uint, error) {
@@ -23,12 +24,50 @@ func (cp *ComputerProject) Create() (uint, error) {
 	}
 	return cp.ID, nil
 }
-func GetComputerProjectById(cid uint, pid uint) (ComputerProject, error) {
+func GetComputerProjectByID(cid int, pid uint) (ComputerProject, error) {
 	var computerProject ComputerProject
 	result := DB.Debug().Model(&ComputerProject{}).Where("computer_id=? AND project_id  = ?", cid, pid).First(&computerProject)
 	return computerProject, result.Error
 }
-func DeleteComputerProjectById(id uint32) error {
+
+func GetComputerProjectByProjectIDAndProjectReleaseID(projectID, projectReleaseID uint) (ComputerProject, error) {
+	var computerProject ComputerProject
+	result := DB.Where("project_id = ? and project_release_id = ?", projectID, projectReleaseID).Find(&computerProject)
+	return computerProject, result.Error
+}
+
+// GetComputerProjectByComputerID 获取指定计算机的资源
+func GetComputerProjectByComputerID(id int) ([]ProjectRelease, error) {
+	var computerProjectList []ComputerProject
+	projectReleaseList := make([]ProjectRelease, 0)
+	result := DB.Debug().Model(&ComputerProject{}).Find(&computerProjectList)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	for _, computerProject := range computerProjectList {
+		projeectRelease, err := GetProjectReleaseByIdAndProjectId(computerProject.ProjectID, computerProject.ProjectReleaseID)
+		if err != nil {
+			return nil, err
+		}
+		projectReleaseList = append(projectReleaseList, projeectRelease)
+	}
+	return projectReleaseList, nil
+}
+func DeleteComputerProjectByID(id int) error {
 	result := DB.Debug().Delete(&ComputerProject{}, id)
 	return result.Error
+}
+
+// 通过项目id列表来批量获取
+func GetComputerProjectByProjectIds(ids []int) ([]ComputerProject, error) {
+	var computerProjectList []ComputerProject
+	result := DB.Debug().Where("project_id IN ?", ids).Find(&computerProjectList)
+	return computerProjectList, result.Error
+}
+
+// GetComputerProjectByProjectID 获取计算机项目通过项目id
+func GetComputerProjectByProjectID(id int) ([]ComputerProject, error) {
+	var computerProjectList []ComputerProject
+	result := DB.Where("project_id = ? ", id).Find(&computerProjectList)
+	return computerProjectList, result.Error
 }

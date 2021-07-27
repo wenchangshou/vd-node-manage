@@ -12,6 +12,7 @@ type ProjectCreateService struct {
 	Category    string `form:"category" json:"category" binding:"required"`
 	Description string `json:"description"`
 	Arguments   string `json:"arguments"`
+	Start       string `json:"start"`
 }
 
 type ProjectListService struct {
@@ -23,6 +24,19 @@ type ProjectListService struct {
 }
 type ProjectDetailService struct {
 	ID uint `form:"path" uri:"id"`
+}
+type ProjectListItemForm struct {
+	model.Project
+	Computers []string
+}
+type ProjectListForm []ProjectListItemForm
+
+func (service *ProjectListForm) AppendComputet(projectId int, hostName string) {
+	for k, v := range *service {
+		if v.Project.ID == uint(projectId) {
+			(*service)[k].Computers = append((*service)[k].Computers, hostName)
+		}
+	}
 }
 
 func (service *ProjectDetailService) Get() serializer.Response {
@@ -43,6 +57,7 @@ func (service *ProjectCreateService) Create(c *gin.Context, user *model.User) se
 		Category:    service.Category,
 		Description: service.Description,
 		Arguments:   service.Arguments,
+		Start:       service.Start,
 	}
 	id, err := project.Create()
 	if err != nil {
@@ -53,13 +68,34 @@ func (service *ProjectCreateService) Create(c *gin.Context, user *model.User) se
 	}
 }
 func (service *ProjectListService) List(c *gin.Context, user *model.User) serializer.Response {
-
+	var result ProjectListForm
+	queryCodition := make([]int, 0)
 	res, total := model.GetProjects(int(service.Page), int(service.PageSize), service.OrderBy, service.Conditions, service.Searches)
+	for _, project := range res {
+		item := ProjectListItemForm{
+			Computers: make([]string, 0),
+		}
+		item.Project = project
+		result = append(result, item)
+		queryCodition = append(queryCodition, int(project.ID))
+	}
+	computerProjectList, err := model.GetComputerProjectByProjectIds(queryCodition)
+	if err != nil {
+		return serializer.Err(serializer.CodeDBError, "获取计算机项目资源列表失败", err)
+	}
+	computers, _ := model.ListComputer()
+	for _, computerProject := range computerProjectList {
+		for _, computer := range computers {
+			if computer.ID == computerProject.ComputerId {
+				result.AppendComputet(int(computerProject.ProjectID), computer.Name)
+			}
+		}
+	}
 
 	return serializer.Response{
 		Data: map[string]interface{}{
 			"total": total,
-			"items": res,
+			"items": result,
 		},
 	}
 }

@@ -28,15 +28,18 @@ func (projectRelease *ProjectRelease) Create() (uint, error) {
 	}
 	return projectRelease.ID, nil
 }
+func (projectRelease *ProjectRelease) Delete() error {
+	return DB.Delete(&ProjectRelease{}, projectRelease.ID).Error
+}
 func GetProjectReleaseByID(id uint) (ProjectRelease, error) {
 	var projectRelease ProjectRelease
-	result := DB.Debug().Model(ProjectRelease{}).Joins("File").Joins("Project").First(&projectRelease)
+	result := DB.Debug().Model(ProjectRelease{}).Joins("File").Joins("Project").First(&projectRelease, id)
 	return projectRelease, result.Error
 }
 
 func GetProjectReleaseByIdAndProjectId(projectID uint, projectReleaseID uint) (ProjectRelease, error) {
 	var projectRelase ProjectRelease
-	result := DB.Debug().Model(ProjectRelease{}).Joins("File").Joins("Project").First(&projectRelase)
+	result := DB.Debug().Model(ProjectRelease{}).Where("project_id = ? AND project_releases.id = ?", projectID, projectReleaseID).Joins("File").Joins("Project").First(&projectRelase)
 	return projectRelase, result.Error
 
 }

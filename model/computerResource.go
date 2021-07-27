@@ -4,8 +4,9 @@ import "gorm.io/gorm"
 
 type ComputerResource struct {
 	gorm.Model
-	ComputerId uint `gorm:"computer_id"`
-	ResourceId uint `gorm:"resource_id"`
+	ComputerID uint `gorm:"computer_id"`
+	ResourceID uint `gorm:"resource_id"`
+	Resource   Resource
 	Status     uint `gorm:"status"`
 }
 
@@ -18,12 +19,19 @@ func (computerResource *ComputerResource) Create() (uint, error) {
 	}
 	return computerResource.ID, nil
 }
-func GetComputerResource(id uint) (*ComputerResource, error) {
+func GetComputerResourceById(id int) (*ComputerResource, error) {
 	computerResource := &ComputerResource{}
 	result := DB.First(computerResource, id)
 	return computerResource, result.Error
 }
-func DeleteComputerResourceById(id uint32) error {
+
+// GetComputerResourceByComputerId 通过计算机id来获取指定计算机资源
+func GetComputerResourceByComputerId(id int) ([]ComputerResource, error) {
+	var computerResourceList []ComputerResource
+	result := DB.Where("computer_id = ?", id).Joins("Resource").Find(&computerResourceList)
+	return computerResourceList, result.Error
+}
+func DeleteComputerResourceById(id int) error {
 	result := DB.Debug().Delete(&ComputerResource{}, id)
 	return result.Error
 }

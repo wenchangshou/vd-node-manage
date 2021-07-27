@@ -18,8 +18,8 @@ func (server *ComputerServer) AddComputerResource(ctx context.Context, request *
 		return nil, err
 	}
 	resource := &model.ComputerResource{
-		ComputerId: computer.ID,
-		ResourceId: uint(request.ResourceID),
+		ComputerID: computer.ID,
+		ResourceID: uint(request.ResourceID),
 	}
 	id, err := resource.Create()
 	return &wrapperspb.BoolValue{
@@ -33,8 +33,8 @@ func (server *ComputerServer) AddComputerProject(ctx context.Context, request *p
 	}
 	newproject := &model.ComputerProject{
 		ComputerId:       computer.ID,
-		ProjectId:        uint(request.ProjectID),
-		ProjectReleaseId: uint(request.ProjectReleaseID),
+		ProjectID:        uint(request.ProjectID),
+		ProjectReleaseID: uint(request.ProjectReleaseID),
 	}
 	id, err := newproject.Create()
 	return &wrapperspb.BoolValue{
@@ -44,11 +44,11 @@ func (server *ComputerServer) AddComputerProject(ctx context.Context, request *p
 
 //GetComputerProject 获取计算机项目
 func (server *ComputerServer) GetComputerProject(ctx context.Context, request *pb.GetComputerProjectRequest) (response *pb.GetComputerProjectResponse, err error) {
-	computerProject, err := model.GetComputerProjectById(uint(request.ComputerId), uint(request.Id))
+	computerProject, err := model.GetComputerProjectByID(int(request.ComputerId), uint(request.Id))
 	if err != nil {
 		return nil, err
 	}
-	projectRelease, err := model.GetProjectReleaseByID(computerProject.ProjectReleaseId)
+	projectRelease, err := model.GetProjectReleaseByID(computerProject.ProjectReleaseID)
 	if err != nil {
 		return nil, err
 	}
@@ -66,13 +66,13 @@ func (server *ComputerServer) GetComputerProject(ctx context.Context, request *p
 	return
 }
 func (server *ComputerServer) DeleteComputerProject(ctx context.Context, id *wrapperspb.UInt32Value) (status *wrapperspb.BoolValue, err error) {
-	err = model.DeleteComputerProjectById(id.GetValue())
+	err = model.DeleteComputerProjectByID(int(id.GetValue()))
 	return &wrapperspb.BoolValue{
 		Value: err == nil,
 	}, err
 }
 func (server *ComputerServer) DeleteComputerResource(ctx context.Context, id *wrapperspb.UInt32Value) (status *wrapperspb.BoolValue, err error) {
-	err = model.DeleteComputerResourceById(id.GetValue())
+	err = model.DeleteComputerResourceById(int(id.GetValue()))
 	return &wrapperspb.BoolValue{
 		Value: err == nil,
 	}, err

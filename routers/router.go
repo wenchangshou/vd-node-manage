@@ -41,9 +41,12 @@ func InitMasterRouter() *gin.Engine {
 		user := v1.Group("user")
 		{
 			user.POST("session", controllers.UserLogin)
-
 			user.POST("",
 				controllers.UserRegister)
+		}
+		file := v1.Group("file")
+		{
+			file.GET(":id", controllers.DownloadFile)
 		}
 		system := v1.Group("system")
 		{
@@ -52,12 +55,17 @@ func InitMasterRouter() *gin.Engine {
 		client := v1.Group("computer")
 		{
 			client.PUT("", controllers.UpdateComputer)
-			client.GET("/:mac/task/pending", controllers.QueryUserPendingTask)
+			client.GET(":id/details", controllers.GetComputerDetails)
+			client.PUT(":id/name", controllers.UpdateComputerName)
+			client.GET(":id/project", controllers.ListComputerProject)
 			client.GET("", controllers.ListComputer)
 		}
 
 		projectRelease := v1.Group("projectRelease")
-		projectRelease.GET(":id", controllers.GetProjectRelease)
+		{
+			projectRelease.GET(":id", controllers.GetProjectRelease)
+			projectRelease.POST(":id/publish", controllers.PublishProject)
+		}
 	}
 	auth := v1.Group("")
 	auth.Use(middleware.AuthRequired())
@@ -79,16 +87,19 @@ func InitMasterRouter() *gin.Engine {
 		projectRelease := auth.Group("projectRelease")
 		{
 			projectRelease.POST("", controllers.CreateProjectRelease)
+			projectRelease.DELETE(":id", controllers.DeleteProjectRelease)
 		}
-		resources := v1.Group("resources")
+		resources := v1.Group("resource")
 		{
-			resources.POST("", controllers.ListProjest)
+			resources.GET("", controllers.ListResource)
+			resources.POST("", controllers.CreateResource)
 		}
 		task := v1.Group("task")
 		{
 			task.POST("project", controllers.CreateProjectTask)
 			task.DELETE("project", controllers.DeleteProjectTask)
 			task.POST("resource", controllers.CreateResourceTask)
+			task.GET("", controllers.ListTask)
 		}
 	}
 	return r

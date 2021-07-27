@@ -1,10 +1,14 @@
 package project
 
 import (
+	"os"
+	"path"
+
 	"github.com/gin-gonic/gin"
 	"github.com/wenchangshou2/vd-node-manage/model"
 	"github.com/wenchangshou2/vd-node-manage/pkg/hashid"
 	"github.com/wenchangshou2/vd-node-manage/pkg/serializer"
+	"github.com/wenchangshou2/vd-node-manage/service/task"
 )
 
 type ProjectReleaseCreateService struct {
@@ -54,4 +58,50 @@ func (service *ProjectReleaseCreateService) Create(c *gin.Context, user *model.U
 	return serializer.Response{
 		Data: hashid.HashID(id, hashid.ProjectID),
 	}
+}
+
+type DeleteProejctReleaseService struct {
+	ID uint `uri:"id" json:"id" binding:"required"`
+}
+
+func (service *DeleteProejctReleaseService) Delete() serializer.Response {
+	projectRelease, err := model.GetProjectReleaseByID(service.ID)
+	if err != nil {
+		return serializer.Err(serializer.CodeDBError, "没有找到对应的发行记录", err)
+	}
+	computerProject, err := model.GetComputerProjectByProjectIDAndProjectReleaseID(projectRelease.ProjectID, projectRelease.ID)
+	if err != nil {
+		return serializer.Err(serializer.CodeDBError, "获取计算机资源失败", err)
+	}
+	if computerProject.ID == 0 {
+		filePath := path.Join("upload/", projectRelease.File.SourceName)
+		os.RemoveAll(filePath)
+		projectRelease.File.Delete()
+		projectRelease.Delete()
+	}
+	return serializer.Response{}
+}
+
+type PublishProjectReleaseService struct {
+	ID uint `uri:"id" json:"id"`
+}
+
+func (service *PublishProjectReleaseService) Publish() serializer.Response {
+	projectRelease, err := model.GetProjectReleaseByID(service.ID)
+	clientsids := make([]uint, 0)
+	if err != nil {
+		return serializer.Err(serializer.CodeDBError, "获取计算机发行版本失败", err)
+	}
+	computers, _ := model.ListComputer()
+	for _, computer := range computers {
+		clientsids = append(clientsids, computer.ID)
+	}
+
+	taskItem := task.ComputerProject{
+		Computers:        clientsids,
+		ProjectID:        projectRelease.ProjectID,
+		ProjectReleaseID: projectRelease.ID,
+		Operator:         projectRelease.Mode,
+	}
+	return taskItem.Add()
 }

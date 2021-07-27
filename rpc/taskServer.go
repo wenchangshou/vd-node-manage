@@ -24,14 +24,21 @@ func (s *TaskServer) getTaskTypeByNumber(t uint) pb.TaskOperatorType {
 	}
 	return pb.TaskOperatorType_UNKNOWN
 }
-func (s *TaskServer) ConvertTaskJsonToProtoBuf(task *model.Task) *pb.Task {
+func (s *TaskServer) ConvertTaskJsonToProtoBuf(task *model.Task, item []model.TaskItem) *pb.Task {
 	result := &pb.Task{}
-	result.Action = s.getTaskTypeByNumber(task.Action)
-	result.Depend = int32(task.Depend)
-	result.Options = task.Options
-	result.Schedule = int32(task.Schedule)
-	result.Status = int32(task.Status)
-	result.ID = int32(task.ID)
+	result.Name = task.Name
+	result.Id = int32(task.ID)
+	result.TaskItem = make([]*pb.TaskItem, 0)
+	for _, _item := range item {
+		taskItem := &pb.TaskItem{}
+		taskItem.Action = pb.TaskOperatorType(_item.Action)
+		taskItem.Depend = int32(_item.Depend)
+		taskItem.Id = int32(_item.ID)
+		taskItem.Options = _item.Options
+		taskItem.Schedule = int32(_item.Schedule)
+		taskItem.Status = int32(_item.Status)
+		result.TaskItem = append(result.TaskItem, taskItem)
+	}
 	return result
 }
 func (s *TaskServer) GetTaskByComputerMac(ctx context.Context, request *pb.GetTaskRequest) (*pb.TasksResponse, error) {
@@ -51,7 +58,8 @@ func (s *TaskServer) GetTaskByComputerMac(ctx context.Context, request *pb.GetTa
 		return response, err
 	}
 	for _, v := range tasks {
-		item := s.ConvertTaskJsonToProtoBuf(&v)
+		subItem, _ := model.GetTaskItemById(int(v.ID))
+		item := s.ConvertTaskJsonToProtoBuf(&v, subItem)
 		items = append(items, item)
 	}
 	response.Items = items

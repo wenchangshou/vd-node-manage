@@ -15,6 +15,7 @@ type File struct {
 	UserId     uint   `gorm:"user_id"`
 	Size       uint   `gorm:"size"`
 	Uuid       string `gorm:"uuid"`
+	Md5        string `gorm:"md5"`
 }
 
 func (file *File) TableName() string {
@@ -25,6 +26,9 @@ func (file *File) Create() (uint, error) {
 		logging.G_Logger.Warn(fmt.Sprintf("无法插入文件:%s", err))
 	}
 	return file.ID, nil
+}
+func (file *File) Delete() error {
+	return DB.Debug().Delete(&File{}, file.ID).Error
 }
 func GetFileByUidAndId(id int, uid uint) (File, error) {
 	var file File

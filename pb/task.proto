@@ -37,12 +37,18 @@ enum TaskOperatorType {
 	DELETE_PROJECT=4;
 	UNKNOWN=5;
 }
-message Task {
-	int32 ID = 1;
+message TaskItem {
+	int32 id = 1;
 	string options =2;
 	TaskOperatorType action = 3;
 	int32 status = 4 ;
-	int32 Depend = 5;
+	int32 depend = 5;
 	int32 schedule = 6;
 	bool active = 7;
+}
+
+message Task {
+	int32 id = 1;
+	string name = 2;
+	repeated TaskItem taskItem = 3;
 }

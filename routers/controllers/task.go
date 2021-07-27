@@ -43,3 +43,14 @@ func QueryUserPendingTask(c *gin.Context) {
 		c.JSON(200, ErrorResponse(err))
 	}
 }
+
+// ListTask 当前任务列表
+func ListTask(c *gin.Context) {
+	var service task.TaskListService
+	if err := c.ShouldBindUri(&service); err == nil {
+		res := service.List(c)
+		c.JSON(200, res)
+	} else {
+		c.JSON(200, ErrorResponse(err))
+	}
+}
