@@ -23,7 +23,6 @@ type TaskListForm struct {
 func (service *TaskListService) List(c *gin.Context) serializer.Response {
 	conditions := make(map[string]string)
 	resTaskList := make([]TaskListForm, 0)
-	conditions["depend"] = "0"
 	res, total := model.GetTasks(service.Page, service.PageSize, service.OrderBy, conditions, service.Searches)
 	for _, item := range res {
 		items, _ := model.GetTasksByDependID(int(item.ID))

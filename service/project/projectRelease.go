@@ -73,12 +73,27 @@ func (service *DeleteProejctReleaseService) Delete() serializer.Response {
 	if err != nil {
 		return serializer.Err(serializer.CodeDBError, "获取计算机资源失败", err)
 	}
-	if computerProject.ID == 0 {
-		filePath := path.Join("upload/", projectRelease.File.SourceName)
-		os.RemoveAll(filePath)
-		projectRelease.File.Delete()
-		projectRelease.Delete()
+	if len(computerProject) > 0 {
+		ids := make([]uint, 0)
+		for _, cp := range computerProject {
+			ids = append(ids, cp.ComputerId)
+		}
+		taskItem := task.ComputerProject{
+			Computers:        ids,
+			ProjectID:        projectRelease.ProjectID,
+			ProjectReleaseID: projectRelease.ID,
+			Operator:         projectRelease.Mode,
+		}
+		response := taskItem.Delete()
+		if response.Code != 0 {
+			return response
+		}
 	}
+	filePath := path.Join("upload/", projectRelease.File.SourceName)
+	os.RemoveAll(filePath)
+	projectRelease.File.Delete()
+	projectRelease.Delete()
+
 	return serializer.Response{}
 }
 

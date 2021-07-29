@@ -66,6 +66,11 @@ func InitMasterRouter() *gin.Engine {
 			projectRelease.GET(":id", controllers.GetProjectRelease)
 			projectRelease.POST(":id/publish", controllers.PublishProject)
 		}
+		resources := v1.Group("resource")
+		{
+			resources.DELETE(":id", controllers.DeleteResource)
+			resources.POST(":id/publish", controllers.PublishResource)
+		}
 	}
 	auth := v1.Group("")
 	auth.Use(middleware.AuthRequired())
@@ -73,6 +78,10 @@ func InitMasterRouter() *gin.Engine {
 		user := v1.Group("user")
 		{
 			user.GET("currentUser", controllers.GetCurrentUser)
+		}
+		computer := v1.Group("computer")
+		{
+			computer.GET("cross", controllers.GetCrossResources)
 		}
 		project := auth.Group("project")
 		{
@@ -100,6 +109,10 @@ func InitMasterRouter() *gin.Engine {
 			task.DELETE("project", controllers.DeleteProjectTask)
 			task.POST("resource", controllers.CreateResourceTask)
 			task.GET("", controllers.ListTask)
+		}
+		system := v1.Group("system")
+		{
+			system.GET("exportProjectRecord", controllers.ExportProjectRecord)
 		}
 	}
 	return r

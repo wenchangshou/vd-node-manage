@@ -17,6 +17,9 @@ type Resource struct {
 func (resources *Resource) TableName() string {
 	return "resources"
 }
+func (resources *Resource) Delete() error {
+	return DB.Delete(&Resource{}, resources.ID).Error
+}
 func (resources *Resource) Create() (int, error) {
 	if err := DB.Create(resources).Error; err != nil {
 		return -1, err

@@ -30,9 +30,14 @@ func GetComputerProjectByID(cid int, pid uint) (ComputerProject, error) {
 	return computerProject, result.Error
 }
 
-func GetComputerProjectByProjectIDAndProjectReleaseID(projectID, projectReleaseID uint) (ComputerProject, error) {
-	var computerProject ComputerProject
+func GetComputerProjectByProjectIDAndProjectReleaseID(projectID, projectReleaseID uint) ([]ComputerProject, error) {
+	var computerProject []ComputerProject
 	result := DB.Where("project_id = ? and project_release_id = ?", projectID, projectReleaseID).Find(&computerProject)
+	return computerProject, result.Error
+}
+func GetComputerCrossProject(ids []int) ([]ComputerProject, error) {
+	var computerProject []ComputerProject
+	result := DB.Debug().Model(&ComputerProject{}).Where("computer_id IN ?", ids).Find(&computerProject)
 	return computerProject, result.Error
 }
 
@@ -69,5 +74,10 @@ func GetComputerProjectByProjectIds(ids []int) ([]ComputerProject, error) {
 func GetComputerProjectByProjectID(id int) ([]ComputerProject, error) {
 	var computerProjectList []ComputerProject
 	result := DB.Where("project_id = ? ", id).Find(&computerProjectList)
+	return computerProjectList, result.Error
+}
+func ListComputerProject() ([]ComputerProject, error) {
+	var computerProjectList []ComputerProject
+	result := DB.Model(&ComputerProject{}).Find(&computerProjectList)
 	return computerProjectList, result.Error
 }

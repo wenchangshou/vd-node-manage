@@ -45,3 +45,9 @@ func GetComputerDetails(c *gin.Context) {
 		c.JSON(200, ErrorResponse(err))
 	}
 }
+func GetCrossResources(c *gin.Context) {
+	var service computer.ComputerProjectGetCrossResource
+	res := service.Get()
+	c.JSON(200, res)
+
+}

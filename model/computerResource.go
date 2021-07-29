@@ -35,3 +35,17 @@ func DeleteComputerResourceById(id int) error {
 	result := DB.Debug().Delete(&ComputerResource{}, id)
 	return result.Error
 }
+
+// 通过项目id列表来批量获取
+func GetComputerResourcesByIds(ids []int) ([]ComputerResource, error) {
+	var computerResources []ComputerResource
+	result := DB.Debug().Where("resource_id IN ?", ids).Find(&computerResources)
+	return computerResources, result.Error
+}
+
+// 通过项目id列表来批量获取
+func GetComputerResourcesByComputerIds(ids []int) ([]ComputerResource, error) {
+	var computerResources []ComputerResource
+	result := DB.Debug().Where("computer_id IN ?", ids).Find(&computerResources)
+	return computerResources, result.Error
+}
