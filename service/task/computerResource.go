@@ -13,6 +13,9 @@ type ComputerResource struct {
 }
 
 func (service *ComputerResource) Add() serializer.Response {
+	var (
+		depend int
+	)
 
 	resource, err := model.GetResourceById(service.ID)
 	if err != nil {
@@ -28,7 +31,18 @@ func (service *ComputerResource) Add() serializer.Response {
 		if err != nil {
 			return serializer.Err(serializer.CodeDBError, "添加任务失败", err)
 		}
-		_, err = model.AddTaskItem(task.ID, model.InstallResourceAction, options, false, 0)
+		_resource, err := model.GetComputerResourceByComputerIdAndResourceId(int(computer), int(service.ID))
+		if _resource.ID > 0 || err != nil {
+			_options := make(map[string]interface{})
+			_options["ID"] = _resource.ID
+			_options["File"] = resource.File
+			task, err := model.AddTaskItem(task.ID, model.DeleteResource, _options, false, 0)
+			if err != nil {
+				return serializer.Err(serializer.CodeDBError, "添加删除任务失败", err)
+			}
+			depend = int(task.ID)
+		}
+		_, err = model.AddTaskItem(task.ID, model.InstallResourceAction, options, false, uint(depend))
 		if err != nil {
 			return serializer.Err(serializer.CodeDBError, "添加任务项失败", err)
 		}

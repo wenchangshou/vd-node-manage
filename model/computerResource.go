@@ -24,6 +24,12 @@ func GetComputerResourceById(id int) (*ComputerResource, error) {
 	result := DB.First(computerResource, id)
 	return computerResource, result.Error
 }
+func GetComputerResourceByComputerIdAndResourceId(computerId int, resourceId int) (*ComputerResource, error) {
+	computerResource := &ComputerResource{}
+	result := DB.Where("computer_id = ? AND resource_id = ?", computerId, resourceId).First(&computerResource)
+	return computerResource, result.Error
+
+}
 
 // GetComputerResourceByComputerId 通过计算机id来获取指定计算机资源
 func GetComputerResourceByComputerId(id int) ([]ComputerResource, error) {

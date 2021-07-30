@@ -27,7 +27,8 @@ func InitCORS(router *gin.Engine) {
 }
 func InitMasterRouter() *gin.Engine {
 	r := gin.Default()
-	InitCORS(r)
+	// InitCORS(r)
+	r.Use(cors.Default())
 	r.Use(gzip.Gzip(gzip.DefaultCompression, gzip.WithExcludedPaths([]string{"/api/"})))
 	r.StaticFS("/upload", http.Dir("./upload"))
 	v1 := r.Group("/api/v1")

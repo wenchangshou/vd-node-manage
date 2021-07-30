@@ -37,6 +37,7 @@ type TaskItem struct {
 	Status   int    `gorm:"status"`
 	Depend   int    `gorm:"depend"`
 	Options  string `gorm:"options"`
+	Message  string `gorm:"message"`
 	Schedule int    `gorm:"schedule"`
 }
 
@@ -102,6 +103,11 @@ func GetTaskListByCidFilterStatus(computerId int, status int) ([]Task, error) {
 func SetTaskStatus(taskId uint, status uint) error {
 	result := DB.Model(&Task{}).Where("id = ? ", taskId).Update("status", status)
 	return result.Error
+}
+func SetTaskItemStatus(taskId uint, status uint, msg string) error {
+	result := DB.Model(&TaskItem{}).Where("id = ?", taskId).Updates(map[string]interface{}{"status": status, "message": msg})
+	return result.Error
+
 }
 
 func GetTasks(page int, size int, orderBy string, conditions map[string]string, searches map[string]string) ([]Task, int64) {

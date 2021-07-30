@@ -4,6 +4,7 @@ import "google/protobuf/wrappers.proto";
 service TaskManagement{
 	rpc getTaskByComputerMac(GetTaskRequest)returns (TasksResponse) ;
 	rpc setTaskStatus(SetTaskStatusRequest)returns (google.protobuf.BoolValue);
+	rpc setTaskItemStatus(SetTaskItemStatusRequest)returns(google.protobuf.BoolValue);
 	rpc setTaskSchedule(SetTaskScheduleRequest) returns(google.protobuf.BoolValue);
 }
 message SetTaskScheduleRequest{
@@ -14,6 +15,11 @@ message SetTaskScheduleRequest{
 message SetTaskStatusRequest{
 	int32 id=1;
 	TaskType type=2;
+}
+message SetTaskItemStatusRequest{
+	int32 id=1;
+	TaskType type=2;
+	string msg=3;
 }
 message TasksResponse{
 	repeated Task items=1;

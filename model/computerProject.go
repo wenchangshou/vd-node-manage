@@ -32,7 +32,7 @@ func GetComputerProjectByID(cid int, pid uint) (ComputerProject, error) {
 
 func GetComputerProjectByProjectIDAndProjectReleaseID(projectID, projectReleaseID uint) ([]ComputerProject, error) {
 	var computerProject []ComputerProject
-	result := DB.Where("project_id = ? and project_release_id = ?", projectID, projectReleaseID).Find(&computerProject)
+	result := DB.Debug().Where("project_id = ? and project_release_id = ?", projectID, projectReleaseID).Find(&computerProject)
 	return computerProject, result.Error
 }
 func GetComputerCrossProject(ids []int) ([]ComputerProject, error) {

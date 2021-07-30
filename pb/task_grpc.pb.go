@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion7
 type TaskManagementClient interface {
 	GetTaskByComputerMac(ctx context.Context, in *GetTaskRequest, opts ...grpc.CallOption) (*TasksResponse, error)
 	SetTaskStatus(ctx context.Context, in *SetTaskStatusRequest, opts ...grpc.CallOption) (*wrapperspb.BoolValue, error)
+	SetTaskItemStatus(ctx context.Context, in *SetTaskItemStatusRequest, opts ...grpc.CallOption) (*wrapperspb.BoolValue, error)
 	SetTaskSchedule(ctx context.Context, in *SetTaskScheduleRequest, opts ...grpc.CallOption) (*wrapperspb.BoolValue, error)
 }
 
@@ -50,6 +51,15 @@ func (c *taskManagementClient) SetTaskStatus(ctx context.Context, in *SetTaskSta
 	return out, nil
 }
 
+func (c *taskManagementClient) SetTaskItemStatus(ctx context.Context, in *SetTaskItemStatusRequest, opts ...grpc.CallOption) (*wrapperspb.BoolValue, error) {
+	out := new(wrapperspb.BoolValue)
+	err := c.cc.Invoke(ctx, "/TaskManagement/setTaskItemStatus", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *taskManagementClient) SetTaskSchedule(ctx context.Context, in *SetTaskScheduleRequest, opts ...grpc.CallOption) (*wrapperspb.BoolValue, error) {
 	out := new(wrapperspb.BoolValue)
 	err := c.cc.Invoke(ctx, "/TaskManagement/setTaskSchedule", in, out, opts...)
@@ -65,6 +75,7 @@ func (c *taskManagementClient) SetTaskSchedule(ctx context.Context, in *SetTaskS
 type TaskManagementServer interface {
 	GetTaskByComputerMac(context.Context, *GetTaskRequest) (*TasksResponse, error)
 	SetTaskStatus(context.Context, *SetTaskStatusRequest) (*wrapperspb.BoolValue, error)
+	SetTaskItemStatus(context.Context, *SetTaskItemStatusRequest) (*wrapperspb.BoolValue, error)
 	SetTaskSchedule(context.Context, *SetTaskScheduleRequest) (*wrapperspb.BoolValue, error)
 	mustEmbedUnimplementedTaskManagementServer()
 }
@@ -78,6 +89,9 @@ func (UnimplementedTaskManagementServer) GetTaskByComputerMac(context.Context, *
 }
 func (UnimplementedTaskManagementServer) SetTaskStatus(context.Context, *SetTaskStatusRequest) (*wrapperspb.BoolValue, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetTaskStatus not implemented")
+}
+func (UnimplementedTaskManagementServer) SetTaskItemStatus(context.Context, *SetTaskItemStatusRequest) (*wrapperspb.BoolValue, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetTaskItemStatus not implemented")
 }
 func (UnimplementedTaskManagementServer) SetTaskSchedule(context.Context, *SetTaskScheduleRequest) (*wrapperspb.BoolValue, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetTaskSchedule not implemented")
@@ -131,6 +145,24 @@ func _TaskManagement_SetTaskStatus_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TaskManagement_SetTaskItemStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetTaskItemStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TaskManagementServer).SetTaskItemStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/TaskManagement/setTaskItemStatus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TaskManagementServer).SetTaskItemStatus(ctx, req.(*SetTaskItemStatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _TaskManagement_SetTaskSchedule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SetTaskScheduleRequest)
 	if err := dec(in); err != nil {
@@ -163,6 +195,10 @@ var TaskManagement_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "setTaskStatus",
 			Handler:    _TaskManagement_SetTaskStatus_Handler,
+		},
+		{
+			MethodName: "setTaskItemStatus",
+			Handler:    _TaskManagement_SetTaskItemStatus_Handler,
 		},
 		{
 			MethodName: "setTaskSchedule",

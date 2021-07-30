@@ -71,3 +71,10 @@ func (s TaskServer) SetTaskStatus(ctx context.Context, request *pb.SetTaskStatus
 		Value: err == nil,
 	}, err
 }
+
+func (s TaskServer) SetTaskItemStatus(ctx context.Context, request *pb.SetTaskItemStatusRequest) (*wrapperspb.BoolValue, error) {
+	err := model.SetTaskItemStatus(uint(request.GetId()), uint(request.GetType()), request.Msg)
+	return &wrapperspb.BoolValue{
+		Value: err == nil,
+	}, err
+}
