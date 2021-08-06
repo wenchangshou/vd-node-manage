@@ -29,6 +29,7 @@ type Task struct {
 	Active     bool   `gorm:"active"`
 	ComputerId int    `gorm:"computer_id"`
 	Status     int    `gorm:"status"`
+	Computer   Computer
 }
 type TaskItem struct {
 	gorm.Model
@@ -110,6 +111,7 @@ func SetTaskItemStatus(taskId uint, status uint, msg string) error {
 
 }
 
+// 获取所有任务项
 func GetTasks(page int, size int, orderBy string, conditions map[string]string, searches map[string]string) ([]Task, int64) {
 	var res []Task
 	var total int64
@@ -129,9 +131,11 @@ func GetTasks(page int, size int, orderBy string, conditions map[string]string, 
 		tx = tx.Where(search)
 	}
 	tx.Count(&total)
-	tx.Debug().Limit(size).Offset((page - 1) * size).Find(&res)
+	tx.Debug().Limit(size).Offset((page - 1) * size).Joins("Computer").Find(&res)
 	return res, total
 }
+
+//通过id获取任务项
 func GetTaskItemById(id int) ([]TaskItem, int64) {
 	var res []TaskItem
 	var total int64
@@ -139,8 +143,9 @@ func GetTaskItemById(id int) ([]TaskItem, int64) {
 	result.Count(&total)
 	return res, total
 }
-func GetTasksByDependID(id int) ([]Task, int64) {
 
+// 通过依赖获取任务项
+func GetTasksByDependID(id int) ([]Task, int64) {
 	var res []Task
 	var total int64
 	result := DB.Model(&Task{}).Where("depend = ?", id).Find(&res)

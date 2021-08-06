@@ -13,6 +13,7 @@ type ProjectCreateService struct {
 	Description string `json:"description"`
 	Arguments   string `json:"arguments"`
 	Start       string `json:"start"`
+	File        int    `json:"file"`
 }
 
 type ProjectListService struct {
@@ -58,6 +59,7 @@ func (service *ProjectCreateService) Create(c *gin.Context, user *model.User) se
 		Description: service.Description,
 		Arguments:   service.Arguments,
 		Start:       service.Start,
+		Cover:       service.File,
 	}
 	id, err := project.Create()
 	if err != nil {

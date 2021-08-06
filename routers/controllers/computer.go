@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -33,6 +34,13 @@ func ListComputer(c *gin.Context) {
 	c.JSON(200, res)
 }
 func ListComputerProject(c *gin.Context) {
+	var service computer.ComputerProjectListService
+	if err := c.ShouldBindUri(&service); err == nil {
+		res := service.List()
+		c.JSON(200, res)
+	} else {
+		c.JSON(200, ErrorResponse(err))
+	}
 
 }
 
@@ -49,5 +57,22 @@ func GetCrossResources(c *gin.Context) {
 	var service computer.ComputerProjectGetCrossResource
 	res := service.Get()
 	c.JSON(200, res)
-
+}
+func OpenComputerExhibition(c *gin.Context) {
+	var service computer.ComputerExhibitionOpenService
+	if err := c.ShouldBindUri(service); err == nil {
+	}
+}
+func GetComputerProjectDir(c *gin.Context) {
+	computerID := c.Param("id")
+	projectID := c.Param("projectID")
+	fmt.Printf("computerID:%v,projectID:%v", computerID, projectID)
+	var service computer.ComputerProjectDirectoryService
+	if err := c.ShouldBindJSON(&service); err == nil {
+		service.ComputerID, _ = strconv.Atoi(computerID)
+		service.ProjectID, _ = strconv.Atoi(projectID)
+		service.Get()
+	} else {
+		c.JSON(200, ErrorResponse(err))
+	}
 }

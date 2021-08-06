@@ -11,9 +11,10 @@ import (
 )
 
 func GetExtranet(c *gin.Context) {
+	ip := c.ClientIP()
 	c.JSON(200, serializer.Response{
 		Code: 0,
-		Data: c.ClientIP(),
+		Data: ip,
 	})
 }
 func ExportProjectRecord(c *gin.Context) {

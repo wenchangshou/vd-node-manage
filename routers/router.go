@@ -53,13 +53,15 @@ func InitMasterRouter() *gin.Engine {
 		{
 			system.GET("extranet", controllers.GetExtranet)
 		}
-		client := v1.Group("computer")
+		computer := v1.Group("computer")
 		{
-			client.PUT("", controllers.UpdateComputer)
-			client.GET(":id/details", controllers.GetComputerDetails)
-			client.PUT(":id/name", controllers.UpdateComputerName)
-			client.GET(":id/project", controllers.ListComputerProject)
-			client.GET("", controllers.ListComputer)
+			computer.PUT("", controllers.UpdateComputer)
+			computer.GET(":id/details", controllers.GetComputerDetails)
+			computer.PUT(":id/name", controllers.UpdateComputerName)
+			computer.GET(":id/project", controllers.ListComputerProject)
+			computer.GET("", controllers.ListComputer)
+			computer.POST(":id/layout", controllers.OpenMultiScreen)
+			computer.POST(":id/:projectID/dir", controllers.GetComputerProjectDir)
 		}
 
 		projectRelease := v1.Group("projectRelease")
@@ -83,6 +85,7 @@ func InitMasterRouter() *gin.Engine {
 		computer := v1.Group("computer")
 		{
 			computer.GET("cross", controllers.GetCrossResources)
+			computer.POST(":id/exhibition", controllers.OpenComputerExhibition)
 		}
 		project := auth.Group("project")
 		{
@@ -115,6 +118,10 @@ func InitMasterRouter() *gin.Engine {
 		{
 			system.GET("exportProjectRecord", controllers.ExportProjectRecord)
 		}
+		// layout := v1.Group("layout")
+		// {
+		// 	layout.PUT("", controllers.OpenMultiScreen)
+		// }
 	}
 	return r
 }

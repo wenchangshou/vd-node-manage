@@ -59,7 +59,7 @@ func (service *ComputerGetDetailsService) Get(c *gin.Context) serializer.Respons
 		return serializer.Err(serializer.CodeDBError, "获取计算机信息失败", err)
 	}
 	computerForm.Computer = computer
-	projects, err := model.GetComputerProjectByComputerID(int(computer.ID))
+	projects, err := model.GetComputerProjectReleaseByComputerID(int(computer.ID))
 	if err != nil {
 		return serializer.Err(serializer.CodeDBError, "获取计算机项目列表失败", err)
 	}

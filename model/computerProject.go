@@ -41,8 +41,8 @@ func GetComputerCrossProject(ids []int) ([]ComputerProject, error) {
 	return computerProject, result.Error
 }
 
-// GetComputerProjectByComputerID 获取指定计算机的资源
-func GetComputerProjectByComputerID(id int) ([]ProjectRelease, error) {
+// GetComputerProjectReleaseByComputerID 获取指定计算机的资源
+func GetComputerProjectReleaseByComputerID(id int) ([]ProjectRelease, error) {
 	var computerProjectList []ComputerProject
 	projectReleaseList := make([]ProjectRelease, 0)
 	result := DB.Debug().Model(&ComputerProject{}).Find(&computerProjectList)
@@ -79,5 +79,10 @@ func GetComputerProjectByProjectID(id int) ([]ComputerProject, error) {
 func ListComputerProject() ([]ComputerProject, error) {
 	var computerProjectList []ComputerProject
 	result := DB.Model(&ComputerProject{}).Find(&computerProjectList)
+	return computerProjectList, result.Error
+}
+func GetComputerProjectByComputerId(id int) ([]ComputerProject, error) {
+	var computerProjectList []ComputerProject
+	result := DB.Model(&ComputerProject{}).Where("computer_id", id).Find(&computerProjectList)
 	return computerProjectList, result.Error
 }

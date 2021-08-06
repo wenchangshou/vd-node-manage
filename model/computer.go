@@ -8,6 +8,13 @@ import (
 
 type Computer struct {
 	gorm.Model
+	Source         string    `gorm:"source" json:"source"`
+	Switchs        string    `gorm:"switchs" json:"switchs"`
+	Active         bool      `gorm:"active" json:"active"`
+	Open           bool      `gorm:"open" json:"open"`
+	MenuIndex      int       `gorm:"menu_index" json:"menu_index"`
+	LayoutIndex    int       `gorm:"layout_index" json:"layout_index"`
+	SelectedNum    string    `gorm:"selected_num" json:"selected_num" default:"[]"`
 	Name           string    `gorm:"name"`
 	Ip             string    `gorm:"ip"`
 	Mac            string    `gorm:"mac" validate:"required,mac"`

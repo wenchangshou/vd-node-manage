@@ -50,14 +50,18 @@ const (
 	//CodeParamErr 各种奇奇怪怪的参数错误
 	CodeParamErr = 40001
 	// CodeCheckLogin 未登录
-	CodeCheckLogin              = 401
-	CodeNoFindFileErr           = 40002
-	CodeNoFindProjectRelease    = 40003
-	CodeJsonUnMarkshalErr       = 40004
-	CodeNoFoundComputerErr      = 40005
-	CodeFileDeleteErr           = 40006
-	CodeDeleteResourceRecordErr = 40007
-	CodeDeleteFileRecordErr     = 40008
+	CodeCheckLogin                  = 401
+	CodeNoFindFileErr               = 40002
+	CodeNoFindProjectRelease        = 40003
+	CodeJsonUnMarkshalErr           = 40004
+	CodeNoFoundComputerErr          = 40005
+	CodeFileDeleteErr               = 40006
+	CodeDeleteResourceRecordErr     = 40007
+	CodeDeleteFileRecordErr         = 40008
+	CodeNotFindComputerErr          = 40009
+	CodeCallZebusApiErr             = 40010
+	CodeNotFindDstComputerServicErr = 40011
+	CodeSendZebusMessageErr         = 40012
 )
 
 func ParamErr(msg string, err error) Response {

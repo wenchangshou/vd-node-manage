@@ -10,12 +10,15 @@ import (
 
 type Project struct {
 	gorm.Model
-	Start       string `gorm:"start"`
-	Name        string `gorm:"size:50"`
-	Category    string `gorm:"category"`
-	Description string `gorm:"description"`
-	Arguments   string `gorm:"arguments"`
-	Control     string `gorm:"control"`
+	Start         string `gorm:"start" json:"start"`
+	Name          string `gorm:"size:50" json:"name"`
+	Category      string `gorm:"category" json:"category"`
+	Description   string `gorm:"description" json:"description"`
+	Arguments     string `gorm:"arguments" json:"arguments"`
+	Control       string `gorm:"control" json:"control"`
+	Cover         int    `gorm:"cover" json:"_"`
+	CoverImageUrl string `json:"cover_image_url"`
+	File          File   `gorm:"foreignKey:Cover" json:"_"`
 }
 
 func (project *Project) TableName() string {
@@ -57,4 +60,15 @@ func GetProjects(Page int, size int, orderBy string, conditions map[string]strin
 	tx.Count(&total)
 	tx.Debug().Limit(size).Offset((Page - 1) * size).Find(&res)
 	return res, total
+}
+func GetProjectByIds(ids []int) ([]Project, error) {
+	var projects []Project
+	result := DB.Debug().Model(&Project{}).Where("project.id in  ? ", ids).Joins("File").Find(&projects)
+	for key, project := range projects {
+		if project.File.ID > 0 {
+			projects[key].CoverImageUrl = "upload/" + project.File.SourceName
+		}
+	}
+	return projects, result.Error
+
 }

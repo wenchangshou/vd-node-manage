@@ -169,3 +169,34 @@ func (service *ComputerProjectGetCrossResource) Get() serializer.Response {
 		Data: form,
 	}
 }
+
+type ComputerProjectListService struct {
+	ID int `json:"id" uri:"id"`
+}
+type ComputerProjectListForm struct {
+	ID          int    `json:"id"`
+	Name        string `json:"name"`
+	Category    string `json:"category"`
+	Description string `json:"description"`
+	Arguments   string `json:"arguments"`
+	Control     string `json:"control"`
+	CoverUri    string `json:"cover_uri"`
+}
+
+func (service *ComputerProjectListService) List() serializer.Response {
+	computerProject, err := model.GetComputerProjectByComputerId(service.ID)
+	ids := make([]int, 0)
+	if err != nil {
+		return serializer.Err(serializer.CodeDBError, "获取计算机项目失败", err)
+	}
+	for _, cp := range computerProject {
+		ids = append(ids, int(cp.ProjectID))
+	}
+	projects, err := model.GetProjectByIds(ids)
+	if err != nil {
+		return serializer.Err(serializer.CodeDBError, "获取项目列表失败", err)
+	}
+	return serializer.Response{
+		Data: projects,
+	}
+}

@@ -41,6 +41,11 @@ type server struct {
 	Ip   string
 	Port uint
 }
+type zebus struct {
+	Ip       string
+	HttpPort int
+	WsPort   int
+}
 
 type log struct {
 	Name         string
@@ -61,6 +66,10 @@ HashIDSalt = {HashIDSalt}
 [Server]
 Ip = "127.0.0.1"
 Port = 1111
+[Zebus]
+Ip = "192.168.0.222"
+HttpPort = 9191
+WsPort = 8181
 `
 
 func Init(path string) error {
@@ -90,6 +99,7 @@ func Init(path string) error {
 		"System":   SystemConfig,
 		"CORS":     CORSConfig,
 		"Server":   ServerConfig,
+		"Zebus":    ZebusConfig,
 	}
 	for sectionName, sectionStruct := range sections {
 		err = mapSection(sectionName, sectionStruct)

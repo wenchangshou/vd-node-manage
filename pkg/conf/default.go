@@ -10,6 +10,11 @@ var ServerConfig = &server{
 	Ip:   "127.0.0.1",
 	Port: 1111,
 }
+var ZebusConfig = &zebus{
+	Ip:       "127.0.0.1",
+	HttpPort: 9191,
+	WsPort:   8181,
+}
 
 // CORSConfig 跨域配置
 var CORSConfig = &cors{
