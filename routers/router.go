@@ -118,6 +118,7 @@ func InitMasterRouter() *gin.Engine {
 		{
 			system.GET("exportProjectRecord", controllers.ExportProjectRecord)
 		}
+
 		// layout := v1.Group("layout")
 		// {
 		// 	layout.PUT("", controllers.OpenMultiScreen)

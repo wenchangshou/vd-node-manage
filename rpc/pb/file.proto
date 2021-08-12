@@ -1,0 +1,25 @@
+syntax="proto3";
+package pb;
+option go_package = "github.com/wenchangshou2/vd-node-manage/rpc/pb";
+import "google/protobuf/wrappers.proto";
+
+service FileManagement {
+	rpc getFileInfoByProjectReleaseID(google.protobuf.Int32Value)returns  (GetFileInfoByProjectReleaseIDResponse);
+}
+message File {
+	int32 ID=1;
+	string name = 2;
+	int64 size=3;
+	string url=4;
+	string sourceName = 5;
+	string uuid = 6;
+
+}
+message GetFileInfoByProjectReleaseIDResponse{
+	int32 ID=1;
+	string name = 2;
+	int64 size=3;
+	string url=4;
+	string sourceName = 5;
+	string uuid = 6;
+}

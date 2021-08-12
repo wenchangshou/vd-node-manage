@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net"
 
-	pb "github.com/wenchangshou2/vd-node-manage/pb"
 	"github.com/wenchangshou2/vd-node-manage/pkg/logging"
+	"github.com/wenchangshou2/vd-node-manage/rpc/pb"
 	"google.golang.org/grpc"
 )
 
@@ -21,6 +21,7 @@ func InitRpc(port string) error {
 	pb.RegisterFileManagementServer(s, &FileServer{})
 	pb.RegisterComputerManagementServer(s, &ComputerServer{})
 	pb.RegisterResourceManagementServer(s, &ResourceServer{})
+	pb.RegisterPubsubServiceServer(s, NewPubsubService())
 
 	if err := s.Serve(lis); err != nil {
 		logging.G_Logger.Error(fmt.Sprintf("grpc new server error:%v", err))

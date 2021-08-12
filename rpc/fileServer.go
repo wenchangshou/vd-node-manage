@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/wenchangshou2/vd-node-manage/model"
-	"github.com/wenchangshou2/vd-node-manage/pb"
+	"github.com/wenchangshou2/vd-node-manage/rpc/pb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
