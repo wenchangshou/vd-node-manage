@@ -1,11 +1,11 @@
-package rpc
+package rpcServer
 
 import (
 	"context"
 	"fmt"
 
 	"github.com/wenchangshou2/vd-node-manage/model"
-	"github.com/wenchangshou2/vd-node-manage/rpc/pb"
+	"github.com/wenchangshou2/vd-node-manage/rpc/server/pb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 

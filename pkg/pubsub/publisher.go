@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/wenchangshou2/vd-node-manage/rpc/pb"
+	pb "github.com/wenchangshou2/vd-node-manage/rpc/server/pb"
 )
 
 var wgPool = sync.Pool{New: func() interface{} { return new(sync.WaitGroup) }}

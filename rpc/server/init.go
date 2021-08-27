@@ -1,11 +1,11 @@
-package rpc
+package rpcServer
 
 import (
 	"fmt"
 	"net"
 
 	"github.com/wenchangshou2/vd-node-manage/pkg/logging"
-	"github.com/wenchangshou2/vd-node-manage/rpc/pb"
+	"github.com/wenchangshou2/vd-node-manage/rpc/server/pb"
 	"google.golang.org/grpc"
 )
 

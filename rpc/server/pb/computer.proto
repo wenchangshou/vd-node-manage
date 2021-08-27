@@ -1,5 +1,5 @@
 syntax = "proto3";
-option go_package = "github.com/wenchangshou2/vd-node-manage/rpc/pb";
+option go_package = "github.com/wenchangshou2/vd-node-manage/rpc/server/pb";
 import "rpc/pb/file.proto";
 import "google/protobuf/wrappers.proto";
 

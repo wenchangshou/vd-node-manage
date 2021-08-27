@@ -5,8 +5,8 @@ import (
 
 	"github.com/wenchangshou2/vd-node-manage/model"
 	"github.com/wenchangshou2/vd-node-manage/pkg/serializer"
-	"github.com/wenchangshou2/vd-node-manage/rpc"
-	"github.com/wenchangshou2/vd-node-manage/rpc/pb"
+	rpcServer "github.com/wenchangshou2/vd-node-manage/rpc/server"
+	"github.com/wenchangshou2/vd-node-manage/rpc/server/pb"
 )
 
 type ComputerProjectDirectoryService struct {
@@ -33,7 +33,7 @@ func (service *ComputerProjectDirectoryService) Get() serializer.Response {
 	// 	return serializer.DBErr("获取项目发行版本失败", err)
 	// }
 
-	rpc.G_pubsubSerice.Publish(context.Background(), &pb.PublishChannel{Topic: computer.Ip, Id: "123456", Body: "{}", Action: "test"})
+	rpcServer.G_pubsubSerice.Publish(context.Background(), &pb.PublishChannel{Topic: computer.Ip, Id: "123456", Body: "{}", Action: "test"})
 	return serializer.Response{}
 
 }

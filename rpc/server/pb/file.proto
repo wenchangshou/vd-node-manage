@@ -1,6 +1,6 @@
 syntax="proto3";
 package pb;
-option go_package = "github.com/wenchangshou2/vd-node-manage/rpc/pb";
+option go_package = "github.com/wenchangshou2/vd-node-manage/rpc/server/pb";
 import "google/protobuf/wrappers.proto";
 
 service FileManagement {
