@@ -23,7 +23,7 @@ type FileCreateService struct {
 
 func (service *FileCreateService) Create(c *gin.Context, user *model.User) serializer.Response {
 	var (
-		id uint
+		id string
 	)
 	// 如果当前采用本地上传
 	if service.Mode == "upload" {
@@ -58,7 +58,7 @@ func (service *FileCreateService) Create(c *gin.Context, user *model.User) seria
 }
 
 type FileDownloadService struct {
-	ID uint `uri:"id" form:"id"`
+	ID string `uri:"id" form:"id"`
 }
 
 func (service FileDownloadService) Download(c *gin.Context) serializer.Response {

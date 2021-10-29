@@ -56,23 +56,44 @@ func InitMasterRouter() *gin.Engine {
 		computer := v1.Group("computer")
 		{
 			computer.PUT("", controllers.UpdateComputer)
+			computer.GET(":id/register", controllers.GetComputerRegisterStatus)
 			computer.GET(":id/details", controllers.GetComputerDetails)
 			computer.PUT(":id/name", controllers.UpdateComputerName)
 			computer.GET(":id/project", controllers.ListComputerProject)
+			computer.GET(":id/resource", controllers.ListComputerResource)
+			computer.GET(":id/task", controllers.GetComputerTask)
+			computer.DELETE(":id/resource/:resource_id", controllers.DeleteComputerResource)
+			computer.POST(":id/resource/:resource_id", controllers.AddComputerResource)
+			computer.GET(":id/projectRelease", controllers.ListComputerProjectRelease)
+			computer.POST(":id/projectRelease/:project_release_id", controllers.AddComputerProjectRelease)
+			computer.GET(":id/projectRelease/:project_release_id", controllers.GetComputerProjectRelease)
+			computer.DELETE(":id/projectRelease/:project_release_id", controllers.DeleteComputerProjectRelease)
 			computer.GET("", controllers.ListComputer)
 			computer.POST(":id/layout", controllers.OpenMultiScreen)
 			computer.POST(":id/:projectID/dir", controllers.GetComputerProjectDir)
+			computer.POST(":id/customLayout", controllers.CreateCustomLayout)
+			computer.GET(":id/customLayout", controllers.GetComputerCustomLayout)
+			computer.GET(":id/exhibition", controllers.GetComputerExhibition)
+		}
+		exhibitionCategory := v1.Group("category")
+		{
+			exhibitionCategory.POST("", controllers.CreateExhibitionCategory)
 		}
 
 		projectRelease := v1.Group("projectRelease")
 		{
 			projectRelease.GET(":id", controllers.GetProjectRelease)
 			projectRelease.POST(":id/publish", controllers.PublishProject)
+			projectRelease.GET(":id/file")
 		}
 		resources := v1.Group("resource")
 		{
 			resources.DELETE(":id", controllers.DeleteResource)
 			resources.POST(":id/publish", controllers.PublishResource)
+			resources.POST("list", controllers.ListResource)
+			resources.POST("", controllers.CreateResource)
+			resources.GET(":id/file", controllers.DownloadResourceFile)
+			resources.DELETE("id/file", controllers.DeleteResourceFile)
 		}
 	}
 	auth := v1.Group("")
@@ -86,6 +107,8 @@ func InitMasterRouter() *gin.Engine {
 		{
 			computer.GET("cross", controllers.GetCrossResources)
 			computer.POST(":id/exhibition", controllers.OpenComputerExhibition)
+			computer.POST(":id/report",controllers.ReportComputerInfo)
+			computer.GET(":id/heartbeat",controllers.Heartbeat)
 		}
 		project := auth.Group("project")
 		{
@@ -102,27 +125,34 @@ func InitMasterRouter() *gin.Engine {
 			projectRelease.POST("", controllers.CreateProjectRelease)
 			projectRelease.DELETE(":id", controllers.DeleteProjectRelease)
 		}
-		resources := v1.Group("resource")
-		{
-			resources.GET("", controllers.ListResource)
-			resources.POST("", controllers.CreateResource)
-		}
+
 		task := v1.Group("task")
 		{
+			task.POST("list", controllers.ListTask)
 			task.POST("project", controllers.CreateProjectTask)
 			task.DELETE("project", controllers.DeleteProjectTask)
 			task.POST("resource", controllers.CreateResourceTask)
-			task.GET("", controllers.ListTask)
+			task.POST("",controllers.UpdateTask)
+			task.POST("taskItem",controllers.UpdateTaskItem)
 		}
 		system := v1.Group("system")
 		{
 			system.GET("exportProjectRecord", controllers.ExportProjectRecord)
 		}
 
-		// layout := v1.Group("layout")
-		// {
-		// 	layout.PUT("", controllers.OpenMultiScreen)
-		// }
+		exhibition := v1.Group("exhibition")
+		{
+			exhibition.POST("", controllers.CreateComputerExhibition)
+			exhibition.PUT("", controllers.UpdateExhbition)
+			exhibition.GET(":id", controllers.GetExhibition)
+			exhibition.DELETE(":id", controllers.DeleteExhibition)
+		}
+		module := v1.Group("module")
+		{
+			module.GET("", controllers.ListModule)
+			module.DELETE(":id", controllers.DeleteModule)
+			module.POST("", controllers.CreateModule)
+		}
 	}
 	return r
 }

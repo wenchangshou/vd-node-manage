@@ -1,15 +1,15 @@
 package computer
 
 import (
-	"github.com/gin-gonic/gin"
 	"github.com/wenchangshou2/vd-node-manage/model"
 	"github.com/wenchangshou2/vd-node-manage/pkg/serializer"
+	"gorm.io/gorm"
 )
 
-type ComputerListService struct {
+type ListService struct {
 }
 
-func (service *ComputerListService) List(c *gin.Context) serializer.Response {
+func (service *ListService) List() serializer.Response {
 	computer, total := model.ListComputer()
 	return serializer.Response{
 		Data: map[string]interface{}{
@@ -19,67 +19,100 @@ func (service *ComputerListService) List(c *gin.Context) serializer.Response {
 	}
 }
 
-type ComputerUpdateService struct {
-	Ip       string `json:"ip" form:"ip" binding:"required"`
-	Mac      string `json:"mac" form:"mac" binding:"required"`
+type UpdateService struct {
+	ID       string `json:"id"`
 	HostName string `json:"host_name"`
+	Screen   string `json:"screen"`
+	IP       string `json:"ip"`
+	Mac      string `json:"mac"`
+	Name     string `json:"name"`
+	Status int `json:"status"`
 }
 
-func (service *ComputerUpdateService) Update(c *gin.Context) serializer.Response {
-	client := model.Computer{
-		Ip:       service.Ip,
-		Mac:      service.Mac,
-		HostName: service.HostName,
-	}
-	if client.IsExistByMac() {
-		if err := client.UpdateByMac(); err != nil {
-			return serializer.Err(403, "更新客户端信息失败", err)
-		}
-		return serializer.Response{}
-	}
-	if err := client.Create(); err != nil {
-		return serializer.Err(403, "创建客户端信息失败", err)
-	}
-	return serializer.Response{}
-}
-
-type ComputerGetDetailsService struct {
-	ID int `json:"id" form:"id" uri:"id"`
-}
-type ComputerGetDetailsForm struct {
-	model.Computer
-	Projects  []model.ProjectRelease
-	Resources []model.ComputerResource
-}
-
-func (service *ComputerGetDetailsService) Get(c *gin.Context) serializer.Response {
-	computerForm := ComputerGetDetailsForm{}
+func (service *UpdateService) Update() serializer.Response {
 	computer, err := model.GetComputerById(service.ID)
+	create := false
+	if gorm.ErrRecordNotFound == err {
+		computer = model.Computer{}
+		computer.ID = service.ID
+		create = true
+	}
+	if len(service.Name) > 0 {
+		computer.Name = service.Name
+	}
+	if len(service.Screen) > 0 {
+		computer.Screen = service.Screen
+	}
+	if len(service.HostName) > 0 {
+		computer.HostName = service.HostName
+	}
+	if len(service.IP) > 0 {
+		computer.Ip = service.IP
+	}
+	if len(service.Mac) > 0 {
+		computer.Mac = service.Mac
+	}
+	if service.Status>0{
+		computer.Status=service.Status
+	}
+	if create {
+		err = computer.Create()
+	} else {
+		err = computer.Save()
+	}
 	if err != nil {
+		return serializer.Err(serializer.CodeDBError, "更新计算机信息失败", err)
+	}
+
+	return serializer.Response{}
+
+}
+
+type IDService struct {
+	ID string `json:"id" form:"id" uri:"id"`
+}
+type GetDetailsForm struct {
+	model.Computer
+	Projects []model.ProjectRelease `json:"projects"`
+}
+
+func (service IDService) Get() serializer.Response {
+	computerForm := GetDetailsForm{}
+	computer, err := model.GetComputerById(service.ID)
+	if err != nil || computer.ID == "" {
 		return serializer.Err(serializer.CodeDBError, "获取计算机信息失败", err)
 	}
 	computerForm.Computer = computer
-	projects, err := model.GetComputerProjectReleaseByComputerID(int(computer.ID))
-	if err != nil {
-		return serializer.Err(serializer.CodeDBError, "获取计算机项目列表失败", err)
+	return serializer.Response{Data: computerForm}
+}
+func (service IDService)Heartbeat()serializer.Response{
+	computer,err:=model.GetComputerById(service.ID)
+	if err!=nil{
+		return serializer.Err(serializer.CodeDBError,"获取计算机实例错误",err)
 	}
-	computerForm.Projects = projects
-	resources, err := model.GetComputerResourceByComputerId(int(computer.ID))
-	if err != nil {
-		return serializer.Err(serializer.CodeDBError, "获取计算机资源失败", err)
+	err=computer.Heartbeat()
+	if err!=nil{
+		return serializer.Err(serializer.CodeDBError,"更新上线时间错误",err)
 	}
-	computerForm.Resources = resources
-	return serializer.Response{Data: map[string]interface{}{
-		"items": computerForm,
-	}}
+	return serializer.Response{}
+}
+func (service IDService) IsRegister() serializer.Response {
+	computer, err := model.GetComputerById(service.ID)
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return serializer.Err(serializer.CodeDBError, "读取计算机信息错误", err)
+	}
+	return serializer.Response{
+		Data: computer.ID != "",
+	}
+
 }
 
-type ComputerUpdateNameService struct {
-	ID   int    `json:"id"`
+type UpdateNameService struct {
+	ID   string `json:"id"`
 	Name string `json:"name" form:"name" binding:"required"`
 }
 
-func (service *ComputerUpdateNameService) Update(c *gin.Context) serializer.Response {
+func (service *UpdateNameService) Update() serializer.Response {
 	data := make(map[string]interface{})
 	data["name"] = service.Name
 	err := model.UpdateComputerById(service.ID, data)
@@ -88,3 +121,17 @@ func (service *ComputerUpdateNameService) Update(c *gin.Context) serializer.Resp
 	}
 	return serializer.Response{}
 }
+
+type GetComputerService struct {
+	ID string `json:"id" uri:"id" form:"id" binding:"required"`
+}
+
+func (service *GetComputerService) Get() serializer.Response {
+
+	computer, err := model.GetComputerById(service.ID)
+	if err != nil || computer.ID == "" {
+		return serializer.Err(serializer.CodeDBError, "获取计算机信息失败", err)
+	}
+	return serializer.Response{}
+}
+

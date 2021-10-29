@@ -5,18 +5,18 @@ import (
 	"strings"
 
 	"github.com/wenchangshou2/vd-node-manage/pkg/logging"
-	"gorm.io/gorm"
 )
 
 type Project struct {
-	gorm.Model
+	Base
+	Status        int    `gorm:"status" json:"status"`
 	Start         string `gorm:"start" json:"start"`
 	Name          string `gorm:"size:50" json:"name"`
 	Category      string `gorm:"category" json:"category"`
 	Description   string `gorm:"description" json:"description"`
 	Arguments     string `gorm:"arguments" json:"arguments"`
 	Control       string `gorm:"control" json:"control"`
-	Cover         int    `gorm:"cover" json:"_"`
+	Cover         string `gorm:"cover" json:"_"`
 	CoverImageUrl string `json:"cover_image_url"`
 	File          File   `gorm:"foreignKey:Cover" json:"_"`
 }
@@ -26,10 +26,10 @@ func (project *Project) TableName() string {
 }
 
 // Create 创建一个项目
-func (project *Project) Create() (uint, error) {
+func (project *Project) Create() (string, error) {
 	if err := DB.Create(project).Error; err != nil {
 		logging.G_Logger.Warn(fmt.Sprintf("无法插入离线下载任务：%s", err))
-		return 0, err
+		return "", err
 	}
 	return project.ID, nil
 }
@@ -61,11 +61,11 @@ func GetProjects(Page int, size int, orderBy string, conditions map[string]strin
 	tx.Debug().Limit(size).Offset((Page - 1) * size).Find(&res)
 	return res, total
 }
-func GetProjectByIds(ids []int) ([]Project, error) {
+func GetProjectByIds(ids []string) ([]Project, error) {
 	var projects []Project
 	result := DB.Debug().Model(&Project{}).Where("project.id in  ? ", ids).Joins("File").Find(&projects)
 	for key, project := range projects {
-		if project.File.ID > 0 {
+		if project.File.ID != "" {
 			projects[key].CoverImageUrl = "upload/" + project.File.SourceName
 		}
 	}

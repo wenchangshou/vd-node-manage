@@ -19,7 +19,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type FileManagementClient interface {
-	GetFileInfoByProjectReleaseID(ctx context.Context, in *wrapperspb.Int32Value, opts ...grpc.CallOption) (*GetFileInfoByProjectReleaseIDResponse, error)
+	GetFileInfoByProjectReleaseID(ctx context.Context, in *wrapperspb.StringValue, opts ...grpc.CallOption) (*GetFileInfoByProjectReleaseIDResponse, error)
 }
 
 type fileManagementClient struct {
@@ -30,7 +30,7 @@ func NewFileManagementClient(cc grpc.ClientConnInterface) FileManagementClient {
 	return &fileManagementClient{cc}
 }
 
-func (c *fileManagementClient) GetFileInfoByProjectReleaseID(ctx context.Context, in *wrapperspb.Int32Value, opts ...grpc.CallOption) (*GetFileInfoByProjectReleaseIDResponse, error) {
+func (c *fileManagementClient) GetFileInfoByProjectReleaseID(ctx context.Context, in *wrapperspb.StringValue, opts ...grpc.CallOption) (*GetFileInfoByProjectReleaseIDResponse, error) {
 	out := new(GetFileInfoByProjectReleaseIDResponse)
 	err := c.cc.Invoke(ctx, "/pb.FileManagement/getFileInfoByProjectReleaseID", in, out, opts...)
 	if err != nil {
@@ -43,7 +43,7 @@ func (c *fileManagementClient) GetFileInfoByProjectReleaseID(ctx context.Context
 // All implementations must embed UnimplementedFileManagementServer
 // for forward compatibility
 type FileManagementServer interface {
-	GetFileInfoByProjectReleaseID(context.Context, *wrapperspb.Int32Value) (*GetFileInfoByProjectReleaseIDResponse, error)
+	GetFileInfoByProjectReleaseID(context.Context, *wrapperspb.StringValue) (*GetFileInfoByProjectReleaseIDResponse, error)
 	mustEmbedUnimplementedFileManagementServer()
 }
 
@@ -51,7 +51,7 @@ type FileManagementServer interface {
 type UnimplementedFileManagementServer struct {
 }
 
-func (UnimplementedFileManagementServer) GetFileInfoByProjectReleaseID(context.Context, *wrapperspb.Int32Value) (*GetFileInfoByProjectReleaseIDResponse, error) {
+func (UnimplementedFileManagementServer) GetFileInfoByProjectReleaseID(context.Context, *wrapperspb.StringValue) (*GetFileInfoByProjectReleaseIDResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetFileInfoByProjectReleaseID not implemented")
 }
 func (UnimplementedFileManagementServer) mustEmbedUnimplementedFileManagementServer() {}
@@ -68,7 +68,7 @@ func RegisterFileManagementServer(s grpc.ServiceRegistrar, srv FileManagementSer
 }
 
 func _FileManagement_GetFileInfoByProjectReleaseID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(wrapperspb.Int32Value)
+	in := new(wrapperspb.StringValue)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func _FileManagement_GetFileInfoByProjectReleaseID_Handler(srv interface{}, ctx 
 		FullMethod: "/pb.FileManagement/getFileInfoByProjectReleaseID",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(FileManagementServer).GetFileInfoByProjectReleaseID(ctx, req.(*wrapperspb.Int32Value))
+		return srv.(FileManagementServer).GetFileInfoByProjectReleaseID(ctx, req.(*wrapperspb.StringValue))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -98,5 +98,5 @@ var FileManagement_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "rpc/pb/file.proto",
+	Metadata: "rpc/server/pb/file.proto",
 }

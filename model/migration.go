@@ -20,7 +20,18 @@ func migration() error {
 	if conf.DatabaseConfig.Type == "mysql" {
 		DB = DB.Set("gorm:table_options", "ENGINE=InnoDB")
 	}
-	err = DB.AutoMigrate(&User{}, &Setting{}, &Project{}, &File{}, &ProjectRelease{}, &Computer{}, &Resource{}, &Task{}, &TaskItem{}, &ComputerProject{}, &ComputerResource{})
+	err = DB.AutoMigrate(&User{}, &Setting{}, &Project{}, &File{}, &ProjectRelease{},
+		&Computer{},
+		&Resource{},
+		&Task{},
+		&TaskItem{},
+		&ExhibitionCategory{},
+		&Exhibition{},
+		&CustomLayout{},
+		&Window{},
+		&Module{},
+		&ExhibitionWindowItem{},
+	)
 	if err != nil {
 		logging.G_Logger.Error("数据库迁移失败:" + err.Error())
 		return err

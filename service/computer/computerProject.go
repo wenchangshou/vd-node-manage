@@ -3,7 +3,6 @@ package computer
 import (
 	"github.com/wenchangshou2/vd-node-manage/model"
 	"github.com/wenchangshou2/vd-node-manage/pkg/serializer"
-	"github.com/wenchangshou2/vd-node-manage/pkg/util"
 )
 
 type ApplicationParams struct {
@@ -16,7 +15,7 @@ type ApplicationParams struct {
 	Message       []string `json:"message"`
 }
 type ApplicationItem struct {
-	ID        int               `json:"id"`
+	ID        string            `json:"id"`
 	Name      string            `json:"name"`
 	Path      string            `json:"path"`
 	Arguments ApplicationParams `json:"arguments"`
@@ -25,7 +24,7 @@ type ApplicationList []ApplicationItem
 
 func (service *ApplicationList) Add(projectRelease model.ProjectRelease) {
 	item := ApplicationItem{
-		ID:   int(projectRelease.ID),
+		ID:   projectRelease.ID,
 		Name: projectRelease.Project.Name,
 		Path: projectRelease.File.Uuid,
 		Arguments: ApplicationParams{
@@ -53,7 +52,7 @@ func (service *ResourceList) Add(resource *model.Resource) {
 	item := ResourceItem{
 		Name: resource.Name,
 		Path: resource.File.SourceName,
-		ID:   int(resource.ID),
+		ID:   resource.ID,
 	}
 	switch resource.Category {
 	case "image":
@@ -79,7 +78,7 @@ func NewResourceList() ResourceList {
 type ResourceItem struct {
 	Path string `json:"path"`
 	Name string `json:"name"`
-	ID   int    `json:"id"`
+	ID   string `json:"id"`
 }
 type ComputerProjectGetCrossResource struct {
 }
@@ -90,58 +89,58 @@ type CrossResourceForm struct {
 	Resource    ResourceList    `json:"resource"`
 }
 
-func (service *ComputerProjectGetCrossResource) getProject(ids []int) (ApplicationList, error) {
+func (service *ComputerProjectGetCrossResource) getProject(ids []string) (ApplicationList, error) {
 	arrayList := ApplicationList{}
-	projectReleaseMap := make(map[uint][]int)
-	computerProjectList, err := model.GetComputerCrossProject(ids)
-	if err != nil {
-		return nil, err
-	}
-	for _, cp := range computerProjectList {
-		if projectReleaseItem, ok := projectReleaseMap[cp.ProjectReleaseID]; ok {
-			projectReleaseMap[cp.ProjectReleaseID] = append(projectReleaseItem, int(cp.ComputerId))
-			continue
-		}
-		projectReleaseMap[cp.ProjectReleaseID] = make([]int, 0)
-		projectReleaseMap[cp.ProjectReleaseID] = append(projectReleaseMap[cp.ProjectReleaseID], int(cp.ComputerId))
-	}
-	for projectReleaseID, computerIds := range projectReleaseMap {
-		if util.IntArrayEquals(ids, computerIds) {
-			pr, err := model.GetProjectReleaseByID(projectReleaseID)
-			if err != nil {
-				continue
-			}
-			arrayList.Add(pr)
-		}
-	}
+	// projectReleaseMap := make(map[string][]string)
+	// computerProjectList, err := model.GetComputerCrossProject(ids)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// for _, cp := range computerProjectList {
+	// 	if projectReleaseItem, ok := projectReleaseMap[cp.ProjectReleaseID]; ok {
+	// 		projectReleaseMap[cp.ProjectReleaseID] = append(projectReleaseItem, cp.ComputerId)
+	// 		continue
+	// 	}
+	// 	projectReleaseMap[cp.ProjectReleaseID] = make([]string, 0)
+	// 	projectReleaseMap[cp.ProjectReleaseID] = append(projectReleaseMap[cp.ProjectReleaseID], cp.ComputerId)
+	// }
+	// for projectReleaseID, computerIds := range projectReleaseMap {
+	// 	if util.IntArrayEquals(ids, computerIds) {
+	// 		pr, err := model.GetProjectReleaseByID(projectReleaseID)
+	// 		if err != nil {
+	// 			continue
+	// 		}
+	// 		arrayList.Add(pr)
+	// 	}
+	// }
 	return arrayList, nil
 }
 
-func (service *ComputerProjectGetCrossResource) getResource(ids []int) (ResourceList, error) {
-	resourceMap := make(map[uint][]int)
+func (service *ComputerProjectGetCrossResource) getResource(ids []string) (ResourceList, error) {
+	// resourceMap := make(map[string][]string)
 	resourceList := NewResourceList()
 	// 获取资源
-	computerResources, err := model.GetComputerResourcesByComputerIds(ids)
-	if err != nil {
-		return resourceList, err
-	}
-	for _, cr := range computerResources {
-		if _, ok := resourceMap[cr.ResourceID]; ok {
-			resourceMap[cr.ResourceID] = append(resourceMap[cr.ResourceID], int(cr.ComputerID))
-			continue
-		}
-		resourceMap[cr.ResourceID] = make([]int, 0)
-		resourceMap[cr.ResourceID] = append(resourceMap[cr.ResourceID], int(cr.ComputerID))
-	}
-	for resourceID, computerIds := range resourceMap {
-		if util.IntArrayEquals(computerIds, ids) {
-			resource, err := model.GetResourceById(resourceID)
-			if err != nil {
-				continue
-			}
-			resourceList.Add(resource)
-		}
-	}
+	// computerResources, err := model.GetComputerResourcesByComputerIds(ids)
+	// if err != nil {
+	// 	return resourceList, err
+	// }
+	// for _, cr := range computerResources {
+	// 	if _, ok := resourceMap[cr.ResourceID]; ok {
+	// 		resourceMap[cr.ResourceID] = append(resourceMap[cr.ResourceID], cr.ComputerID)
+	// 		continue
+	// 	}
+	// 	resourceMap[cr.ResourceID] = make([]string, 0)
+	// 	resourceMap[cr.ResourceID] = append(resourceMap[cr.ResourceID], cr.ComputerID)
+	// }
+	// for resourceID, computerIds := range resourceMap {
+	// 	if util.IntArrayEquals(computerIds, ids) {
+	// 		resource, err := model.GetResourceById(resourceID)
+	// 		if err != nil {
+	// 			continue
+	// 		}
+	// 		resourceList.Add(resource)
+	// 	}
+	// }
 	return resourceList, nil
 }
 
@@ -153,9 +152,9 @@ func (service *ComputerProjectGetCrossResource) Get() serializer.Response {
 	computers, _ := model.ListComputer()
 	form := CrossResourceForm{}
 
-	ids := make([]int, 0)
+	ids := make([]string, 0)
 	for _, computer := range computers {
-		ids = append(ids, int(computer.ID))
+		ids = append(ids, computer.ID)
 	}
 	form.Application, err = service.getProject(ids)
 	if err != nil {
@@ -171,10 +170,10 @@ func (service *ComputerProjectGetCrossResource) Get() serializer.Response {
 }
 
 type ComputerProjectListService struct {
-	ID int `json:"id" uri:"id"`
+	ID string `json:"id" uri:"id"`
 }
 type ComputerProjectListForm struct {
-	ID          int    `json:"id"`
+	ID          string `json:"id"`
 	Name        string `json:"name"`
 	Category    string `json:"category"`
 	Description string `json:"description"`
@@ -184,19 +183,78 @@ type ComputerProjectListForm struct {
 }
 
 func (service *ComputerProjectListService) List() serializer.Response {
-	computerProject, err := model.GetComputerProjectByComputerId(service.ID)
-	ids := make([]int, 0)
+	// computerProject, err := model.GetComputerProjectByComputerId(service.ID)
+	// ids := make([]string, 0)
+	// if err != nil {
+	// 	return serializer.Err(serializer.CodeDBError, "获取计算机项目失败", err)
+	// }
+	// for _, cp := range computerProject {
+	// 	ids = append(ids, cp.ProjectID)
+	// }
+	// projects, err := model.GetProjectByIds(ids)
+	// if err != nil {
+	// 	return serializer.Err(serializer.CodeDBError, "获取项目列表失败", err)
+	// }
+	return serializer.Response{
+		// Data: projects,
+	}
+}
+
+type ComputerProjectReleaseService struct {
+	ID               string `json:"id" uri:"id" form:"id"`
+	ProjectReleaseID string `json:"project_release_id" uri:"project_release_id" form:"project_release_id"`
+}
+
+func (service ComputerProjectReleaseService) Create() serializer.Response {
+	computer, err := model.GetComputerById(service.ID)
 	if err != nil {
+		return serializer.Err(serializer.CodeDBError, "获取计算机失败", err)
+	}
+	projectRelease, err := model.GetProjectReleaseByID(service.ProjectReleaseID)
+	if err != nil {
+		return serializer.Err(serializer.CodeDBError, "获取计算机发行版本错误", err)
+	}
+	err = computer.AddProject(projectRelease)
+	if err != nil {
+		return serializer.Err(serializer.CodeDBError, "添加计算机项目失败", err)
+	}
+	return serializer.Response{}
+}
+
+func (service ComputerProjectReleaseService) Delete() serializer.Response {
+	computer, err := model.GetComputerById(service.ID)
+	if err != nil {
+		return serializer.Err(serializer.CodeDBError, "获取计算机失败", err)
+	}
+	projectRelease, err := model.GetProjectReleaseByID(service.ProjectReleaseID)
+	if err != nil {
+		return serializer.Err(serializer.CodeDBError, "获取计算机发行版本错误", err)
+	}
+	err = computer.DeleteProject(projectRelease)
+	if err != nil {
+		return serializer.Err(serializer.CodeDBError, "删除计算机项目失败", err)
+	}
+	return serializer.Response{}
+}
+func (service ComputerProjectReleaseService) Get() serializer.Response {
+	computer, err := model.GetComputerById(service.ID)
+	if err != nil {
+		return serializer.Err(serializer.CodeDBError, "获取计算机失败", err)
+	}
+	projectRelease, err := computer.GetComputerProject(service.ProjectReleaseID)
+	if err != nil || projectRelease.ID == "" {
 		return serializer.Err(serializer.CodeDBError, "获取计算机项目失败", err)
 	}
-	for _, cp := range computerProject {
-		ids = append(ids, int(cp.ProjectID))
-	}
-	projects, err := model.GetProjectByIds(ids)
-	if err != nil {
-		return serializer.Err(serializer.CodeDBError, "获取项目列表失败", err)
-	}
 	return serializer.Response{
-		Data: projects,
+		Data: projectRelease,
 	}
+}
+
+func (service ComputerProjectReleaseService) List() serializer.Response {
+	computer, err := model.GetComputerById(service.ID)
+	if err != nil {
+		return serializer.Err(serializer.CodeDBError, "获取计算机失败", err)
+	}
+	p, _ := computer.ListComputerProject()
+	return serializer.Response{Data: p}
 }

@@ -21,7 +21,7 @@ type GetDirectorForm struct {
 
 func (service *ComputerProjectDirectoryService) Get() serializer.Response {
 	computer, err := model.GetComputerById(service.ComputerID)
-	if err != nil || computer.ID == 0 {
+	if err != nil || computer.ID == "" {
 		return serializer.DBErr("获取计算机对象失败", err)
 	}
 	// project, err := model.GetComputerProjectByID(int(computer.ID), uint(service.ProjectID))

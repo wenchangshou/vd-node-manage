@@ -15,7 +15,7 @@ func (service *QueryComputerTaskService) Query() serializer.Response {
 	if err != nil {
 		return serializer.Err(serializer.CodeNoFoundComputerErr, "没有找到指定计算机", nil)
 	}
-	tasks, err := model.GetPendingTaskByComputerId(int(computer.ID))
+	tasks, err := model.GetPendingTaskByComputerId(computer.ID)
 	if err != nil {
 		return serializer.Err(serializer.CodeDBError, "获取待处理任务失败", err)
 	}

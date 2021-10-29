@@ -3,6 +3,7 @@ module github.com/wenchangshou2/vd-node-manage
 go 1.16
 
 require (
+	github.com/eclipse/paho.mqtt.golang v1.3.5 // indirect
 	github.com/frankban/quicktest v1.13.0 // indirect
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-contrib/gzip v0.0.3
@@ -13,7 +14,7 @@ require (
 	github.com/go-resty/resty/v2 v2.6.0
 	github.com/google/btree v1.0.1 // indirect
 	github.com/google/go-cmp v0.5.6 // indirect
-	github.com/google/uuid v1.2.0
+	github.com/google/uuid v1.3.0
 	github.com/json-iterator/go v1.1.11 // indirect
 	github.com/kr/pretty v0.3.0 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect

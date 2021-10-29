@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/wenchangshou2/vd-node-manage/pkg/util"
-	"gorm.io/gorm"
 )
 
 const (
@@ -24,7 +23,7 @@ const (
 
 type User struct {
 	// 表字段
-	gorm.Model
+	Base
 	Username string `gorm:"size:50"`
 	Password string `json:"-"`
 	Status   int
@@ -38,9 +37,9 @@ func GetUserByUsername(username string) (User, error) {
 }
 
 //GetActiveUserByID 通过id获取用户
-func GetActiveUserByID(ID interface{}) (User, error) {
+func GetActiveUserByID(ID string) (User, error) {
 	var user User
-	result := DB.Where("status=?", Active).First(&user, ID)
+	result := DB.Where("status=? AND ID = ?", Active, ID).First(&user)
 	return user, result.Error
 }
 func (user *User) CheckPassword(password string) (bool, error) {

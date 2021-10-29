@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/wenchangshou2/vd-node-manage/model"
-	"github.com/wenchangshou2/vd-node-manage/pkg/hashid"
 )
 
 func BuildUserResponse(user model.User) Response {
@@ -31,7 +30,7 @@ type User struct {
 
 func BuildUser(user model.User) User {
 	return User{
-		ID:        hashid.HashID(user.ID, hashid.UserID),
+		ID:        user.ID,
 		Status:    user.Status,
 		CreatedAt: user.CreatedAt,
 		UserNmae:  user.Username,

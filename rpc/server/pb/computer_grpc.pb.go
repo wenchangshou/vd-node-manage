@@ -278,5 +278,5 @@ var ComputerManagement_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "rpc/pb/computer.proto",
+	Metadata: "rpc/server/pb/computer.proto",
 }

@@ -19,7 +19,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ResourceManagementClient interface {
-	GetResourceDetailedInfo(ctx context.Context, in *wrapperspb.UInt32Value, opts ...grpc.CallOption) (*GetResourceDetailedInfoResponse, error)
+	GetResourceDetailedInfo(ctx context.Context, in *wrapperspb.StringValue, opts ...grpc.CallOption) (*GetResourceDetailedInfoResponse, error)
 }
 
 type resourceManagementClient struct {
@@ -30,7 +30,7 @@ func NewResourceManagementClient(cc grpc.ClientConnInterface) ResourceManagement
 	return &resourceManagementClient{cc}
 }
 
-func (c *resourceManagementClient) GetResourceDetailedInfo(ctx context.Context, in *wrapperspb.UInt32Value, opts ...grpc.CallOption) (*GetResourceDetailedInfoResponse, error) {
+func (c *resourceManagementClient) GetResourceDetailedInfo(ctx context.Context, in *wrapperspb.StringValue, opts ...grpc.CallOption) (*GetResourceDetailedInfoResponse, error) {
 	out := new(GetResourceDetailedInfoResponse)
 	err := c.cc.Invoke(ctx, "/ResourceManagement/GetResourceDetailedInfo", in, out, opts...)
 	if err != nil {
@@ -43,7 +43,7 @@ func (c *resourceManagementClient) GetResourceDetailedInfo(ctx context.Context, 
 // All implementations must embed UnimplementedResourceManagementServer
 // for forward compatibility
 type ResourceManagementServer interface {
-	GetResourceDetailedInfo(context.Context, *wrapperspb.UInt32Value) (*GetResourceDetailedInfoResponse, error)
+	GetResourceDetailedInfo(context.Context, *wrapperspb.StringValue) (*GetResourceDetailedInfoResponse, error)
 	mustEmbedUnimplementedResourceManagementServer()
 }
 
@@ -51,7 +51,7 @@ type ResourceManagementServer interface {
 type UnimplementedResourceManagementServer struct {
 }
 
-func (UnimplementedResourceManagementServer) GetResourceDetailedInfo(context.Context, *wrapperspb.UInt32Value) (*GetResourceDetailedInfoResponse, error) {
+func (UnimplementedResourceManagementServer) GetResourceDetailedInfo(context.Context, *wrapperspb.StringValue) (*GetResourceDetailedInfoResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetResourceDetailedInfo not implemented")
 }
 func (UnimplementedResourceManagementServer) mustEmbedUnimplementedResourceManagementServer() {}
@@ -68,7 +68,7 @@ func RegisterResourceManagementServer(s grpc.ServiceRegistrar, srv ResourceManag
 }
 
 func _ResourceManagement_GetResourceDetailedInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(wrapperspb.UInt32Value)
+	in := new(wrapperspb.StringValue)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func _ResourceManagement_GetResourceDetailedInfo_Handler(srv interface{}, ctx co
 		FullMethod: "/ResourceManagement/GetResourceDetailedInfo",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ResourceManagementServer).GetResourceDetailedInfo(ctx, req.(*wrapperspb.UInt32Value))
+		return srv.(ResourceManagementServer).GetResourceDetailedInfo(ctx, req.(*wrapperspb.StringValue))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -98,5 +98,5 @@ var ResourceManagement_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "rpc/pb/resource.proto",
+	Metadata: "rpc/server/pb/resource.proto",
 }

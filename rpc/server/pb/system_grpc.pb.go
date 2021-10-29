@@ -97,5 +97,5 @@ var SystemManagement_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "rpc/pb/system.proto",
+	Metadata: "rpc/server/pb/system.proto",
 }

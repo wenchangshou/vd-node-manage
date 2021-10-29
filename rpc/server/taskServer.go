@@ -27,13 +27,13 @@ func (s *TaskServer) getTaskTypeByNumber(t uint) pb.TaskOperatorType {
 func (s *TaskServer) ConvertTaskJsonToProtoBuf(task *model.Task, item []model.TaskItem) *pb.Task {
 	result := &pb.Task{}
 	result.Name = task.Name
-	result.Id = int32(task.ID)
+	result.Id = task.ID
 	result.TaskItem = make([]*pb.TaskItem, 0)
 	for _, _item := range item {
 		taskItem := &pb.TaskItem{}
 		taskItem.Action = pb.TaskOperatorType(_item.Action)
-		taskItem.Depend = int32(_item.Depend)
-		taskItem.Id = int32(_item.ID)
+		taskItem.Depend = _item.Depend
+		taskItem.Id = _item.ID
 		taskItem.Options = _item.Options
 		taskItem.Schedule = int32(_item.Schedule)
 		taskItem.Status = int32(_item.Status)
@@ -50,15 +50,15 @@ func (s *TaskServer) GetTaskByComputerMac(ctx context.Context, request *pb.GetTa
 		return response, err
 	}
 	if request.TaskType == pb.TaskType_ALL {
-		tasks, err = model.GetTaskListByCid(int(computer.ID))
+		tasks, err = model.GetTaskListByCid(computer.ID)
 	} else {
-		tasks, err = model.GetTaskListByCidFilterStatus(int(computer.ID), int(request.TaskType))
+		tasks, err = model.GetTaskListByCidFilterStatus(computer.ID, int(request.TaskType))
 	}
 	if err != nil {
 		return response, err
 	}
 	for _, v := range tasks {
-		subItem, _ := model.GetTaskItemById(int(v.ID))
+		subItem, _ := model.GetTaskItemById(v.ID)
 		item := s.ConvertTaskJsonToProtoBuf(&v, subItem)
 		items = append(items, item)
 	}
@@ -66,14 +66,14 @@ func (s *TaskServer) GetTaskByComputerMac(ctx context.Context, request *pb.GetTa
 	return response, nil
 }
 func (s TaskServer) SetTaskStatus(ctx context.Context, request *pb.SetTaskStatusRequest) (*wrapperspb.BoolValue, error) {
-	err := model.SetTaskStatus(uint(request.GetId()), uint(request.GetType()))
+	err := model.SetTaskStatus(request.GetId(), uint(request.GetType()))
 	return &wrapperspb.BoolValue{
 		Value: err == nil,
 	}, err
 }
 
 func (s TaskServer) SetTaskItemStatus(ctx context.Context, request *pb.SetTaskItemStatusRequest) (*wrapperspb.BoolValue, error) {
-	err := model.SetTaskItemStatus(uint(request.GetId()), uint(request.GetType()), request.Msg)
+	err := model.SetTaskItemStatus(request.GetId(), uint(request.GetType()), request.Msg)
 	return &wrapperspb.BoolValue{
 		Value: err == nil,
 	}, err

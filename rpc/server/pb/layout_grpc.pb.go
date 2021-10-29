@@ -134,5 +134,5 @@ var LayoutManage_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "rpc/pb/layout.proto",
+	Metadata: "rpc/server/pb/layout.proto",
 }

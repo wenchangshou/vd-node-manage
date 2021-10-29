@@ -14,8 +14,9 @@ func CreateProjectTask(c *gin.Context) {
 		c.JSON(200, ErrorResponse(err))
 	}
 }
+// CreateResourceTask 创建资源任务
 func CreateResourceTask(c *gin.Context) {
-	var service task.ComputerResource
+	var service task.ComputerResourcePublicService
 	if err := c.ShouldBindJSON(&service); err == nil {
 		res := service.Add()
 		c.JSON(200, res)
@@ -33,24 +34,34 @@ func DeleteProjectTask(c *gin.Context) {
 	}
 }
 
-// QueryUserTask 查询用户任务
-func QueryUserPendingTask(c *gin.Context) {
-	var service task.QueryComputerTaskService
-	if err := c.ShouldBindUri(&service); err == nil {
-		res := service.Query()
+
+// ListTask 当前任务列表
+func ListTask(c *gin.Context) {
+	var service task.ListService
+	if err := c.ShouldBind(&service); err == nil {
+		res := service.List(c)
 		c.JSON(200, res)
 	} else {
 		c.JSON(200, ErrorResponse(err))
 	}
 }
 
-// ListTask 当前任务列表
-func ListTask(c *gin.Context) {
-	var service task.TaskListService
-	if err := c.ShouldBindUri(&service); err == nil {
-		res := service.List(c)
-		c.JSON(200, res)
-	} else {
-		c.JSON(200, ErrorResponse(err))
+func UpdateTask (c *gin.Context){
+	var service task.UpdateTaskService
+	if err:=c.ShouldBind(&service);err==nil{
+		res:=service.Update()
+		c.JSON(200,res)
+	}else{
+		c.JSON(200,ErrorResponse(err))
 	}
+}
+func UpdateTaskItem(c *gin.Context){
+	var service task.UpdateTaskItemService
+	if err:=c.ShouldBind(&service);err==nil{
+		res:=service.Update()
+		c.JSON(200,res)
+	}else{
+		c.JSON(200,ErrorResponse(err))
+	}
+
 }

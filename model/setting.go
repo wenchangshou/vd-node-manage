@@ -3,12 +3,10 @@ package model
 import (
 	"net/url"
 	"strconv"
-
-	"gorm.io/gorm"
 )
 
 type Setting struct {
-	gorm.Model
+	Base
 	Type  string `gorm:"not null"`
 	Name  string `gorm:"unique;not null;index:setting_key"`
 	Value string `gorm:"size:‎65535"`

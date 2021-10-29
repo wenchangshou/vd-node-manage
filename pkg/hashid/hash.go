@@ -12,6 +12,7 @@ const (
 	ProjectID
 	FileID
 	TaskID
+	CategoryID
 )
 
 var (

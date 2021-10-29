@@ -161,5 +161,5 @@ var PubsubService_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 	},
-	Metadata: "rpc/pb/pubsub.proto",
+	Metadata: "rpc/server/pb/pubsub.proto",
 }

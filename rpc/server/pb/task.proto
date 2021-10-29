@@ -8,16 +8,16 @@ service TaskManagement{
 	rpc setTaskSchedule(SetTaskScheduleRequest) returns(google.protobuf.BoolValue);
 }
 message SetTaskScheduleRequest{
-	int32 id=1;
+	string id=1;
 	float schedule =2;
 }
 
 message SetTaskStatusRequest{
-	int32 id=1;
+	string id=1;
 	TaskType type=2;
 }
 message SetTaskItemStatusRequest{
-	int32 id=1;
+	string id=1;
 	TaskType type=2;
 	string msg=3;
 }
@@ -47,17 +47,17 @@ enum TaskOperatorType {
 	UNKNOWN=5;
 }
 message TaskItem {
-	int32 id = 1;
+	string id = 1;
 	string options =2;
 	TaskOperatorType action = 3;
 	int32 status = 4 ;
-	int32 depend = 5;
+	string depend = 5;
 	int32 schedule = 6;
 	bool active = 7;
 }
 
 message Task {
-	int32 id = 1;
+	string id = 1;
 	string name = 2;
 	repeated TaskItem taskItem = 3;
 }

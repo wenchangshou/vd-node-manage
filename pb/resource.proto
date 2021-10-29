@@ -3,10 +3,10 @@ option go_package ="github.com/wenchangshou2/vd-node-manage/pb";
 import "google/protobuf/wrappers.proto";
 
 service ResourceManagement {
-	rpc GetResourceDetailedInfo (google.protobuf.UInt32Value) returns (GetResourceDetailedInfoResponse);
+	rpc GetResourceDetailedInfo (google.protobuf.StringValue) returns (GetResourceDetailedInfoResponse);
 }
 message GetResourceDetailedInfoResponse{
-	uint32 ID = 1;
+	string ID = 1;
 	string name = 2;
 	string category =3;
 	message File {

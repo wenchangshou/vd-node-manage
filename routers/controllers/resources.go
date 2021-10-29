@@ -7,7 +7,7 @@ import (
 
 func ListResource(c *gin.Context) {
 	var service resources.ResourceListService
-	if err := c.ShouldBindUri(&service); err == nil {
+	if err := c.ShouldBindJSON(&service); err == nil {
 		res := service.List(c)
 		c.JSON(200, res)
 	} else {
@@ -36,6 +36,25 @@ func PublishResource(c *gin.Context) {
 	var service resources.ResourcePublishService
 	if err := c.ShouldBindUri(&service); err == nil {
 		res := service.Publish()
+		c.JSON(200, res)
+	} else {
+		c.JSON(200, ErrorResponse(err))
+	}
+}
+func DownloadResourceFile(c *gin.Context) {
+	var service resources.ResourceIDService
+	if err := c.ShouldBindUri(&service); err == nil {
+		res := service.Download(c)
+		c.JSON(200, res)
+	} else {
+		c.JSON(200, ErrorResponse(err))
+	}
+}
+
+func DeleteResourceFile(c *gin.Context) {
+	var service resources.ResourceIDService
+	if err := c.ShouldBindUri(&service); err == nil {
+		res := service.Delete(c)
 		c.JSON(200, res)
 	} else {
 		c.JSON(200, ErrorResponse(err))

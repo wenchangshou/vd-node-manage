@@ -13,13 +13,13 @@ type FileServer struct {
 	pb.UnimplementedFileManagementServer
 }
 
-func (server *FileServer) GetFileInfoByProjectReleaseID(ctx context.Context, id *wrapperspb.Int32Value) (*pb.GetFileInfoByProjectReleaseIDResponse, error) {
-	pr, err := model.GetProjectReleaseByID(uint(id.GetValue()))
+func (server *FileServer) GetFileInfoByProjectReleaseID(ctx context.Context, id *wrapperspb.StringValue) (*pb.GetFileInfoByProjectReleaseIDResponse, error) {
+	pr, err := model.GetProjectReleaseByID(id.GetValue())
 	if err != nil {
 		return nil, err
 	}
 	result := pb.GetFileInfoByProjectReleaseIDResponse{
-		ID:         int32(pr.File.ID),
+		ID:         pr.File.ID,
 		Size:       int64(pr.File.Size),
 		Url:        "upload/" + pr.File.SourceName,
 		SourceName: pr.File.SourceName,
