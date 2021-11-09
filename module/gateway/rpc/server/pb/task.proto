@@ -1,0 +1,63 @@
+syntax = "proto3";
+option go_package = "github.com/wenchangshou2/vd-node-manage/rpc/pb";
+import "google/protobuf/wrappers.proto";
+service TaskManagement{
+	rpc getTaskByComputerMac(GetTaskRequest)returns (TasksResponse) ;
+	rpc setTaskStatus(SetTaskStatusRequest)returns (google.protobuf.BoolValue);
+	rpc setTaskItemStatus(SetTaskItemStatusRequest)returns(google.protobuf.BoolValue);
+	rpc setTaskSchedule(SetTaskScheduleRequest) returns(google.protobuf.BoolValue);
+}
+message SetTaskScheduleRequest{
+	string id=1;
+	float schedule =2;
+}
+
+message SetTaskStatusRequest{
+	string id=1;
+	TaskType type=2;
+}
+message SetTaskItemStatusRequest{
+	string id=1;
+	TaskType type=2;
+	string msg=3;
+}
+message TasksResponse{
+	repeated Task items=1;
+}
+message GetTaskRequest{
+	string mac=1;
+	TaskType taskType=2;
+}
+message StreamActiveTask{
+
+}
+enum TaskType {
+	INITIALIZE = 0;
+	EXECUTE  =1;
+	DONE = 2;
+	ERROR=3;
+	ALL=4;
+}
+enum TaskOperatorType {
+	INSTALL_PROJECT=0;
+	INSTALL_RESOURCE=1;
+	UPGRADE_PROJECT=2;
+	DELETE_RESOURCE=3;
+	DELETE_PROJECT=4;
+	UNKNOWN=5;
+}
+message TaskItem {
+	string id = 1;
+	string options =2;
+	TaskOperatorType action = 3;
+	int32 status = 4 ;
+	string depend = 5;
+	int32 schedule = 6;
+	bool active = 7;
+}
+
+message Task {
+	string id = 1;
+	string name = 2;
+	repeated TaskItem taskItem = 3;
+}

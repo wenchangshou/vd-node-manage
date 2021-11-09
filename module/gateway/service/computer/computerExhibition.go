@@ -1,0 +1,14 @@
+package computer
+
+import (
+	"github.com/wenchangshou2/vd-node-manage/module/gateway/pkg/serializer"
+)
+
+type ComputerExhibitionOpenService struct {
+	ComputerID   int `json:"id" uri:"id"`
+	ExhibitionID int `json:"exhibitionID"`
+}
+
+func (service *ComputerExhibitionOpenService) Open() serializer.Response {
+	return serializer.Response{}
+}
