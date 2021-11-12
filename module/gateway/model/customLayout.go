@@ -2,7 +2,7 @@ package model
 
 import (
 	"fmt"
-	"github.com/wenchangshou2/vd-node-manage/module/gateway/pkg/logging"
+	"github.com/wenchangshou2/vd-node-manage/common/logging"
 )
 
 // 自定义布局
@@ -22,7 +22,7 @@ func (customLayout *CustomLayout) Create() (string, error) {
 	maxId := GetCustomLayoutMaxId()
 	customLayout.Sort = int(maxId) + 1
 	if err := DB.Create(customLayout).Error; err != nil {
-		logging.G_Logger.Warn(fmt.Sprintf("添加新的自定义布局失败:%s", err.Error()))
+		logging.GLogger.Warn(fmt.Sprintf("添加新的自定义布局失败:%s", err.Error()))
 		return "", err
 	}
 	return customLayout.ID, nil

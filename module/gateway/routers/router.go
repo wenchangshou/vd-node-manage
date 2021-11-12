@@ -1,8 +1,8 @@
 package routers
 
 import (
+	"github.com/wenchangshou2/vd-node-manage/module/gateway/g"
 	middleware2 "github.com/wenchangshou2/vd-node-manage/module/gateway/middleware"
-	"github.com/wenchangshou2/vd-node-manage/module/gateway/pkg/conf"
 	controllers2 "github.com/wenchangshou2/vd-node-manage/module/gateway/routers/controllers"
 	"net/http"
 
@@ -13,13 +13,13 @@ import (
 
 // InitCORS 初始化跨域配置
 func InitCORS(router *gin.Engine) {
-	if conf.CORSConfig.AllowOrigins[0] != "UNSET" {
+	if g.Config().Cors.AllowOrigins[0] != "UNSET" {
 		router.Use(cors.New(cors.Config{
-			AllowOrigins:     conf.CORSConfig.AllowOrigins,
-			AllowMethods:     conf.CORSConfig.AllowMethods,
-			AllowHeaders:     conf.CORSConfig.AllowHeaders,
-			AllowCredentials: conf.CORSConfig.AllowCredentials,
-			ExposeHeaders:    conf.CORSConfig.ExposeHeaders,
+			AllowOrigins:     g.Config().Cors.AllowOrigins,
+			AllowMethods:     g.Config().Cors.AllowMethods,
+			AllowHeaders:     g.Config().Cors.AllowHeaders,
+			AllowCredentials: g.Config().Cors.AllowCredentials,
+			ExposeHeaders:    g.Config().Cors.ExposeHeaders,
 		}))
 		return
 	}
@@ -32,7 +32,7 @@ func InitMasterRouter() *gin.Engine {
 	r.Use(gzip.Gzip(gzip.DefaultCompression, gzip.WithExcludedPaths([]string{"/api/"})))
 	r.StaticFS("/upload", http.Dir("./upload"))
 	v1 := r.Group("/api/v1")
-	v1.Use(middleware2.Session(conf.SystemConfig.SessionSecret))
+	v1.Use(middleware2.Session(g.Config().System.SessionSecret))
 	v1.Use(middleware2.CurrentUser())
 	{
 		site := v1.Group("site")

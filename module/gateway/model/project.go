@@ -2,7 +2,7 @@ package model
 
 import (
 	"fmt"
-	"github.com/wenchangshou2/vd-node-manage/module/gateway/pkg/logging"
+	"github.com/wenchangshou2/vd-node-manage/common/logging"
 	"strings"
 )
 
@@ -27,7 +27,7 @@ func (project *Project) TableName() string {
 // Create 创建一个项目
 func (project *Project) Create() (string, error) {
 	if err := DB.Create(project).Error; err != nil {
-		logging.G_Logger.Warn(fmt.Sprintf("无法插入离线下载任务：%s", err))
+		logging.GLogger.Warn(fmt.Sprintf("无法插入离线下载任务：%s", err))
 		return "", err
 	}
 	return project.ID, nil

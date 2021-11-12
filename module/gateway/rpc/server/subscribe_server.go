@@ -2,7 +2,7 @@ package rpcServer
 
 import (
 	"context"
-	"github.com/wenchangshou2/vd-node-manage/module/gateway/pkg/pubsub"
+	"github.com/wenchangshou2/vd-node-manage/common/publisher"
 	"github.com/wenchangshou2/vd-node-manage/module/gateway/rpc/server/pb"
 	"strings"
 	"time"
@@ -13,13 +13,13 @@ var (
 )
 
 type PubSubServer struct {
-	pub *pubsub.Publisher
+	pub *publisher.Publisher
 	pb.UnimplementedPubsubServiceServer
 }
 
-func NewPubsubService() *PubSubServer {
+func NewPubsService() *PubSubServer {
 	G_pubsubSerice = &PubSubServer{
-		pub: pubsub.NewPublisher(100*time.Millisecond, 10),
+		pub: publisher.NewPublisher(100*time.Millisecond, 10),
 	}
 	return G_pubsubSerice
 }
@@ -29,10 +29,8 @@ func (p *PubSubServer) Publish(ctx context.Context, req *pb.PublishChannel) (*pb
 }
 func (p *PubSubServer) Subscribe(channel *pb.SubscribeChannel, stream pb.PubsubService_SubscribeServer) error {
 	ch := p.pub.SubscribeTopic(func(v interface{}) bool {
-		if recv, ok := v.(*pb.PublishChannel); ok {
-			if strings.HasPrefix(recv.Topic, channel.Topic) {
-				return true
-			}
+		if rev, ok := v.(*pb.PublishChannel); ok {
+			return strings.HasPrefix(rev.Topic,channel.Topic)
 		}
 		return false
 	})

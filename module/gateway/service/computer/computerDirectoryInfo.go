@@ -2,8 +2,8 @@ package computer
 
 import (
 	"context"
+	"github.com/wenchangshou2/vd-node-manage/common/serializer"
 	"github.com/wenchangshou2/vd-node-manage/module/gateway/model"
-	"github.com/wenchangshou2/vd-node-manage/module/gateway/pkg/serializer"
 	"github.com/wenchangshou2/vd-node-manage/module/gateway/rpc/server"
 	"github.com/wenchangshou2/vd-node-manage/module/gateway/rpc/server/pb"
 )

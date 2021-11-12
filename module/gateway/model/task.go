@@ -3,12 +3,14 @@ package model
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/wenchangshou2/vd-node-manage/module/gateway/pkg/logging"
+	"github.com/wenchangshou2/vd-node-manage/common/logging"
 	"strings"
 )
+
 type TaskStatus uint
+
 const (
-	Initializes TaskStatus= iota
+	Initializes TaskStatus = iota
 	Progress
 	Done
 	Error
@@ -23,21 +25,21 @@ const (
 
 type Task struct {
 	Base
-	Name       string `gorm:"name" json:"name"`
-	Active     bool   `gorm:"active" json:"active"`
-	ComputerId string `gorm:"computer_id" json:"computer_id"`
-	Status     int    `gorm:"status" json:"status"`
+	Name       string     `gorm:"name" json:"name"`
+	Active     bool       `gorm:"active" json:"active"`
+	ComputerId string     `gorm:"computer_id" json:"computer_id"`
+	Status     int        `gorm:"status" json:"status"`
 	TaskItems  []TaskItem ``
 }
 type TaskItem struct {
 	Base
 	TaskID   string
-	Action   uint   `gorm:"action" json:"action"`
-	Status   TaskStatus    `gorm:"status" json:"status"`
-	Depend   string `gorm:"depend" json:"depend"`
-	Options  string `gorm:"options" json:"options"`
-	Message  string `gorm:"message" json:"message"`
-	Schedule int    `gorm:"schedule" json:"schedule"`
+	Action   uint       `gorm:"action" json:"action"`
+	Status   TaskStatus `gorm:"status" json:"status"`
+	Depend   string     `gorm:"depend" json:"depend"`
+	Options  string     `gorm:"options" json:"options"`
+	Message  string     `gorm:"message" json:"message"`
+	Schedule int        `gorm:"schedule" json:"schedule"`
 }
 
 func (taskItem *TaskItem) TableName() string {
@@ -50,7 +52,7 @@ func (task *Task) TableName() string {
 
 func (task *Task) Add() (string, error) {
 	if err := DB.Create(&task).Error; err != nil {
-		logging.G_Logger.Warn(fmt.Sprintf("添加任务项失败:%v", err))
+		logging.GLogger.Warn(fmt.Sprintf("添加任务项失败:%v", err))
 		return "", err
 	}
 	return task.ID, nil
@@ -183,9 +185,9 @@ func ListTask(Page int, size int, orderBy string, conditions map[string]string, 
 	tx.Debug().Limit(size).Offset((Page - 1) * size).Preload("TaskItems").Find(&res)
 	return res, total
 }
-func UpdateTaskStatusByIds(ids []string,status int)error{
-	return DB.Model(&Task{}).Where("ID=?",ids).Update("status",status).Error
+func UpdateTaskStatusByIds(ids []string, status int) error {
+	return DB.Model(&Task{}).Where("ID=?", ids).Update("status", status).Error
 }
-func UpdateTaskItemStatusByIds(ids []string,status int)error{
-	return DB.Model(&TaskItem{}).Where("ID=?",ids).Update("status",status).Error
+func UpdateTaskItemStatusByIds(ids []string, status int) error {
+	return DB.Model(&TaskItem{}).Where("ID=?", ids).Update("status", status).Error
 }

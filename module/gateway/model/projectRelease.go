@@ -2,7 +2,7 @@ package model
 
 import (
 	"fmt"
-	"github.com/wenchangshou2/vd-node-manage/module/gateway/pkg/logging"
+	"github.com/wenchangshou2/vd-node-manage/common/logging"
 )
 
 type ProjectRelease struct {
@@ -21,7 +21,7 @@ type ProjectRelease struct {
 
 func (projectRelease *ProjectRelease) Create() (string, error) {
 	if err := DB.Create(projectRelease).Error; err != nil {
-		logging.G_Logger.Warn(fmt.Sprintf("无法插入项目版本：%s", err))
+		logging.GLogger.Warn(fmt.Sprintf("无法插入项目版本：%s", err))
 		return "", err
 	}
 	return projectRelease.ID, nil
@@ -48,4 +48,3 @@ func GetProjectReleaseListByProjectID(id string) ([]ProjectRelease, error) {
 	result := DB.Debug().Model(ProjectRelease{}).Where("project_id = ?", id).Joins("File").Find(&projectList)
 	return projectList, result.Error
 }
-

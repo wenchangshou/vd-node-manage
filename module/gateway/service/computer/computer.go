@@ -1,8 +1,8 @@
 package computer
 
 import (
+	"github.com/wenchangshou2/vd-node-manage/common/serializer"
 	"github.com/wenchangshou2/vd-node-manage/module/gateway/model"
-	"github.com/wenchangshou2/vd-node-manage/module/gateway/pkg/serializer"
 	"gorm.io/gorm"
 )
 
@@ -26,7 +26,7 @@ type UpdateService struct {
 	IP       string `json:"ip"`
 	Mac      string `json:"mac"`
 	Name     string `json:"name"`
-	Status int `json:"status"`
+	Status   int    `json:"status"`
 }
 
 func (service *UpdateService) Update() serializer.Response {
@@ -52,8 +52,8 @@ func (service *UpdateService) Update() serializer.Response {
 	if len(service.Mac) > 0 {
 		computer.Mac = service.Mac
 	}
-	if service.Status>0{
-		computer.Status=service.Status
+	if service.Status > 0 {
+		computer.Status = service.Status
 	}
 	if create {
 		err = computer.Create()
@@ -85,14 +85,14 @@ func (service IDService) Get() serializer.Response {
 	computerForm.Computer = computer
 	return serializer.Response{Data: computerForm}
 }
-func (service IDService)Heartbeat() serializer.Response {
-	computer,err:=model.GetComputerById(service.ID)
-	if err!=nil{
-		return serializer.Err(serializer.CodeDBError,"获取计算机实例错误",err)
+func (service IDService) Heartbeat() serializer.Response {
+	computer, err := model.GetComputerById(service.ID)
+	if err != nil {
+		return serializer.Err(serializer.CodeDBError, "获取计算机实例错误", err)
 	}
-	err=computer.Heartbeat()
-	if err!=nil{
-		return serializer.Err(serializer.CodeDBError,"更新上线时间错误",err)
+	err = computer.Heartbeat()
+	if err != nil {
+		return serializer.Err(serializer.CodeDBError, "更新上线时间错误", err)
 	}
 	return serializer.Response{}
 }
@@ -134,4 +134,3 @@ func (service *GetComputerService) Get() serializer.Response {
 	}
 	return serializer.Response{}
 }
-

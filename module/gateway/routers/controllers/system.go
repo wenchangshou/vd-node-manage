@@ -3,7 +3,7 @@ package controllers
 import (
 	"bytes"
 	"fmt"
-	"github.com/wenchangshou2/vd-node-manage/module/gateway/pkg/serializer"
+	"github.com/wenchangshou2/vd-node-manage/common/serializer"
 	"github.com/wenchangshou2/vd-node-manage/module/gateway/service/system"
 	"net/http"
 

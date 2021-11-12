@@ -453,9 +453,9 @@ type TaskItem struct {
 	unknownFields protoimpl.UnknownFields
 
 	Id       string           `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Options string           `protobuf:"bytes,2,opt,name=options,proto3" json:"options,omitempty"`
-	Action  TaskOperatorType `protobuf:"varint,3,opt,name=action,proto3,enum=TaskOperatorType" json:"action,omitempty"`
-	Status  int32            `protobuf:"varint,4,opt,name=status,proto3" json:"status,omitempty"`
+	Options  string           `protobuf:"bytes,2,opt,name=options,proto3" json:"options,omitempty"`
+	Action   TaskOperatorType `protobuf:"varint,3,opt,name=action,proto3,enum=TaskOperatorType" json:"action,omitempty"`
+	Status   int32            `protobuf:"varint,4,opt,name=status,proto3" json:"status,omitempty"`
 	Depend   string           `protobuf:"bytes,5,opt,name=depend,proto3" json:"depend,omitempty"`
 	Schedule int32            `protobuf:"varint,6,opt,name=schedule,proto3" json:"schedule,omitempty"`
 	Active   bool             `protobuf:"varint,7,opt,name=active,proto3" json:"active,omitempty"`

@@ -3,9 +3,8 @@ package layout
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/wenchangshou2/vd-node-manage/common/serializer"
 	"github.com/wenchangshou2/vd-node-manage/module/gateway/model"
-	"github.com/wenchangshou2/vd-node-manage/module/gateway/pkg/serializer"
-
 	"github.com/wenchangshou2/vd-node-manage/zebus"
 )
 
@@ -22,21 +21,21 @@ type Source struct {
 	URI   string `json:"uri"`
 }
 type Window struct {
-	ID        string      `json:"id"`
-	X         int         `json:"x"`
-	Y         int         `json:"y"`
-	Z         int         `json:"z"`
-	Width     int         `json:"width"`
-	Height    int         `json:"height"`
-	Service   string      `json:"service"`
+	ID        string `json:"id"`
+	X         int    `json:"x"`
+	Y         int    `json:"y"`
+	Z         int    `json:"z"`
+	Width     int    `json:"width"`
+	Height    int    `json:"height"`
+	Service   string `json:"service"`
 	Arguments string `json:"arguments"`
 	Style     Style  `json:"style"`
 }
 type OpenMultiScreenService struct {
-	LayoutID string      `json:"layout_id"`
-	Kill    bool     `json:"kill"`
-	Style   Style    `json:"style"`
-	Windows []Window `json:"windows"`
+	LayoutID string   `json:"layout_id"`
+	Kill     bool     `json:"kill"`
+	Style    Style    `json:"style"`
+	Windows  []Window `json:"windows"`
 }
 
 // type LayoutOpenMultiScreenService struct {

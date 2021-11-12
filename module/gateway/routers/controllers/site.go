@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/wenchangshou2/vd-node-manage/module/gateway/pkg/serializer"
+	"github.com/wenchangshou2/vd-node-manage/common/serializer"
 )
 
 func Ping(c *gin.Context) {

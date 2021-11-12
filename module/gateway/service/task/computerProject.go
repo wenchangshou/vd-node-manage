@@ -2,8 +2,8 @@ package task
 
 import (
 	"fmt"
+	"github.com/wenchangshou2/vd-node-manage/common/serializer"
 	"github.com/wenchangshou2/vd-node-manage/module/gateway/model"
-	"github.com/wenchangshou2/vd-node-manage/module/gateway/pkg/serializer"
 )
 
 // ComputerProject 计算机项目
@@ -25,10 +25,10 @@ func (service ComputerProject) install() serializer.Response {
 	if err != nil {
 		return serializer.Err(serializer.CodeDBError, "获取对应的发行版本失败", err)
 	}
-	option["id"]=projectRelease.ID
-	option["uri"]="upload/"+projectRelease.File.SourceName
-	option["name"]=projectRelease.File.Name
-	option["source"]=projectRelease.File.SourceName
+	option["id"] = projectRelease.ID
+	option["uri"] = "upload/" + projectRelease.File.SourceName
+	option["name"] = projectRelease.File.Name
+	option["source"] = projectRelease.File.SourceName
 	// 根据项目id，获取所有的发行id
 	projectReleaseIds := make([]string, 0)
 	projectReleaseList, err := model.GetProjectReleaseListByProjectID(service.ProjectID)
@@ -49,7 +49,7 @@ func (service ComputerProject) install() serializer.Response {
 			return serializer.Err(serializer.CodeDBError, "添加任务失败", err)
 		}
 		if len(pr) > 0 {
-			_option:=make(map[string]interface{})
+			_option := make(map[string]interface{})
 			_option["id"] = service.ProjectReleaseID
 			_option["file"] = pr[0].File
 			subTask, err := model.AddTaskItem(task.ID, model.DeleteProject, _option, false, "")

@@ -2,16 +2,15 @@ package bootstrap
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/wenchangshou2/vd-node-manage/common/logging"
+	"github.com/wenchangshou2/vd-node-manage/module/gateway/g"
 	"github.com/wenchangshou2/vd-node-manage/module/gateway/model"
-	conf2 "github.com/wenchangshou2/vd-node-manage/module/gateway/pkg/conf"
-	"github.com/wenchangshou2/vd-node-manage/module/gateway/pkg/logging"
 )
 
-func Init(path string) {
+func Init() {
 	InitApplication()
-	conf2.Init(path)
-	logging.InitLogging(conf2.LogConfig.Path, conf2.LogConfig.Level)
-	if !conf2.SystemConfig.Debug {
+	logging.InitLogging(g.Config().Log.Path, g.Config().Log.Level)
+	if !g.Config().System.Debug{
 		gin.SetMode(gin.ReleaseMode)
 	}
 	model.Init()

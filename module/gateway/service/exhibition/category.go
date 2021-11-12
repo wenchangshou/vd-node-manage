@@ -1,8 +1,8 @@
 package exhibition
 
 import (
+	"github.com/wenchangshou2/vd-node-manage/common/serializer"
 	"github.com/wenchangshou2/vd-node-manage/module/gateway/model"
-	"github.com/wenchangshou2/vd-node-manage/module/gateway/pkg/serializer"
 )
 
 type CategoryService struct {

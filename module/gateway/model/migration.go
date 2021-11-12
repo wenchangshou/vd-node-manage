@@ -1,8 +1,8 @@
 package model
 
 import (
-	"github.com/wenchangshou2/vd-node-manage/module/gateway/pkg/conf"
-	"github.com/wenchangshou2/vd-node-manage/module/gateway/pkg/logging"
+	"github.com/wenchangshou2/vd-node-manage/common/logging"
+	"github.com/wenchangshou2/vd-node-manage/module/gateway/g"
 )
 
 func needMigration() bool {
@@ -13,11 +13,11 @@ func migration() error {
 		err error
 	)
 	if !needMigration() {
-		logging.G_Logger.Info("数据库版本匹配,跳过数据库迁移")
+		logging.GLogger.Info("数据库版本匹配,跳过数据库迁移")
 		return nil
 	}
-	logging.G_Logger.Info("开始进行数据库初始化......")
-	if conf.DatabaseConfig.Type == "mysql" {
+	logging.GLogger.Info("开始进行数据库初始化......")
+	if g.Config().Database.Type == "mysql" {
 		DB = DB.Set("gorm:table_options", "ENGINE=InnoDB")
 	}
 	err = DB.AutoMigrate(&User{}, &Setting{}, &Project{}, &File{}, &ProjectRelease{},
@@ -33,11 +33,11 @@ func migration() error {
 		&ExhibitionWindowItem{},
 	)
 	if err != nil {
-		logging.G_Logger.Error("数据库迁移失败:" + err.Error())
+		logging.GLogger.Error("数据库迁移失败:" + err.Error())
 		return err
 	}
 	//创建初始存储策略
-	logging.G_Logger.Info("数据库初始化结束")
+	logging.GLogger.Info("数据库初始化结束")
 	return err
 }
 func addDefaultSettings() {

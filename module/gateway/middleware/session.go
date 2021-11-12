@@ -4,8 +4,8 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/memstore"
 	"github.com/gin-gonic/gin"
-	"github.com/wenchangshou2/vd-node-manage/module/gateway/pkg/serializer"
-	"github.com/wenchangshou2/vd-node-manage/module/gateway/pkg/util"
+	"github.com/wenchangshou2/vd-node-manage/common/serializer"
+	"github.com/wenchangshou2/vd-node-manage/common/util"
 )
 
 var Store memstore.Store

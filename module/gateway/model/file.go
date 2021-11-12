@@ -2,7 +2,7 @@ package model
 
 import (
 	"fmt"
-	"github.com/wenchangshou2/vd-node-manage/module/gateway/pkg/logging"
+	"github.com/wenchangshou2/vd-node-manage/common/logging"
 )
 
 type File struct {
@@ -21,7 +21,7 @@ func (file *File) TableName() string {
 }
 func (file *File) Create() (string, error) {
 	if err := DB.Create(file).Error; err != nil {
-		logging.G_Logger.Warn(fmt.Sprintf("无法插入文件:%s", err))
+		logging.GLogger.Warn(fmt.Sprintf("无法插入文件:%s", err))
 	}
 	return file.ID, nil
 }

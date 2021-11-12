@@ -2,8 +2,8 @@ package resources
 
 import (
 	"fmt"
+	"github.com/wenchangshou2/vd-node-manage/common/serializer"
 	"github.com/wenchangshou2/vd-node-manage/module/gateway/model"
-	"github.com/wenchangshou2/vd-node-manage/module/gateway/pkg/serializer"
 	"github.com/wenchangshou2/vd-node-manage/module/gateway/service/file"
 	"github.com/wenchangshou2/vd-node-manage/module/gateway/service/task"
 	"path"
@@ -89,11 +89,11 @@ func (service ResourceDeleteService) Delete() serializer.Response {
 	}
 	// 如果当前的资源
 	if len(resource.Computers) > 0 {
-		ids:=make([]string,0)
-		for _,computer:=range  resource.Computers{
-			ids=append(ids, computer.ID)
+		ids := make([]string, 0)
+		for _, computer := range resource.Computers {
+			ids = append(ids, computer.ID)
 		}
-		taskItem:= task.ComputerResourceDeleteService{ID: ids,Resource: resource}
+		taskItem := task.ComputerResourceDeleteService{ID: ids, Resource: resource}
 		taskItem.Add()
 	}
 	resourcePath := path.Join("upload", resource.File.SourceName)
@@ -115,6 +115,7 @@ func (service ResourceDeleteService) Delete() serializer.Response {
 type ResourcePublishService struct {
 	ID string `uri:"id" json:"id"`
 }
+
 // Publish 推送展项
 func (service *ResourcePublishService) Publish() serializer.Response {
 	clientIds := make([]string, 0)

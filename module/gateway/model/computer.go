@@ -5,6 +5,7 @@ import (
 
 	"gorm.io/gorm"
 )
+
 type ComputerStatus int32
 type Computer struct {
 	Base
@@ -23,7 +24,7 @@ type Computer struct {
 	Screen         string           `gorm:"screen" json:"screen"`
 	Resources      []Resource       `gorm:"many2many:computer_resources;" json:"_"`
 	ProjectRelease []ProjectRelease ` gorm:"many2many:computer_projects;"  `
-	Status int `gorm:"status" json:"status"`
+	Status         int              `gorm:"status" json:"status"`
 }
 
 func (Computer) TableName() string {
@@ -49,11 +50,11 @@ func (computer Computer) GetComputerProject(projectReleaseID string) (p *Project
 	err = DB.Debug().Model(&computer).Where("id=?", projectReleaseID).Association("ProjectRelease").Find(&p)
 	return
 }
-func (computer Computer)GetTasks(status TaskStatus,count int)([]Task,error){
+func (computer Computer) GetTasks(status TaskStatus, count int) ([]Task, error) {
 	var task []Task
 	//err:= DB.Debug().Model(&Task{}).Joins("left join task_items on task.id=task_items.task_id").Where("computer_id=? AND task.status=?",computer.ID,status).Limit(count).Find(&res).Error
-	err:=DB.Debug().Where("computer_id=?AND task.status=?",computer.ID,status).Limit(count).Preload("TaskItems").Find(&task).Error
-	return task,err
+	err := DB.Debug().Where("computer_id=?AND task.status=?", computer.ID, status).Limit(count).Preload("TaskItems").Find(&task).Error
+	return task, err
 }
 func (computer Computer) ListComputerResource() (resources []Resource, err error) {
 	err = DB.Debug().Model(&computer).Association("Resources").Find(&resources)
@@ -81,9 +82,9 @@ func (computer *Computer) IsExistByMac() bool {
 	}
 	return true
 }
-func (computer Computer)Heartbeat()error{
-	now:=time.Now()
-	return DB.Debug().Model(&computer).Update("last_online_time",now).Error
+func (computer Computer) Heartbeat() error {
+	now := time.Now()
+	return DB.Debug().Model(&computer).Update("last_online_time", now).Error
 }
 
 func (computer *Computer) UpdateByMac() error {
@@ -110,7 +111,7 @@ func GetComputerByMac(mac string) (Computer, error) {
 }
 func GetComputerById(id interface{}) (Computer, error) {
 	var computer Computer
-	result := DB.Model(&Computer{}).First(&computer,"id=?",id)
+	result := DB.Model(&Computer{}).First(&computer, "id=?", id)
 	return computer, result.Error
 
 }
@@ -126,10 +127,10 @@ func ListComputer() ([]Computer, int64) {
 	return computers, total
 }
 
-func  CheckComputerProjectRelease(computerID string,ids []string) (p []ProjectRelease, err error) {
-	computer,err:=GetComputerById(computerID)
-	if err!=nil{
-		return nil,err
+func CheckComputerProjectRelease(computerID string, ids []string) (p []ProjectRelease, err error) {
+	computer, err := GetComputerById(computerID)
+	if err != nil {
+		return nil, err
 	}
 	err = DB.Debug().Model(computer).Association("ProjectRelease").Find(&p)
 	return

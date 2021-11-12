@@ -1,8 +1,8 @@
 package module
 
 import (
+	"github.com/wenchangshou2/vd-node-manage/common/serializer"
 	"github.com/wenchangshou2/vd-node-manage/module/gateway/model"
-	"github.com/wenchangshou2/vd-node-manage/module/gateway/pkg/serializer"
 )
 
 type CreateModuleService struct {
@@ -11,10 +11,11 @@ type CreateModuleService struct {
 	Value    string `json:"value" form:"value"`
 }
 
-func (service *CreateModuleService) Create() serializer.Response {
+func (service CreateModuleService) Create() serializer.Response {
 	module := model.Module{
-		Name:  service.Name,
-		Value: service.Value,
+		Name:     service.Name,
+		Value:    service.Value,
+		Category: service.Category,
 	}
 	err := module.Create()
 	if err != nil {

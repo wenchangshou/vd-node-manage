@@ -1,7 +1,7 @@
 package computer
 
 import (
-	"github.com/wenchangshou2/vd-node-manage/module/gateway/pkg/serializer"
+	"github.com/wenchangshou2/vd-node-manage/common/serializer"
 )
 
 type ComputerExhibitionOpenService struct {

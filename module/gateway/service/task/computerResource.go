@@ -2,8 +2,8 @@ package task
 
 import (
 	"fmt"
+	"github.com/wenchangshou2/vd-node-manage/common/serializer"
 	"github.com/wenchangshou2/vd-node-manage/module/gateway/model"
-	"github.com/wenchangshou2/vd-node-manage/module/gateway/pkg/serializer"
 )
 
 type ComputerResourcePublicService struct {
@@ -35,7 +35,7 @@ func (service *ComputerResourcePublicService) Add() serializer.Response {
 	option["id"] = resource.ID
 	option["uri"] = "upload/" + resource.File.SourceName
 	option["name"] = resource.File.Name
-	option["source"]=resource.File.SourceName
+	option["source"] = resource.File.SourceName
 	for _, computer := range service.Computers {
 		task, err := model.AddTask(fmt.Sprintf("添加%s资源", resource.Name), computer)
 		if err != nil {
@@ -63,7 +63,7 @@ func (service *ComputerResourcePublicService) Add() serializer.Response {
 }
 
 type ComputerResourceDeleteService struct {
-	ID       []string       `json:"id" uri:"id" form:"id"`
+	ID       []string        `json:"id" uri:"id" form:"id"`
 	Resource *model.Resource `json:"resource"`
 }
 
@@ -84,7 +84,7 @@ func (service ComputerResourceDeleteService) Add() serializer.Response {
 
 	return serializer.Response{
 		Code: 0,
-		Msg: "Success",
+		Msg:  "Success",
 	}
 
 }

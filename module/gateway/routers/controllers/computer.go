@@ -167,7 +167,7 @@ func ListComputerProjectRelease(c *gin.Context) {
 func GetComputerTask(c *gin.Context) {
 	var service computer2.ListComputerTaskService
 	if err := c.ShouldBind(&service); err == nil {
-		service.ID=c.Param("id")
+		service.ID = c.Param("id")
 		res := service.GetComputerTask()
 		c.JSON(200, res)
 	} else {
@@ -176,21 +176,21 @@ func GetComputerTask(c *gin.Context) {
 }
 
 // ReportComputerInfo 上报计算机服务信息
-func ReportComputerInfo(c *gin.Context){
+func ReportComputerInfo(c *gin.Context) {
 	var service computer2.UpdateService
-	if err:=c.ShouldBindJSON(&service);err==nil{
-		res:=service.Update()
-		c.JSON(200,res)
-	}else{
+	if err := c.ShouldBindJSON(&service); err == nil {
+		res := service.Update()
+		c.JSON(200, res)
+	} else {
 		c.JSON(200, ErrorResponse(err))
 	}
 }
-func Heartbeat(c *gin.Context){
+func Heartbeat(c *gin.Context) {
 	var service computer2.IDService
-	if err:=c.ShouldBindUri(&service);err==nil{
-		res:=service.Heartbeat()
-		c.JSON(200,res)
-	}else{
+	if err := c.ShouldBindUri(&service); err == nil {
+		res := service.Heartbeat()
+		c.JSON(200, res)
+	} else {
 		c.JSON(200, ErrorResponse(err))
 	}
 

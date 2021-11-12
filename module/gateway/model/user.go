@@ -5,7 +5,7 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"errors"
-	"github.com/wenchangshou2/vd-node-manage/module/gateway/pkg/util"
+	"github.com/wenchangshou2/zutil"
 	"strings"
 )
 
@@ -67,8 +67,7 @@ func (user *User) CheckPassword(password string) (bool, error) {
 	return bs == passwordStore[1], nil
 }
 func (user *User) SetPassword(password string) error {
-	salt := util.RandStringRunes(16)
-
+	salt := zutil.RandStringRunes(16)
 	hash := sha1.New()
 	_, err := hash.Write([]byte(password + salt))
 	bs := hex.EncodeToString(hash.Sum(nil))

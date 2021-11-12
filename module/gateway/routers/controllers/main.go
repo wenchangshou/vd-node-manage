@@ -2,11 +2,10 @@ package controllers
 
 import (
 	"encoding/json"
-	"github.com/wenchangshou2/vd-node-manage/module/gateway/model"
-	"github.com/wenchangshou2/vd-node-manage/module/gateway/pkg/serializer"
-
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/wenchangshou2/vd-node-manage/common/serializer"
+	"github.com/wenchangshou2/vd-node-manage/module/gateway/model"
 )
 
 // ParamErrorMsg 根据Validator返回的错误信息给出错误提示

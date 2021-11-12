@@ -2,8 +2,8 @@ package model
 
 import (
 	"fmt"
-	"github.com/wenchangshou2/vd-node-manage/module/gateway/pkg/conf"
-	"github.com/wenchangshou2/vd-node-manage/module/gateway/pkg/logging"
+	"github.com/wenchangshou2/vd-node-manage/common/logging"
+	"github.com/wenchangshou2/vd-node-manage/module/gateway/g"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
@@ -14,27 +14,29 @@ import (
 var DB *gorm.DB
 
 func Init() error {
-	logging.G_Logger.Info("初始化数据库连接")
 	var (
 		db  *gorm.DB
 		err error
 	)
+	cfg:=g.Config()
+	logging.GLogger.Info("初始化数据库连接")
 	if gin.Mode() == gin.TestMode {
 		db, err = gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
 	} else {
-		switch conf.DatabaseConfig.Type {
+
+		switch cfg.Database.Type {
 		case "UNSET", "sqlite", "sqlite3":
-			db, err = gorm.Open(sqlite.Open(conf.DatabaseConfig.DBFile), &gorm.Config{})
+			db, err = gorm.Open(sqlite.Open(cfg.Database.DBFile), &gorm.Config{})
 		case "mysql":
 			dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-				conf.DatabaseConfig.User,
-				conf.DatabaseConfig.Password,
-				conf.DatabaseConfig.Host,
-				conf.DatabaseConfig.Port,
-				conf.DatabaseConfig.Name)
+				cfg.Database.User,
+				cfg.Database.Password,
+				cfg.Database.Host,
+				cfg.Database.Port,
+				cfg.Database.Name)
 			db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 		default:
-			panic("不支持数据库类型:" + conf.DatabaseConfig.Type)
+			panic("不支持数据库类型:" + cfg.Database.Type)
 		}
 	}
 	if err != nil {
