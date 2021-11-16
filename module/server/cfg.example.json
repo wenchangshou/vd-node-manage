@@ -1,0 +1,12 @@
+{
+  "debug": true,
+  "database": "",
+  "hosts": "",
+  "maxConns": 20,
+  "maxIdle": 100,
+  "listen": ":6030",
+  "http": {
+    "enabled": true,
+    "listen": "0.0.0.0:6031"
+  }
+}
