@@ -3,20 +3,19 @@ package executor
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/wenchangshou2/vd-node-manage/module/agent/pkg/conf"
+	"github.com/wenchangshou2/vd-node-manage/common/file"
+	"github.com/wenchangshou2/vd-node-manage/module/agent/g"
 	IService "github.com/wenchangshou2/vd-node-manage/module/agent/service"
-	"github.com/wenchangshou2/vd-node-manage/module/agent/util"
 	"path"
-
 )
 
 type InstallResourceExecutor struct {
 	Option          InstallResourceOption
-	HttpRequestUri string
-	taskService IService.TaskService
+	HttpRequestUri  string
+	taskService     IService.TaskService
 	computerService IService.ComputerService
 	Mac             string
-	taskID string
+	taskID          string
 }
 type InstallResourceOption struct {
 	ID   string `json:"id"`
@@ -25,22 +24,23 @@ type InstallResourceOption struct {
 }
 
 func (executor *InstallResourceExecutor) Execute() error {
+	cfg:=g.Config()
 	requestUrl := "http://" + executor.HttpRequestUri + "/" + executor.Option.Uri
-	dstPath := path.Join(conf.ResourceConfig.Directory, "resource/")
-	err := util.DownloadFile(requestUrl, dstPath, executor.Option.ID+"-"+executor.Option.Name, func(length, downLen int64) {
+	dstPath := path.Join(cfg.Resource.Directory, "resource/")
+	err := file.DownloadFile(requestUrl, dstPath, executor.Option.ID+"-"+executor.Option.Name, func(length, downLen int64) {
 		fmt.Printf("download:len:%d,downLen:%d\n", length, downLen)
 	})
 	if err != nil {
-		executor.taskService.SetTaskItemStatus([]string{executor.taskID},ERROR)
+		executor.taskService.SetTaskItemStatus([]string{executor.taskID}, ERROR)
 		//executor.NotifyEvent(executor.TaskID, ERROR, "下载文件失败")
 		return err
 	}
 	err = executor.computerService.AddComputerResource(executor.Option.ID)
 	if err != nil {
-		executor.taskService.SetTaskItemStatus([]string{executor.taskID},ERROR)
+		executor.taskService.SetTaskItemStatus([]string{executor.taskID}, ERROR)
 		return err
 	}
-	executor.taskService.SetTaskItemStatus([]string{executor.taskID},DONE)
+	executor.taskService.SetTaskItemStatus([]string{executor.taskID}, DONE)
 	return nil
 }
 

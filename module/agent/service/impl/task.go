@@ -13,7 +13,7 @@ type TaskHttpService struct {
 	GetUrlStruct
 	ID   string
 	Ip   string
-	Port int
+	Port uint
 }
 
 func (t TaskHttpService) SetTaskItemStatus(ids []string, status int) error {
@@ -61,13 +61,13 @@ type GetComputerTaskResultForm struct {
 	Data GetComputerTaskResultDataForm
 }
 
-func (t TaskHttpService) GetTasks(status int,count int) ([]dto.Task, error) {
+func (t TaskHttpService) GetTasks(status int, count int) ([]dto.Task, error) {
 	var rtu GetComputerTaskResultForm
 	client := resty.New()
 	requestUrl := t.GetUrl(t.Ip, t.Port, fmt.Sprintf("computer/%s/task", t.ID))
 	resp, err := client.R().SetBody(map[string]interface{}{
-		"status":status,
-		"count":count,
+		"status": status,
+		"count":  count,
 	}).SetResult(&rtu).Get(requestUrl)
 	if err != nil {
 		return nil, errors.Wrap(err, "请示获取计算机任务失败")
@@ -79,7 +79,8 @@ func (t TaskHttpService) GetTasks(status int,count int) ([]dto.Task, error) {
 	return rtu.Data.Items, nil
 }
 
-func NewTaskHttpService(id string, ip string, port int) *TaskHttpService {
+// NewTaskHttpService 创建新的http任务服务
+func NewTaskHttpService(id string, ip string, port uint) *TaskHttpService {
 	return &TaskHttpService{
 		ID:   id,
 		Ip:   ip,

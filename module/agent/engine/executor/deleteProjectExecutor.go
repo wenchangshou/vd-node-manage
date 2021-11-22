@@ -2,7 +2,7 @@ package executor
 
 import (
 	"encoding/json"
-	"github.com/wenchangshou2/vd-node-manage/module/agent/pkg/conf"
+	"github.com/wenchangshou2/vd-node-manage/module/agent/g"
 	IService "github.com/wenchangshou2/vd-node-manage/module/agent/service"
 	"path"
 
@@ -10,17 +10,18 @@ import (
 )
 
 type DeleteOption struct {
-	ID   string  `json:"id"`
-	File File `json:"file"`
+	ID   string `json:"id"`
+	File File   `json:"file"`
 }
 type DeleteProjectExecutor struct {
 	Option          DeleteOption
 	ComputerService IService.ComputerService
-	TaskID string
+	TaskID          string
 }
 
 func (executor *DeleteProjectExecutor) Execute() error {
-	projectPath := path.Join(conf.ResourceConfig.Directory, "application", executor.Option.File.Uuid)
+	cfg := g.Config()
+	projectPath := path.Join(cfg.Resource.Directory, "application", executor.Option.File.Uuid)
 	zutil.IsExistDelete(projectPath)
 	return executor.ComputerService.DeleteComputerProject(executor.Option.ID)
 }

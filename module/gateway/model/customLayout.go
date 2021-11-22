@@ -1,11 +1,11 @@
 package model
 
 import (
-	"fmt"
-	"github.com/wenchangshou2/vd-node-manage/common/logging"
+"fmt"
+"github.com/wenchangshou2/vd-node-manage/common/logging"
 )
 
-// 自定义布局
+// CustomLayout 自定义布局
 type CustomLayout struct {
 	Base
 	Name       string `json:"name"`

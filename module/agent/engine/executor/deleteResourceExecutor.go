@@ -2,11 +2,11 @@ package executor
 
 import (
 	"encoding/json"
-	"github.com/wenchangshou2/vd-node-manage/module/agent/pkg/conf"
+	"github.com/wenchangshou2/vd-node-manage/module/agent/g"
 	IService "github.com/wenchangshou2/vd-node-manage/module/agent/service"
+	"github.com/wenchangshou2/zutil"
 	"path"
 
-	"github.com/wenchangshou2/zutil"
 )
 
 type DeleteResourceExecutor struct {
@@ -15,7 +15,8 @@ type DeleteResourceExecutor struct {
 }
 
 func (executor *DeleteResourceExecutor) Execute() error {
-	resourcePath := path.Join(conf.ResourceConfig.Directory, "resource", executor.Option.File.GetResourcePath())
+	cfg:=g.Config()
+	resourcePath := path.Join(cfg.Resource.Directory, "resource", executor.Option.File.GetResourcePath())
 	zutil.IsExistDelete(resourcePath)
 	return executor.ComputerService.DeleteComputerResource(executor.Option.ID)
 }

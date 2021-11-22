@@ -1,8 +1,0 @@
-{"level":"info","time":"2021-06-11T10:39:11.340+0800","caller":"/works/code/vd-node-manage/pkg/logging/logging.go:92","msg":"log 初始化成功","serviceName":"zebus"}
-{"level":"info","time":"2021-06-11T10:39:11.340+0800","caller":"/works/code/vd-node-manage/models/init.go:18","msg":"初始化数据库连接","serviceName":"zebus"}
-{"level":"info","time":"2021-06-11T10:39:11.341+0800","caller":"/works/code/vd-node-manage/models/migration.go:19","msg":"开始进行数据库初始化......","serviceName":"zebus"}
-{"level":"info","time":"2021-06-11T10:39:11.688+0800","caller":"/works/code/vd-node-manage/models/migration.go:25","msg":"数据库初始化结束","serviceName":"zebus"}
-{"level":"info","time":"2021-06-11T10:39:14.154+0800","caller":"/works/code/vd-node-manage/pkg/logging/logging.go:92","msg":"log 初始化成功","serviceName":"zebus"}
-{"level":"info","time":"2021-06-11T10:39:14.154+0800","caller":"/works/code/vd-node-manage/models/init.go:18","msg":"初始化数据库连接","serviceName":"zebus"}
-{"level":"info","time":"2021-06-11T10:39:14.155+0800","caller":"/works/code/vd-node-manage/models/migration.go:19","msg":"开始进行数据库初始化......","serviceName":"zebus"}
-{"level":"info","time":"2021-06-11T10:39:14.484+0800","caller":"/works/code/vd-node-manage/models/migration.go:25","msg":"数据库初始化结束","serviceName":"zebus"}

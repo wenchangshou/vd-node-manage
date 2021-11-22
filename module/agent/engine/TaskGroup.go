@@ -3,10 +3,10 @@ package engine
 import (
 	"context"
 	"fmt"
+	"github.com/wenchangshou2/vd-node-manage/common/logging"
 	"github.com/wenchangshou2/vd-node-manage/module/agent/dto"
 	"github.com/wenchangshou2/vd-node-manage/module/agent/engine/executor"
 	"github.com/wenchangshou2/vd-node-manage/module/agent/pkg/e"
-	"github.com/wenchangshou2/vd-node-manage/module/gateway/pkg/logging"
 )
 
 type TaskGroup struct {
@@ -54,7 +54,7 @@ func (task *TaskGroup) execute() {
 		item := node.Data
 		e, err := task.generator(e.ExecuteType(item.Action), item.ID, item.Options)
 		if err != nil {
-			logging.G_Logger.Warn(fmt.Sprintf("生成类别错误:%s", err.Error()))
+			logging.GLogger.Warn(fmt.Sprintf("生成类别错误:%s", err.Error()))
 			task.statusChan <- executor.ERROR
 			return false
 		}

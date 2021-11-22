@@ -2,11 +2,10 @@ package player
 
 import (
 	"fmt"
+	"github.com/wenchangshou2/vd-node-manage/common/process"
 	"github.com/wenchangshou2/vd-node-manage/module/agent/pkg/e"
-	"github.com/wenchangshou2/vd-node-manage/module/agent/pkg/process"
 	"github.com/wenchangshou2/zutil"
 	"sync"
-
 )
 
 type ResourcePlayer struct {
@@ -24,7 +23,7 @@ func (player *ResourcePlayer) Check() (bool, error) {
 	return false, nil
 }
 
-// 打开一个播放器
+// Open 打开一个播放器
 func (player *ResourcePlayer) Open(wg *sync.WaitGroup, port int) (err error) {
 	fmt.Println("open")
 	defer wg.Done()

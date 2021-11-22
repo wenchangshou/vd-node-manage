@@ -2,7 +2,7 @@ package hashid
 
 import (
 	"errors"
-	"github.com/wenchangshou2/vd-node-manage/module/gateway/pkg/conf"
+	"github.com/wenchangshou2/vd-node-manage/module/gateway/g"
 
 	"github.com/speps/go-hashids/v2"
 )
@@ -22,8 +22,7 @@ var (
 // HashEncode  对给定数据计算HashID
 func HashEncode(v []int) (string, error) {
 	hd := hashids.NewData()
-	hd.Salt = conf.SystemConfig.HashIDSalt
-
+	hd.Salt = g.Config().System.HashIDSalt
 	h, err := hashids.NewWithData(hd)
 	if err != nil {
 		return "", err
@@ -37,7 +36,7 @@ func HashEncode(v []int) (string, error) {
 
 func HashDecode(raw string) ([]int, error) {
 	hd := hashids.NewData()
-	hd.Salt = conf.SystemConfig.HashIDSalt
+	hd.Salt = g.Config().System.HashIDSalt
 	h, err := hashids.NewWithData(hd)
 	if err != nil {
 		return []int{}, err

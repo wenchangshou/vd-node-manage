@@ -9,7 +9,7 @@ type File struct {
 	Base
 	Name       string `gorm:"name" json:"name"`
 	Mode       string `gorm:"mode" json:"mode"`
-	SourceName string `gorm:"source_name" json:"soruceName"`
+	SourceName string `gorm:"source_name" json:"sourceName"`
 	UserId     string `gorm:"user_id" json:"user_id"`
 	Size       uint   `gorm:"size" json:"size"`
 	Uuid       string `gorm:"uuid" json:"uuid"`

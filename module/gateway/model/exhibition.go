@@ -20,8 +20,8 @@ func (exhibition *Exhibition) Create() (string, error) {
 	}
 	return exhibition.ID, nil
 }
-func (exhibtion *Exhibition) Update(val map[string]interface{}) error {
-	return DB.Model(exhibtion).Updates(val).Error
+func (exhibition *Exhibition) Update(val map[string]interface{}) error {
+	return DB.Model(exhibition).Updates(val).Error
 }
 
 //GetExhibitionByCategory 通过类别获取展项
@@ -36,7 +36,7 @@ func GetExhibitionByID(id string) (exhibition Exhibition, err error) {
 	return exhibition, result.Error
 }
 
-func DeleteExhibtionByID(id string) error {
+func DeleteExhibitionByID(id string) error {
 	result := DB.Unscoped().Delete(&Exhibition{}, "id=?", id)
 	return result.Error
 }

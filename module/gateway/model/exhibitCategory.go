@@ -8,7 +8,7 @@ type ExhibitionCategory struct {
 }
 
 func (exhibitionCategory *ExhibitionCategory) TableName() string {
-	return "exhition_category"
+	return "exhibition_category"
 }
 func (exhibitionCategory *ExhibitionCategory) Create() (string, error) {
 	if err := DB.Create(exhibitionCategory).Error; err != nil {
@@ -17,9 +17,9 @@ func (exhibitionCategory *ExhibitionCategory) Create() (string, error) {
 	return exhibitionCategory.ID, nil
 }
 
-//GetComputerExhibtionCatetory 获取指定计算机的展项类别
-func GetComputerExhibtionCatetory(cid string) ([]ExhibitionCategory, error) {
-	var categorys []ExhibitionCategory
-	result := DB.Where("computer_id=?", cid).Find(&categorys)
-	return categorys, result.Error
+// GetComputerExhibitionCategory  获取指定计算机的展项类别
+func GetComputerExhibitionCategory(cid string) ([]ExhibitionCategory, error) {
+	var categories []ExhibitionCategory
+	result := DB.Where("computer_id=?", cid).Find(&categories)
+	return categories, result.Error
 }

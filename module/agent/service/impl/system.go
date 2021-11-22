@@ -1,11 +1,11 @@
 package HttpService
 
 import (
+	"github.com/go-resty/resty/v2"
+	"github.com/pkg/errors"
 	"github.com/wenchangshou2/vd-node-manage/module/agent/pkg/e"
 	"github.com/wenchangshou2/vd-node-manage/module/agent/util"
 	"net/http"
-	"github.com/go-resty/resty/v2"
-	"github.com/pkg/errors"
 )
 
 // GetExternIp  获取当前的计算机ip

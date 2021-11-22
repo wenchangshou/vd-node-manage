@@ -1,0 +1,33 @@
+{
+  "hostname": "",
+  "ip": "",
+  "server": {
+    "mode": "manual",
+    "httpAddress": "192.168.10.121:8888",
+    "rpcAddress": "192.168.10.121:8889"
+  },
+  "rpc": {
+    "address": "localhost:10051"
+  },
+  "log": {
+    "name": "log",
+    "path": "logs",
+    "ext": "log",
+    "level": "debug",
+    "maxMsgSize": 1048576,
+    "argumentType": "file"
+  },
+  "resource": {
+    "directory": "c:/zoolon",
+    "tmp": "c:/zoolon/tmp"
+  },
+  "heartbeat": {
+    "enabled": true,
+    "addr": "127.0.0.1:6030",
+    "interval": 60,
+    "timeout": 1000
+  },
+  "task": {
+    "count": 1
+  }
+}

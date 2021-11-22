@@ -12,8 +12,8 @@ import (
 const (
 	// Active 账户正常状态
 	Active = iota
-	// NotActivicated 未激活
-	NotActivicated
+	// NotActivated 未激活
+	NotActivated
 	// Baned 被封禁
 	Baned
 	// OveruseBaned 超额使用被封禁

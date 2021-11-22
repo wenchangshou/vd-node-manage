@@ -8,5 +8,9 @@
   "http": {
     "enabled": true,
     "listen": "0.0.0.0:6031"
+  },
+  "redis": {
+    "addr": "192.168.0.222:6379",
+    "maxIdle": 5
   }
 }

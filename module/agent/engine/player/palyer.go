@@ -4,14 +4,13 @@ import (
 	"errors"
 	"github.com/wenchangshou2/vd-node-manage/module/agent/pkg/e"
 	"sync"
-
 )
 
 type IPlayer interface {
 	Open(*sync.WaitGroup, int) error
 	GetThreadId() uint32
 	Close() error
-	// Change() error
+	// Check  error
 	Check() (bool, error)
 	// OpenCheck() (bool, error)
 }

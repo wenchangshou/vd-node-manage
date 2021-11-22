@@ -31,7 +31,7 @@ func InitDatabase() {
 				config.Database.Host,
 				config.Database.Port,
 				config.Database.Name)
-			db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+			db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 		default:
 			log.Fatalln("Unsupported database type")
 		}
@@ -39,6 +39,9 @@ func InitDatabase() {
 	if err != nil {
 		log.Fatalln("Unable to connect to the database", "err", err)
 	}
-	DB=db
-	err=
+	DB = db
+	err = migration()
+	if err != nil {
+		log.Fatalln("migration db error", "error", err)
+	}
 }

@@ -21,7 +21,7 @@ func (exhibitionWindowItem *ExhibitionWindowItem) Create() error {
 	return DB.Model(&ExhibitionWindowItem{}).Create(&exhibitionWindowItem).Error
 }
 
-func GetExhibtionDetailsByExhibtionID(id string) ([]ExhibitionWindowItem, error) {
+func GetExhibitionDetailsByExhibitionID(id string) ([]ExhibitionWindowItem, error) {
 	var items []ExhibitionWindowItem
 	err := DB.Debug().Model(&ExhibitionWindowItem{}).
 		Preload("Project").Preload("Resource").
@@ -37,7 +37,7 @@ func DeleteExhibitionWindowItemByExhibitionID(id string) error {
 func GetSpecifiedModuleExhibition(id string) ([]string, error) {
 	ids := make([]string, 0)
 	var items []ExhibitionWindowItem
-	result := DB.Model(&ExhibitionWindowItem{}).Where("modlue_id=?", id).Find(&items)
+	result := DB.Model(&ExhibitionWindowItem{}).Where("module_id=?", id).Find(&items)
 	if result.Error != nil {
 		return ids, result.Error
 	}

@@ -43,7 +43,7 @@ func migration() error {
 func addDefaultSettings() {
 	defaultSettings := []Setting{
 		{
-			Name: "siteURL", Value: `http://localhost`, Type: "biasic",
+			Name: "siteURL", Value: `http://localhost`, Type: "basic",
 		},
 		{
 			Name: "siteName", Value: `vd-node-manage`, Type: "basic",

@@ -9,4 +9,3 @@ func Replace(table map[string]string, s string) string {
 	}
 	return s
 }
-

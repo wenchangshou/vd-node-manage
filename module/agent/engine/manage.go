@@ -2,14 +2,13 @@ package engine
 
 import (
 	"context"
+	"github.com/wenchangshou2/vd-node-manage/common/logging"
 	"github.com/wenchangshou2/vd-node-manage/module/agent/dto"
 	"github.com/wenchangshou2/vd-node-manage/module/agent/engine/executor"
-	"github.com/wenchangshou2/vd-node-manage/module/agent/pkg/logging"
 	IService "github.com/wenchangshou2/vd-node-manage/module/agent/service"
 	"sync"
 	"sync/atomic"
 	"time"
-
 )
 
 var ActionGroup map[int]*executor.IExecute
@@ -27,8 +26,8 @@ type TaskChangeEventInfo struct {
 // @param maxExecutorCount 允许同时执行任务数
 // @param httpRequestUri http请求地址
 // @param rpcRequestUri rpc请求地址
-func NewTaskManage(count int32,httpRequest string, taskService IService.TaskService, computerService IService.ComputerService) (*TaskManage, error) {
-	g:=executor.GenerateExecutorFactoryFunc(computerService,taskService,httpRequest)
+func NewTaskManage(count int32, httpRequest string, taskService IService.TaskService, computerService IService.ComputerService) (*TaskManage, error) {
+	g := executor.GenerateExecutorFactoryFunc(computerService, taskService, httpRequest)
 	GTaskExecute = &TaskManage{
 		maxExecutorCount:    count,
 		taskAddNotify:       make(chan dto.Task),
@@ -36,7 +35,7 @@ func NewTaskManage(count int32,httpRequest string, taskService IService.TaskServ
 		computerService:     computerService,
 		notifyExecuteChange: make(chan TaskChangeEventInfo),
 		TaskStatusList:      NewTaskList(),
-		generator:&g,
+		generator:           &g,
 	}
 	return GTaskExecute, nil
 }
@@ -83,12 +82,14 @@ func NewTaskList() *TaskList {
 	return &TaskList{items: make(map[string]TaskStatus)}
 
 }
+
 //Delete 删除元素
-func (taskList*TaskList)Delete(id string){
+func (taskList *TaskList) Delete(id string) {
 	taskList.Lock()
 	defer taskList.Unlock()
-	delete(taskList.items,id)
+	delete(taskList.items, id)
 }
+
 // LoadAndDeleteByStatus  加载并且删除元素
 func (taskList *TaskList) LoadAndDeleteByStatus(status TaskStatus) (string, bool) {
 	taskList.Lock()
@@ -128,13 +129,13 @@ func (manage *TaskManage) execute(task dto.Task) {
 		return
 	}
 	ctx, cancel := context.WithCancel(context.Background())
-	manage.cancelFuncMap.LoadOrStore(task.ID,cancel)
-	group := NewTaskGroup(task, ctx,manage.generator)
-	status:=group.Start()
+	manage.cancelFuncMap.LoadOrStore(task.ID, cancel)
+	group := NewTaskGroup(task, ctx, manage.generator)
+	status := group.Start()
 	select {
-	case status:=<-status:
-		manage.taskService.SetTaskStatus([]string{task.ID},status)
-		atomic.AddInt32(&manage.executorCount,-1)
+	case status := <-status:
+		manage.taskService.SetTaskStatus([]string{task.ID}, status)
+		atomic.AddInt32(&manage.executorCount, -1)
 		manage.TaskStatusList.Delete(task.ID)
 	}
 

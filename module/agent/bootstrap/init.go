@@ -1,24 +1,21 @@
 package bootstrap
 
 import (
-	"github.com/wenchangshou2/vd-node-manage/module/agent/pkg/conf"
-	"github.com/wenchangshou2/vd-node-manage/module/agent/pkg/logging"
+	"github.com/wenchangshou2/vd-node-manage/common/logging"
+	"github.com/wenchangshou2/vd-node-manage/module/agent/g"
 	"path"
 
 	"github.com/wenchangshou2/zutil"
 )
 
-func Init(confPath string) {
+func Init() {
 	InitApplication()
-	err := conf.Init(confPath)
-	if err != nil {
-		panic(err)
-	}
-	logging.InitLogging(conf.LogConfig.Path, conf.LogConfig.Level)
-	zutil.IsNotExistMkDir(conf.ResourceConfig.Directory)
-	zutil.IsNotExistMkDir(conf.ResourceConfig.Tmp)
-	applicationPath := path.Join(conf.ResourceConfig.Directory, "application")
-	resourcePath := path.Join(conf.ResourceConfig.Directory, "resource")
+	cfg := g.Config()
+	logging.InitLogging(cfg.Log.Path, cfg.Log.Level)
+	zutil.IsNotExistMkDir(cfg.Resource.Directory)
+	zutil.IsNotExistMkDir(cfg.Resource.Tmp)
+	applicationPath := path.Join(cfg.Resource.Directory, "application")
+	resourcePath := path.Join(cfg.Resource.Directory, "resource")
 	zutil.IsNotExistMkDir(applicationPath)
 	zutil.IsNotExistMkDir(resourcePath)
 }

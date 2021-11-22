@@ -46,7 +46,7 @@ func getResourceCategory(category string) string {
 
 func (service GetComputerExhibitionService) Get(c *gin.Context) serializer.Response {
 	result := GetComputerExhibitionFormData{}
-	categorys, err := model.GetComputerExhibtionCatetory(service.ID)
+	categorys, err := model.GetComputerExhibitionCategory(service.ID)
 	if err != nil {
 		return serializer.Err(serializer.CodeDBError, "获取展项类别失败", err)
 	}
@@ -150,7 +150,7 @@ func (service *ExhibitionService) Update() serializer.Response {
 	if err != nil {
 		return serializer.Err(serializer.CodeDBError, "没有找到对应的展项", err)
 	}
-	err = model.DeleteExhibtionWindowByExhibitionID(exhibtion.ID)
+	err = model.DeleteExhibitionWindowByExhibitionID(exhibtion.ID)
 	if err != nil {
 		return serializer.Err(serializer.CodeDBError, "删除子窗口失败", err)
 	}
@@ -185,11 +185,11 @@ func (service *ExhibitionService) Delete() serializer.Response {
 	if err != nil {
 		return serializer.Err(serializer.CodeDBError, "删除展项窗口资源失败", err)
 	}
-	err = model.DeleteExhibtionWindowByExhibitionID(service.ID)
+	err = model.DeleteExhibitionWindowByExhibitionID(service.ID)
 	if err != nil {
 		return serializer.Err(serializer.CodeDBError, "删除展项窗口失败", err)
 	}
-	err = model.DeleteExhibtionByID(service.ID)
+	err = model.DeleteExhibitionByID(service.ID)
 	if err != nil {
 		return serializer.Err(serializer.CodeDBError, "删除展项失败", err)
 	}
@@ -237,7 +237,7 @@ func (service *GetExhibitionDetailsService) Get() serializer.Response {
 	if err != nil {
 		return serializer.Err(serializer.CodeDBError, "获取展项失败", err)
 	}
-	items, err := model.GetExhibtionDetailsByExhibtionID(exhibition.ID)
+	items, err := model.GetExhibitionDetailsByExhibitionID(exhibition.ID)
 	if err != nil {
 		return serializer.Err(serializer.CodeDBError, "获取展项详细信息失败", err)
 	}

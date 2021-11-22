@@ -3,7 +3,8 @@ package executor
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/wenchangshou2/vd-node-manage/module/agent/pkg/conf"
+	"github.com/wenchangshou2/vd-node-manage/common/file"
+	"github.com/wenchangshou2/vd-node-manage/module/agent/g"
 	IService "github.com/wenchangshou2/vd-node-manage/module/agent/service"
 	"github.com/wenchangshou2/vd-node-manage/module/agent/util"
 	"github.com/wenchangshou2/zutil"
@@ -12,13 +13,13 @@ import (
 )
 
 type InstallProjectExecutor struct {
-	TaskID      string
-	HttpAddress string
+	TaskID          string
+	HttpAddress     string
 	Options         InstallProjectOption
 	NotifyEvent     func(string, int, string)
 	ComputerService IService.ComputerService
-	TaskService IService.TaskService
-	HttpRequestUri string
+	TaskService     IService.TaskService
+	HttpRequestUri  string
 	Mac             string
 }
 type File struct {
@@ -38,38 +39,38 @@ func (file *File) GetApplicationPath() string {
 }
 
 type InstallProjectOption struct {
-	ID        string `json:"id"`
+	ID string `json:"id"`
 	//ProjectReleaseID string `json:"project_release_id"`
-	Uri              string `json:"uri"`
+	Uri    string `json:"uri"`
 	Source string `json:"source"`
-	Name string `json:"name"`
+	Name   string `json:"name"`
 }
 
 func (executor *InstallProjectExecutor) Execute() error {
+	cfg := g.Config()
 	requestUri := "http://" + executor.HttpRequestUri + "/" + executor.Options.Uri
-	dstPath := path.Join(conf.ResourceConfig.Directory, "application", executor.Options.ID)
-	tmpPath := path.Join(conf.ResourceConfig.Tmp, executor.Options.Source)
-
-	err:=util.DownloadFile(requestUri,conf.ResourceConfig.Tmp,executor.Options.Source, func(length, downLen int64) {
+	dstPath := path.Join(cfg.Resource.Directory, "application", executor.Options.ID)
+	tmpPath := path.Join(cfg.Resource.Tmp, executor.Options.Source)
+	err := file.DownloadFile(requestUri, cfg.Resource.Tmp, executor.Options.Source, func(length, downLen int64) {
 
 	})
-	if err!=nil{
-		fmt.Println("下载错误:",err)
+	if err != nil {
+		fmt.Println("下载错误:", err)
 	}
 	zutil.IsNotExistMkDir(dstPath)
-	err=util.UnZip(dstPath,tmpPath)
+	err = util.UnZip(dstPath, tmpPath)
 	if err != nil {
 		os.RemoveAll(tmpPath)
-		executor.TaskService.SetTaskItemStatus([]string{executor.TaskID},ERROR)
+		executor.TaskService.SetTaskItemStatus([]string{executor.TaskID}, ERROR)
 		return err
 	}
-	err=executor.ComputerService.AddComputerProject(executor.Options.ID)
-	if err!=nil{
-		executor.TaskService.SetTaskItemStatus([]string{executor.TaskID},ERROR)
+	err = executor.ComputerService.AddComputerProject(executor.Options.ID)
+	if err != nil {
+		executor.TaskService.SetTaskItemStatus([]string{executor.TaskID}, ERROR)
 		return err
 	}
 	os.RemoveAll(tmpPath)
-	executor.TaskService.SetTaskItemStatus([]string{executor.TaskID},DONE)
+	executor.TaskService.SetTaskItemStatus([]string{executor.TaskID}, DONE)
 	return nil
 }
 

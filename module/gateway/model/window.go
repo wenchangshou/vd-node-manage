@@ -31,7 +31,7 @@ func GetExhibitionWindowByExhibitionID(id string) ([]Window, error) {
 	result := DB.Model(&Window{}).Where("exhibition_id=?", id).Find(&items)
 	return items, result.Error
 }
-func DeleteExhibtionWindowByExhibitionID(id string) error {
+func DeleteExhibitionWindowByExhibitionID(id string) error {
 	result := DB.Unscoped().Delete(&Window{}, "exhibition_id=?", id)
 	return result.Error
 }

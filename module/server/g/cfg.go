@@ -8,7 +8,7 @@ import (
 )
 
 type HttpConfig struct {
-	Enabled bool   `json:"json:"enabled"`
+	Enabled bool   `json:"enabled"`
 	Listen  string `json:"listen"`
 }
 type DatabaseConfig struct {
@@ -21,6 +21,12 @@ type DatabaseConfig struct {
 	DBFile      string `json:"dbFile"`
 	Port        int    `json:"port"`
 }
+type RedisConfig struct{
+	Addr string `json:"addr"`
+	MaxIdle int `json:"maxIdle"`
+	HighQueues []string `json:"highQueues"`
+	LowQueues []string `json:"lowQueues"`
+}
 type GlobalConfig struct {
 	Debug    bool            `json:"debug"`
 	Hosts    string          `json:"hosts"`
@@ -29,6 +35,7 @@ type GlobalConfig struct {
 	Listen   string          `json:"listen"`
 	Http     *HttpConfig     `json:"http"`
 	Database *DatabaseConfig `json:"database"`
+	Redis *RedisConfig `json:"redis"`
 }
 
 var (
