@@ -56,7 +56,7 @@ type GlobalConfig struct {
 	IP        string           `json:"ip"`
 	Log       *LogConfig        `json:"log"`
 	Server    *ServerConfig     `json:"server"`
-	Rpc       *RpcConfig        `json:"rpc"`
+	Rpc       *RpcConfig        `json:"rpc-old"`
 	Resource  *ResourceConfig   `json:"resource"`
 	Task      *TaskConfig       `json:"task"`
 	Heartbeat *HeartbeatConfig `json:"heartbeat"`

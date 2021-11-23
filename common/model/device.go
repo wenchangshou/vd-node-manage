@@ -15,3 +15,9 @@ type DeviceRegisterResponse struct {
 	ID string `json:"id"`
 	Status int `json:"status"`
 }
+
+
+type DeviceUpdateInfo struct {
+	LastUpdate int64
+	ReportRequest *DeviceReportRequest
+}

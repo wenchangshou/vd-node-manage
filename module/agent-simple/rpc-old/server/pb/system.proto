@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+option go_package = "github.com/wenchangshou2/vd-node-manage/rpc-old/server/pb";
+import "google/protobuf/wrappers.proto";
+
+message Empty {
+
+}
+service SystemManagement {
+    rpc ping(Empty)returns(google.protobuf.BoolValue);
+}

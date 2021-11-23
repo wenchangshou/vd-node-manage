@@ -46,6 +46,7 @@ require (
 	github.com/speps/go-hashids/v2 v2.0.1
 	github.com/tealeg/xlsx/v3 v3.2.3
 	github.com/toolkits/file v0.0.0-20160325033739-a5b3c5147e07
+	github.com/toolkits/net v0.0.0-20160910085801-3f39ab6fe3ce
 	github.com/ugorji/go/codec v1.2.6 // indirect
 	github.com/wenchangshou2/zutil v0.0.0-20210812023746-8bb048339a0b
 	go.uber.org/atomic v1.7.0 // indirect

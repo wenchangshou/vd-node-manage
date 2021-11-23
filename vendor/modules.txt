@@ -143,6 +143,9 @@ github.com/tealeg/xlsx/v3
 # github.com/toolkits/file v0.0.0-20160325033739-a5b3c5147e07
 ## explicit
 github.com/toolkits/file
+# github.com/toolkits/net v0.0.0-20160910085801-3f39ab6fe3ce
+## explicit
+github.com/toolkits/net
 # github.com/ugorji/go/codec v1.2.6
 ## explicit; go 1.11
 github.com/ugorji/go/codec
