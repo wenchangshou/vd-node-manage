@@ -3,8 +3,12 @@
   "ip": "",
   "server": {
     "mode": "manual",
+    "register": false,
+    "id": "xxxxx",
     "httpAddress": "192.168.10.121:8888",
-    "rpcAddress": "192.168.10.121:8889"
+    "rpcAddress": "192.168.10.121:8889",
+    "reportInterval": 60,
+    "QueryTaskInterval": 60
   },
   "rpc": {
     "address": "localhost:10051"
@@ -26,6 +30,11 @@
     "addr": "127.0.0.1:6030",
     "interval": 60,
     "timeout": 1000
+  },
+  "http":{
+    "enabled": true,
+    "listen": "0.0.0.0:8888",
+    "backdoor": true
   },
   "task": {
     "count": 1

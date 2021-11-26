@@ -1,14 +1,16 @@
 package model
 
-import "strings"
+import (
+	"gorm.io/gorm"
+	"strings"
+)
 
 type Resource struct {
-	Base
+	gorm.Model
 	Name string `json:"name" gorm:"name"`
-	Type string `json:"type" gorm:"type"`
 	Category string `gorm:"category" json:"category"`
-	FileID string `json:"_"`
-	File File
+	Uri string
+	FileID uint `json:"_"`
 }
 
 func (resources *Resource) TableName() string {
@@ -17,9 +19,9 @@ func (resources *Resource) TableName() string {
 func (resources *Resource) Delete() error {
 	return DB.Model(&Resource{}).Where("id=?", resources.ID).Delete(resources).Error
 }
-func (resources *Resource) Create() (string, error) {
+func (resources *Resource) Create() (uint, error) {
 	if err := DB.Create(resources).Error; err != nil {
-		return "", err
+		return 0, err
 	}
 	return resources.ID, nil
 }

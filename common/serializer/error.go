@@ -60,9 +60,11 @@ const (
 	CodeDeleteFileRecordErr         = 40008
 	CodeNotFindComputerErr          = 40009
 	CodeCallZebusApiErr             = 40010
-	CodeNotFindDstComputerServicErr = 40011
+	CodeNotFindDstComputerServiceErr = 40011
 	CodeSendZebusMessageErr         = 40012
+	CodeDeviceCodeRepeatErr =  50001
 )
+
 
 func ParamErr(msg string, err error) Response {
 	if msg == "" {

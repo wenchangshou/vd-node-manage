@@ -1,8 +1,12 @@
 {
   "debug": true,
   "database": {
-    "type": "sqlite",
-    "dbFile": "./server.db"
+    "type": "mysql",
+    "User": "root",
+    "Password": "123.com",
+    "Host": "192.168.0.222",
+    "Port": 3306,
+    "Name": "vd"
   },
   "hosts": "",
   "maxCons": 20,

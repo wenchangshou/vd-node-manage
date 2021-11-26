@@ -7,17 +7,25 @@ type DeviceReportRequest struct {
 	Ip       string
 }
 type DeviceRegisterRequest struct {
-	HID string `json:"hid"`
-	Type string `json:"type"`
-	Params string `json:"params"`
+	Code string `json:"code"`
+	ConnType string `json:"connType"`
 }
 type DeviceRegisterResponse struct {
-	ID string `json:"id"`
-	Status int `json:"status"`
+	ID     uint `json:"id"`
+	Status int    `json:"status"`
+	Code int `json:"code"`
+	Msg string `json:"msg"`
 }
-
 
 type DeviceUpdateInfo struct {
-	LastUpdate int64
+	LastUpdate    int64
 	ReportRequest *DeviceReportRequest
 }
+
+type DeviceStatusType int32
+
+const (
+	Device_Init = iota
+	Device_Register
+	Device_Disable
+)

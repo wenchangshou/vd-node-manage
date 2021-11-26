@@ -4,7 +4,6 @@ import (
 	"github.com/go-resty/resty/v2"
 	"github.com/pkg/errors"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/pkg/e"
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/util"
 	"net/http"
 )
 
@@ -24,14 +23,4 @@ func GetExternIp() (ip string, err error) {
 		return "", errors.New("获取计算机外部ip失败，错误消息:" + rtu.Msg)
 	}
 	return rtu.Data.(string), nil
-}
-func GetComputermac() (string, error) {
-	var (
-		ip  string
-		err error
-	)
-	if ip, err = GetExternIp(); err != nil {
-		return "", err
-	}
-	return util.GetMacByIp(ip)
 }

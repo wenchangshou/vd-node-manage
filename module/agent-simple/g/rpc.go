@@ -15,7 +15,18 @@ type SingleConnRpcClient struct {
 	RpcServer string
 	Timeout   time.Duration
 }
-
+var (
+	ServerRpcClient *SingleConnRpcClient
+)
+func InitRpcClients(){
+	if Config().Server.Register{
+		ServerRpcClient=&SingleConnRpcClient{
+			rpcClient: nil,
+			RpcServer: Config().Heartbeat.Addr,
+			Timeout:   time.Duration(Config().Heartbeat.Timeout)*time.Millisecond,
+		}
+	}
+}
 func (client *SingleConnRpcClient) close() {
 	if client.rpcClient != nil {
 		client.rpcClient.Close()
@@ -44,6 +55,7 @@ func (client *SingleConnRpcClient) serverConn() error {
 		return err
 	}
 }
+
 func (client *SingleConnRpcClient) Call(method string, args interface{}, reply interface{}) error {
 	client.Lock()
 	defer client.Unlock()

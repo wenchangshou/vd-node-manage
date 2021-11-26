@@ -1,8 +1,11 @@
 package model
 
+import "gorm.io/gorm"
+
 type File struct {
-	Base
+	gorm.Model
 	Name       string `gorm:"name" json:"name"`
+	Category string
 	Mode       string `gorm:"mode" json:"mode"`
 	SourceName string `gorm:"source_name" json:"sourceName"`
 	Size       uint   `gorm:"size" json:"size"`
@@ -13,9 +16,9 @@ type File struct {
 func (file *File) TableName() string {
 	return "file"
 }
-func (file *File) Create() (string, error) {
+func (file *File) Create() (uint, error) {
 	if err := DB.Create(file).Error; err != nil {
-		return "", err
+		return 0, err
 	}
 	return file.ID,nil
 }

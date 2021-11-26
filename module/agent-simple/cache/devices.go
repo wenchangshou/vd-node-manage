@@ -17,6 +17,7 @@ func NewSafeDevices() *SafeDevices {
 }
 func (this *SafeDevices) Put(req *model.DeviceReportRequest) {
 }
+// Get 获取指定的硬件id的元素
 func (this *SafeDevices) Get(hid string) (*model.DeviceUpdateInfo, bool) {
 	this.RLock()
 	defer this.RUnlock()

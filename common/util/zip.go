@@ -2,7 +2,7 @@ package util
 
 import (
 	"archive/zip"
-	"errors"
+	"github.com/pkg/errors"
 	"io"
 	"os"
 	"path/filepath"

@@ -11,10 +11,13 @@ import (
 
 // ServerConfig 服务配置
 type ServerConfig struct {
-	Address string `json:"address"`
-	Mode string `json:"mode"`
+	Address     string `json:"address"`
+	Mode        string `json:"mode"`
 	HttpAddress string `json:"httpAddress"`
-	RpcAddress string `json:"rpcAddress"`
+	RpcAddress  string `json:"rpcAddress"`
+	Register    bool `json:"register"`
+	ReportInterval int `json:"reportInterval"`
+	QueryTaskInterval int `json:"queryTaskInterval"`
 }
 
 // LogConfig 日志配置
@@ -60,6 +63,7 @@ type GlobalConfig struct {
 	Resource  *ResourceConfig   `json:"resource"`
 	Task      *TaskConfig       `json:"task"`
 	Heartbeat *HeartbeatConfig `json:"heartbeat"`
+	Http          *HttpConfig       `json:"http"`
 }
 
 var (

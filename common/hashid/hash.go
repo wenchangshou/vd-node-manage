@@ -13,6 +13,7 @@ const (
 	FileID
 	TaskID
 	CategoryID
+	DeviceID
 )
 
 var (

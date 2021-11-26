@@ -18,12 +18,12 @@ func migration() error {
 		return nil
 	}
 	if config.Database.Type == "mysql" {
-		DB = DB.Set("gorm:table_options", "ENGINE=InnoDB")
+		//DB = DB.Set("gorm:table_options", "ENGINE=InnoDB")
 	}
 	err = DB.AutoMigrate(
 		&Device{},
-		&File{},
-		&Resource{},
+		//&File{},
+		//&Resource{},
 		)
 	if err != nil {
 		log.Fatalln("migration database fail", "error", err)

@@ -9,6 +9,7 @@ import (
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/cron"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/engine"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/g"
+	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/http"
 	"github.com/wenchangshou2/zutil"
 	"net"
 	"path"
@@ -28,10 +29,12 @@ func (p *program) Start(SystemService.Service) error {
 	return nil
 }
 func (p *program) run() {
-
 	hardware := g.Hardware()
 	g.InitLocalIp()
+	g.InitRpcClients()
+	go http.Start()
 	cfg := g.Config()
+	cron.ReportDeviceStatus()
 	// 是否启用自动发现
 	if cfg.Server.Mode == "auto" {
 		invention, err := discover.NewInvention(net.IPv4zero, 0)
@@ -75,7 +78,6 @@ func init() {
 	zutil.IsNotExistMkDir(ap)
 	zutil.IsNotExistMkDir(rp)
 	g.ParseHardware(*hardware)
-	cron.ReportDeviceStatus()
 }
 func main() {
 	var (

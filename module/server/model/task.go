@@ -50,10 +50,10 @@ func (task *Task) TableName() string {
 	return "task"
 }
 
-func (task *Task) Add() (string, error) {
+func (task *Task) Add() (int, error) {
 	if err := DB.Create(&task).Error; err != nil {
 		logging.GLogger.Warn(fmt.Sprintf("添加任务项失败:%v", err))
-		return "", err
+		return -1, err
 	}
 	return task.ID, nil
 }

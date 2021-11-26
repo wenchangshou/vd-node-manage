@@ -1,11 +1,14 @@
 package http
 
 import (
-	"encoding/json"
+	"fmt"
+	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/gzip"
+	"github.com/gin-gonic/gin"
 	"github.com/julienschmidt/httprouter"
 	"github.com/wenchangshou2/vd-node-manage/module/server/g"
+	"github.com/wenchangshou2/vd-node-manage/module/server/http/controllers"
 	"log"
-	"net/http"
 )
 
 var router *httprouter.Router
@@ -15,52 +18,32 @@ type Dto struct {
 	Data interface{} `json:"data"`
 }
 
-func init() {
-	router = httprouter.New()
-	configCommonRoutes()
-	configDeviceRoutes()
-	configFileRoutes()
-}
-
-func RenderJson(w http.ResponseWriter, v interface{}) {
-	bs, err := json.Marshal(v)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+func InitRouter() *gin.Engine {
+	r := gin.Default()
+	r.Use(cors.Default())
+	r.Use(gzip.Gzip(gzip.DefaultCompression, gzip.WithExcludedPaths([]string{"/api/"})))
+	v1 := r.Group("/api/v1")
+	{
+		v1.GET("/health", controllers.Health)
+		device:=v1.Group("/device")
+		{
+			device.POST("",controllers.AddDevice)
+			device.POST("/register",controllers.RegisterDevice)
+		}
 	}
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.Write(bs)
+	return r
 }
-
-func RenderDataJson(w http.ResponseWriter, data interface{}) {
-	RenderJson(w, Dto{Msg: "success", Data: data})
-}
-
-func RenderMsgJson(w http.ResponseWriter, msg string) {
-	RenderJson(w, map[string]string{"msg": msg})
-}
-
-func AutoRender(w http.ResponseWriter, data interface{}, err error) {
-	if err != nil {
-		RenderMsgJson(w, err.Error())
-		return
-	}
-	RenderDataJson(w, data)
-}
-
 func Start() {
+	fmt.Println(g.Config().Http)
 	if !g.Config().Http.Enabled {
 		return
 	}
-
-	addr := g.Config().Http.Listen
-	if addr == "" {
+	addr:=g.Config().Http.Listen
+	if addr==""{
 		return
 	}
-	s := &http.Server{
-		Addr:           addr,
-		MaxHeaderBytes: 1 << 30,
+	r:=InitRouter()
+	if err:=r.Run(addr);err!=nil{
+		log.Fatalln("start http","err",err.Error())
 	}
-	log.Println("http listening", addr)
-	log.Fatalln(s.ListenAndServe())
 }
