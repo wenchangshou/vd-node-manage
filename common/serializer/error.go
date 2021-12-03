@@ -63,6 +63,7 @@ const (
 	CodeNotFindDstComputerServiceErr = 40011
 	CodeSendZebusMessageErr         = 40012
 	CodeDeviceCodeRepeatErr =  50001
+	CodeNotFindDeviceErr = 60000
 )
 
 

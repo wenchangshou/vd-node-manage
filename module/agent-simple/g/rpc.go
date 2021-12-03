@@ -18,11 +18,11 @@ type SingleConnRpcClient struct {
 var (
 	ServerRpcClient *SingleConnRpcClient
 )
-func InitRpcClients(){
+func InitRpcClients() {
 	if Config().Server.Register{
 		ServerRpcClient=&SingleConnRpcClient{
 			rpcClient: nil,
-			RpcServer: Config().Heartbeat.Addr,
+			RpcServer: Config().Server.RpcAddress,
 			Timeout:   time.Duration(Config().Heartbeat.Timeout)*time.Millisecond,
 		}
 	}

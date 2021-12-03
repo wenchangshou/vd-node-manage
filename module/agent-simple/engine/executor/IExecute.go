@@ -25,14 +25,13 @@ type IExecute interface {
 }
 
 // GenerateExecutorFactoryFunc 生成执行器工厂函数
-func GenerateExecutorFactoryFunc(computerService IService.ComputerService, taskService IService.TaskService, httpRequestUri string) GeneratorFunction {
+func GenerateExecutorFactoryFunc( taskService IService.TaskService, httpRequestUri string) GeneratorFunction {
 	return func(executorType e.ExecuteType, taskID string, option string) (IExecute, error) {
 		var err error
 		switch executorType {
 		case e.InstallProjectAction:
 			e := &InstallProjectExecutor{
 				TaskID:          taskID,
-				ComputerService: computerService,
 				HttpRequestUri:  httpRequestUri,
 				TaskService:     taskService,
 			}
@@ -44,7 +43,6 @@ func GenerateExecutorFactoryFunc(computerService IService.ComputerService, taskS
 		case e.DeleteProject:
 			e := &DeleteProjectExecutor{
 				TaskID:          taskID,
-				ComputerService: computerService,
 			}
 			if err = e.BindOption(option); err != nil {
 				return nil, errors.New("delete project action bind param error")
@@ -53,7 +51,6 @@ func GenerateExecutorFactoryFunc(computerService IService.ComputerService, taskS
 		case e.InstallResourceAction:
 			e := &InstallResourceExecutor{
 				taskID:          taskID,
-				computerService: computerService,
 				taskService:     taskService,
 				HttpRequestUri:  httpRequestUri,
 			}
@@ -63,7 +60,6 @@ func GenerateExecutorFactoryFunc(computerService IService.ComputerService, taskS
 			return e, nil
 		case e.DeleteResource:
 			e := &DeleteResourceExecutor{
-				ComputerService: computerService,
 			}
 			if err = e.BindOption(option); err != nil {
 				return nil, errors.New("delete resource action bind param error")

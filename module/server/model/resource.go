@@ -7,10 +7,11 @@ import (
 
 type Resource struct {
 	gorm.Model
-	Name string `json:"name" gorm:"name"`
+	Name     string `json:"name" gorm:"name"`
+	Service  string `json:"service"`
 	Category string `gorm:"category" json:"category"`
-	Uri string
-	FileID uint `json:"_"`
+	Uri      string `json:"uri"`
+	Status   uint   `json:"status"`
 }
 
 func (resources *Resource) TableName() string {
@@ -24,6 +25,11 @@ func (resources *Resource) Create() (uint, error) {
 		return 0, err
 	}
 	return resources.ID, nil
+}
+
+func (resources *Resource) Add() (uint, error) {
+	err := DB.Create(&resources).Error
+	return resources.ID, err
 }
 func GetResourceById(id string) (*Resource, error) {
 	var resource *Resource
@@ -54,12 +60,13 @@ func GetResources(Page int, size int, orderBy string, conditions map[string]stri
 	return res, total
 }
 
-func GetResourcesByIds(ids []string) ([]Resource, error) {
+func GetResourcesByIds(ids []uint) ([]Resource, error) {
 
 	var res []Resource
 
 	// err := DB.Model(&Computer{}).Association("Resources").DB.Where("computer_id=?", ids).Find(&res).Error
-	return res, nil
+	err := DB.Model(&Resource{}).Where("id like ?", ids).Find(&res).Error
+	return res, err
 }
 func ListResource(Page int, size int, orderBy string, conditions map[string]string, searches map[string]string) (resources []Resource, total int64) {
 	tx := DB.Model(Resource{})

@@ -27,8 +27,15 @@ func InitRouter() *gin.Engine {
 		v1.GET("/health", controllers.Health)
 		device:=v1.Group("/device")
 		{
+			device.POST("/list",controllers.ListDevice)
 			device.POST("",controllers.AddDevice)
 			device.POST("/register",controllers.RegisterDevice)
+			device.POST("/resource",controllers.AddDeviceResource)
+		}
+		resource:=v1.Group("/resource")
+		{
+			resource.POST("/upload",controllers.UploadFile)
+			resource.POST("",controllers.AddResource)
 		}
 	}
 	return r

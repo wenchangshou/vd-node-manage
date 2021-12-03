@@ -11,10 +11,10 @@
   "hosts": "",
   "maxCons": 20,
   "maxIdle": 100,
-  "listen": ":6030",
+  "listen": "192.168.10.121:6030",
   "http": {
     "enabled": true,
-    "listen": "0.0.0.0:6031"
+    "listen": "192.168.10.121:6031"
   },
   "redis": {
     "addr": "123.com@120.53.243.218:6379",

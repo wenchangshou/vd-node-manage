@@ -56,7 +56,7 @@ func (service *OpenMultiScreenService) Open(computerId int) serializer.Response 
 		return serializer.Err(serializer.CodeCallZebusApiErr, "调用zebus接口错误", err)
 	}
 	if !serverInfo.IsExistServer(computer.Ip, "vd-ResourcesService") {
-		return serializer.Err(serializer.CodeNotFindDstComputerServicErr, "目标计算机服务未在线", nil)
+		return serializer.Err(serializer.CodeNotFindDeviceErr, "目标计算机服务未在线", nil)
 	}
 	topic := fmt.Sprintf("/zebus/%s/vd-ResourcesService", computer.Ip)
 	b, err := json.Marshal(service)

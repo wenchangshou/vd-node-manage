@@ -81,7 +81,7 @@ func (t TaskHttpService) GetTasks(status int, count int) ([]dto.Task, error) {
 // NewTaskHttpService 创建新的http任务服务
 func NewTaskHttpService(id string, address string) TaskHttpService {
 	return TaskHttpService{
-		ID:   id,
-		Address:address,
+		ID:      id,
+		Address: address,
 	}
 }

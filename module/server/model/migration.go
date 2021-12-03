@@ -22,8 +22,9 @@ func migration() error {
 	}
 	err = DB.AutoMigrate(
 		&Device{},
-		//&File{},
-		//&Resource{},
+		&File{},
+		&Resource{},
+		&ResourceDistribution{},
 		)
 	if err != nil {
 		log.Fatalln("migration database fail", "error", err)

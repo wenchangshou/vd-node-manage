@@ -4,15 +4,14 @@ import (
 	"flag"
 	"fmt"
 	SystemService "github.com/kardianos/service"
-	discover "github.com/wenchangshou2/vd-node-manage/common/discovery"
 	"github.com/wenchangshou2/vd-node-manage/common/logging"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/cron"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/engine"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/g"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/http"
 	"github.com/wenchangshou2/zutil"
-	"net"
 	"path"
+	"time"
 )
 
 var (
@@ -28,31 +27,52 @@ func (p *program) Start(SystemService.Service) error {
 	go p.run()
 	return nil
 }
+
+// waitRegister 等待注册
+func waitRegister() <-chan bool {
+	result := make(chan bool)
+	go func() {
+		timeTicker := time.NewTicker(time.Millisecond * 500)
+		for {
+			select {
+			case <-timeTicker.C:
+				if g.Config().Server.Register {
+					result <- true
+				}
+			}
+		}
+	}()
+
+	return result
+}
 func (p *program) run() {
-	hardware := g.Hardware()
+	go http.Start()
+	//cfg := g.Config()
+	result := waitRegister()
+	<-result
 	g.InitLocalIp()
 	g.InitRpcClients()
-	go http.Start()
-	cfg := g.Config()
 	cron.ReportDeviceStatus()
-	// 是否启用自动发现
-	if cfg.Server.Mode == "auto" {
-		invention, err := discover.NewInvention(net.IPv4zero, 0)
-		if err != nil {
-			logging.GLogger.Error(fmt.Sprintf("初始化发现服务失败：%v\n", err))
-			return
-		}
-		serverInfo, err := invention.WaitRegister()
-		if err != nil {
-			logging.GLogger.Error(fmt.Sprintf("等待注册失败:%s\n", err.Error()))
-			return
-		}
-		cfg.Server.Address = fmt.Sprintf("%s:%d", serverInfo.Ip, serverInfo.Port)
-	}
-	err := engine.InitSchedule(g.Config().Server.HttpAddress,g.Config().Server.RpcAddress, hardware.ID)
+	err := engine.InitSchedule(g.Config().Server.HttpAddress,g.Config().Server.RpcAddress, g.Config().Server.ID)
 	if err != nil {
 		return
 	}
+	fmt.Println("成功")
+
+	//// 是否启用自动发现
+	//if cfg.Server.Mode == "auto" {
+	//	invention, err := discover.NewInvention(net.IPv4zero, 0)
+	//	if err != nil {
+	//		logging.GLogger.Error(fmt.Sprintf("初始化发现服务失败：%v\n", err))
+	//		return
+	//	}
+	//	serverInfo, err := invention.WaitRegister()
+	//	if err != nil {
+	//		logging.GLogger.Error(fmt.Sprintf("等待注册失败:%s\n", err.Error()))
+	//		return
+	//	}
+	//	cfg.Server.Address = fmt.Sprintf("%s:%d", serverInfo.Ip, serverInfo.Port)
+	//}
 }
 func (p *program) Stop(SystemService.Service) error {
 	return nil
@@ -68,11 +88,11 @@ func init() {
 	// Init
 	g.InitApplication()
 	g.ParseConfig(*cfg)
-	conf:=g.Config()
-	logging.InitLogging(conf.Log.Path,conf.Log.Level)
+	conf := g.Config()
+	logging.InitLogging(conf.Log.Path, conf.Log.Level)
 	// 创建工作目录
-	ap:=path.Join(conf.Resource.Directory,"application")
-	rp:=path.Join(conf.Resource.Directory,"resource")
+	ap := path.Join(conf.Resource.Directory, "application")
+	rp := path.Join(conf.Resource.Directory, "resource")
 	zutil.IsNotExistMkDir(conf.Resource.Directory)
 	zutil.IsNotExistMkDir(conf.Resource.Tmp)
 	zutil.IsNotExistMkDir(ap)
@@ -82,6 +102,7 @@ func init() {
 func main() {
 	var (
 		err error
+		s   SystemService.Service
 	)
 	svcConfig := &SystemService.Config{
 		Name:        "vd client",
@@ -89,7 +110,7 @@ func main() {
 		Description: "",
 	}
 	prg := &program{}
-	s, err := SystemService.New(prg, svcConfig)
+	s, err = SystemService.New(prg, svcConfig)
 	if err != nil {
 		logging.GLogger.Error("创建服务失败:" + err.Error())
 	}

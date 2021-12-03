@@ -8,16 +8,17 @@ import (
 	"sync"
 )
 
-
 // ServerConfig 服务配置
 type ServerConfig struct {
-	Address     string `json:"address"`
-	Mode        string `json:"mode"`
-	HttpAddress string `json:"httpAddress"`
-	RpcAddress  string `json:"rpcAddress"`
-	Register    bool `json:"register"`
-	ReportInterval int `json:"reportInterval"`
-	QueryTaskInterval int `json:"queryTaskInterval"`
+	Address           string `json:"address"`
+	Mode              string `json:"mode"`
+	HttpAddress       string `json:"httpAddress"`
+	RpcAddress        string `json:"rpcAddress"`
+	Register          bool   `json:"register"`
+	ID                uint   `json:"id"`
+	ReportInterval    int    `json:"reportInterval"`
+	QueryTaskInterval int    `json:"queryTaskInterval"`
+	RedisAddress      string `json:"redis_address"`
 }
 
 // LogConfig 日志配置
@@ -57,13 +58,13 @@ type GlobalConfig struct {
 	Debug     bool             `json:"debug"`
 	Hostname  string           `json:"hostname"`
 	IP        string           `json:"ip"`
-	Log       *LogConfig        `json:"log"`
-	Server    *ServerConfig     `json:"server"`
-	Rpc       *RpcConfig        `json:"rpc-old"`
-	Resource  *ResourceConfig   `json:"resource"`
-	Task      *TaskConfig       `json:"task"`
+	Log       *LogConfig       `json:"log"`
+	Server    *ServerConfig    `json:"server"`
+	Rpc       *RpcConfig       `json:"rpc-old"`
+	Resource  *ResourceConfig  `json:"resource"`
+	Task      *TaskConfig      `json:"task"`
 	Heartbeat *HeartbeatConfig `json:"heartbeat"`
-	Http          *HttpConfig       `json:"http"`
+	Http      *HttpConfig      `json:"http"`
 }
 
 var (
@@ -77,6 +78,17 @@ func Config() *GlobalConfig {
 	configLock.RLock()
 	defer configLock.RUnlock()
 	return config
+}
+func SetRegisterStatus(status bool, id uint, httpAddress, rpcAddress, redisAddress string) {
+	configLock.Lock()
+	defer configLock.Unlock()
+	config.Server.Register = status
+	config.Server.ID = id
+	config.Server.HttpAddress = httpAddress
+	config.Server.RpcAddress = rpcAddress
+	config.Server.RedisAddress = redisAddress
+	b, _ := json.Marshal(config)
+	file.WriteString(ConfigFile, string(b))
 }
 
 // ParseConfig 解析配置文件
@@ -109,18 +121,18 @@ func Hostname() (string, error) {
 		return hostname, nil
 	}
 	hostname, err := os.Hostname()
-	if err!=nil{
-		log.Println("ERROR: os.Hostname() fail",err)
+	if err != nil {
+		log.Println("ERROR: os.Hostname() fail", err)
 	}
-	return hostname,err
+	return hostname, err
 }
-func IP() string{
-	ip:=Config().IP
-	if ip!=""{
+func IP() string {
+	ip := Config().IP
+	if ip != "" {
 		return ip
 	}
-	if len(LocalIp)>0{
-		ip=LocalIp
+	if len(LocalIp) > 0 {
+		ip = LocalIp
 	}
 	return ip
 }

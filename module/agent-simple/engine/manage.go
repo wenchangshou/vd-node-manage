@@ -1,8 +1,6 @@
 package engine
 
 import (
-	"context"
-	"github.com/wenchangshou2/vd-node-manage/common/logging"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/dto"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/engine/executor"
 	IService "github.com/wenchangshou2/vd-node-manage/module/agent-simple/service"
@@ -26,13 +24,12 @@ type TaskChangeEventInfo struct {
 // @param maxExecutorCount 允许同时执行任务数
 // @param httpRequestUri http请求地址
 // @param rpcRequestUri rpc请求地址
-func NewTaskManage(count int32, httpRequest string, taskService IService.TaskService, computerService IService.ComputerService) (*TaskManage, error) {
-	g := executor.GenerateExecutorFactoryFunc(computerService, taskService, httpRequest)
+func NewTaskManage(count int32, httpRequest string, taskService IService.TaskService) (*TaskManage, error) {
+	g := executor.GenerateExecutorFactoryFunc( taskService, httpRequest)
 	GTaskExecute = &TaskManage{
 		maxExecutorCount:    count,
 		taskAddNotify:       make(chan dto.Task),
 		taskService:         taskService,
-		computerService:     computerService,
 		notifyExecuteChange: make(chan TaskChangeEventInfo),
 		TaskStatusList:      NewTaskList(),
 		generator:           &g,
@@ -122,22 +119,22 @@ func (taskList *TaskList) Get(id string) TaskStatus {
 // execute 执行器
 func (manage *TaskManage) execute(task dto.Task) {
 	// 将任务设置成执行状态
-	err := manage.taskService.SetTaskStatus([]string{task.ID}, executor.EXECUTE)
-	if err != nil {
-		logging.GLogger.Info("更新任务状态失败")
-		manage.taskService.SetTaskStatus([]string{task.ID}, executor.ERROR)
-		return
-	}
-	ctx, cancel := context.WithCancel(context.Background())
-	manage.cancelFuncMap.LoadOrStore(task.ID, cancel)
-	group := NewTaskGroup(task, ctx, manage.generator)
-	status := group.Start()
-	select {
-	case status := <-status:
-		manage.taskService.SetTaskStatus([]string{task.ID}, status)
-		atomic.AddInt32(&manage.executorCount, -1)
-		manage.TaskStatusList.Delete(task.ID)
-	}
+	//err := manage.taskService.SetTaskStatus([]{task.ID}, executor.EXECUTE)
+	//if err != nil {
+	//	logging.GLogger.Info("更新任务状态失败")
+	//	manage.taskService.SetTaskStatus([]uint{task.ID}, executor.ERROR)
+	//	return
+	//}
+	//ctx, cancel := context.WithCancel(context.Background())
+	//manage.cancelFuncMap.LoadOrStore(task.ID, cancel)
+	//group := NewTaskGroup(task, ctx, manage.generator)
+	//status := group.Start()
+	//select {
+	//case status := <-status:
+	//	manage.taskService.SetTaskStatus([]string{task.ID}, status)
+	//	atomic.AddInt32(&manage.executorCount, -1)
+	//	manage.TaskStatusList.Delete(task.ID)
+	//}
 
 }
 
@@ -192,11 +189,11 @@ func (manage *TaskManage) AddTaskByExecuteList(task []dto.Task) {
 func (manage *TaskManage) AddTask(tasks []dto.Task) error {
 	manage.Lock()
 	defer manage.Unlock()
-	for _, task := range tasks {
-		atomic.AddInt32(&manage.waitCount, 1)
-		manage.TaskStatusList.Store(task.ID, WAIT)
-		manage.waitTask.LoadOrStore(task.ID, task)
-	}
+	//for _, task := range tasks {
+		//atomic.AddInt32(&manage.waitCount, 1)
+		//manage.TaskStatusList.Store(task.ID, WAIT)
+		//manage.waitTask.LoadOrStore(task.ID, task)
+	//}
 	return nil
 }
 func (manage *TaskManage) Start() {
