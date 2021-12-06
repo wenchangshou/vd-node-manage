@@ -2,7 +2,6 @@ package rpc
 
 import (
 	"github.com/wenchangshou2/vd-node-manage/common/model"
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/cache"
 	"github.com/wenchangshou2/vd-node-manage/module/server/g"
 	"github.com/wenchangshou2/vd-node-manage/module/server/service"
 )
@@ -38,7 +37,7 @@ func (device *Device) ReportStatus(args *model.DeviceReportRequest, reply *model
 		reply.Code = 1
 		return nil
 	}
-	cache.Devices.Put(args)
+	//cache.Devices.Put(args)
 	return nil
 }
 func (device *Device) QueryTask(args *model.DeviceReportRequest, reply *model.DeviceQueryStatusResponse) error {

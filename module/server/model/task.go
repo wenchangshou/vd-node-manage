@@ -1,26 +1,11 @@
 package model
 
 import (
-"encoding/json"
-"fmt"
-"github.com/wenchangshou2/vd-node-manage/common/logging"
-"strings"
-)
-
-type TaskStatus uint
-
-const (
-	Initializes TaskStatus = iota
-	Progress
-	Done
-	Error
-)
-const (
-	InstallProjectAction = iota
-	InstallResourceAction
-	UpgradeProjectAction
-	DeleteResource
-	DeleteProject
+	"encoding/json"
+	"fmt"
+	"github.com/wenchangshou2/vd-node-manage/common/logging"
+	"github.com/wenchangshou2/vd-node-manage/common/model"
+	"strings"
 )
 
 type Task struct {
@@ -34,12 +19,12 @@ type Task struct {
 type TaskItem struct {
 	Base
 	TaskID   string
-	Action   uint       `gorm:"action" json:"action"`
-	Status   TaskStatus `gorm:"status" json:"status"`
-	Depend   string     `gorm:"depend" json:"depend"`
-	Options  string     `gorm:"options" json:"options"`
-	Message  string     `gorm:"message" json:"message"`
-	Schedule int        `gorm:"schedule" json:"schedule"`
+	Action   uint             `gorm:"action" json:"action"`
+	Status   model.TaskStatus `gorm:"status" json:"status"`
+	Depend   string           `gorm:"depend" json:"depend"`
+	Options  string           `gorm:"options" json:"options"`
+	Message  string           `gorm:"message" json:"message"`
+	Schedule int              `gorm:"schedule" json:"schedule"`
 }
 
 func (taskItem *TaskItem) TableName() string {
@@ -66,7 +51,7 @@ func AddTaskItem(taskId string, action uint, options map[string]interface{}, act
 		Action:   action,
 		Options:  string(jsonStr),
 		Schedule: 0,
-		Status:   Initializes,
+		Status:   model.Initializes,
 		Depend:   depend,
 	}
 	result := DB.Model(&TaskItem{}).Create(&taskItem)
@@ -84,12 +69,6 @@ func AddTask(name string, computerID string) (Task, error) {
 	return task, result.Error
 }
 
-//GetPendingTaskByComputerId 获取待处理的任务
-func GetPendingTaskByComputerId(computerId string) ([]Task, error) {
-	var tasks []Task
-	result := DB.Model(&Task{}).Where("computer_id = ? AND status != ?", computerId, Done).Find(&tasks)
-	return tasks, result.Error
-}
 func GetTaskListByCid(computerId string) ([]Task, error) {
 	var tasks []Task
 	result := DB.Debug().Model(&Task{}).Where("computer_id = ?", computerId).Find(&tasks)
@@ -115,13 +94,8 @@ func GetTaskListByCidFilterStatus(computerId string, status int) ([]Task, error)
 	return tasks, result.Error
 }
 
-// SetTaskStatus 设置任务的状态
-func SetTaskStatus(taskId string, status uint) error {
-	result := DB.Model(&Task{}).Where("id = ? ", taskId).Update("status", status)
-	return result.Error
-}
 func SetTaskItemStatus(taskId string, status uint, msg string) error {
-	result := DB.Model(&TaskItem{}).Where("id = ?", taskId).Updates(map[string]interface{}{"status": status, "message": msg})
+	result := DB.Model(&TaskItem{}).Where("id like ?", taskId).Updates(map[string]interface{}{"status": status, "message": msg})
 	return result.Error
 
 }

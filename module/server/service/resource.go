@@ -1,6 +1,7 @@
 package service
 
 import (
+	"encoding/json"
 	model2 "github.com/wenchangshou2/vd-node-manage/common/model"
 	"github.com/wenchangshou2/vd-node-manage/common/serializer"
 	"github.com/wenchangshou2/vd-node-manage/module/server/model"
@@ -30,7 +31,7 @@ func (service *ResourceAddService) Add() serializer.Response {
 	}
 	return serializer.Response{
 		Data: map[string]interface{}{
-			"id":id,
+			"id": id,
 		},
 	}
 }
@@ -39,18 +40,30 @@ type DeviceResourceAddService struct {
 	DeviceID   uint `json:"device_id" binding:"required"`
 	ResourceID uint `json:"resource_id" binding:"required""`
 	Status     int  `json:"status"`
+	Active     bool `json:"active"`
 }
 
 // Add 添加设备资源
 func (service DeviceResourceAddService) Add() serializer.Response {
-	task := model.ResourceDistribution{
-		DeviceID:   service.DeviceID,
-		ResourceID: service.ResourceID,
-		Status:     model2.TaskInitialization,
-		Schedule:   0,
+	//task := model.ResourceDistribution{
+	//	DeviceID:   service.DeviceID,
+	//	ResourceID: service.ResourceID,
+	//	Status:     model2.TaskInitialization,
+	//	Schedule:   0,
+	//}
+	params := make(map[string]interface{})
+	params["resource_id"] = service.ResourceID
+	m := model.Event{
+		DeviceID: service.DeviceID,
+		Active:   service.Active,
+		Action:   model2.InstallResourceAction,
+		Status:   model2.Initializes,
 	}
-	if err := task.Add(); err != nil {
-		return serializer.Err(serializer.CodeDBError, "添加设备资源失败", err)
+	b, _ := json.Marshal(params)
+	m.Params = string(b)
+	err := m.Add()
+	if err != nil {
+		return serializer.Err(serializer.CodeDBError, "添加资源分发事件失败", err)
 	}
 	return serializer.Response{}
 }

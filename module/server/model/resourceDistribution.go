@@ -1,8 +1,6 @@
 package model
 
 import (
-	"fmt"
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/dto"
 	"gorm.io/gorm"
 )
 
@@ -22,25 +20,32 @@ func (m ResourceDistribution) TableName() string {
 func (m ResourceDistribution) Add() error {
 	return DB.Create(&m).Error
 }
-func QueryResourceDistributionByDeviceID(id uint) (tasks []dto.Task, err error) {
-	var items []ResourceDistribution
-	err = DB.Debug().Model(&ResourceDistribution{}).Where("device_id=?", id).Preload("Resource").Find(&items).Error
-	if err != nil {
-		return nil, err
-	}
-	for _, item := range items {
-		params := make(map[string]interface{})
-		params["uri"] = item.Resource.Uri
-		params["status"] = 0
-		params["id"] = item.ID
-		params["resource_id"] = item.ResourceID
-		_item := dto.Task{
-			Action: "resourceDistribution",
-			Params: params,
-		}
-		tasks = append(tasks, _item)
-	}
 
-	fmt.Println(items)
-	return
+//func QueryResourceDistributionByDeviceID(id uint) (tasks []dto.Task, err error) {
+//var items []ResourceDistribution
+//err = DB.Debug().Model(&ResourceDistribution{}).Where("device_id=?", id).Preload("Resource").Find(&items).Error
+//if err != nil {
+//	return nil, err
+//}
+//for _, item := range items {
+//	params := make(map[string]interface{})
+//	params["uri"] = item.Resource.Uri
+//	params["status"] = 0
+//	params["resource_id"] = item.ResourceID
+//	_item := dto.Task{
+//		Action: "resourceDistribution",
+//		ID:     id,
+//		Params: params,
+//	}
+//	tasks = append(tasks, _item)
+//}
+//
+//fmt.Println(items)
+//return
+//}
+
+// SetResourceDistributionStatus  设置任务的状态
+func SetResourceDistributionStatus(taskId []uint, status uint) error {
+	result := DB.Model(&ResourceDistribution{}).Where("id like   ? ", taskId).Update("status", status)
+	return result.Error
 }

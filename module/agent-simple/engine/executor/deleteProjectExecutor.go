@@ -16,7 +16,7 @@ type DeleteOption struct {
 type DeleteProjectExecutor struct {
 	Option          DeleteOption
 	ComputerService IService.ComputerService
-	TaskID          string
+	TaskID          uint
 }
 
 func (executor *DeleteProjectExecutor) Execute() error {

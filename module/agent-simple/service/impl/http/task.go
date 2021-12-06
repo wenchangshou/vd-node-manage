@@ -15,7 +15,7 @@ type TaskHttpService struct {
 	Address string
 }
 
-func (t TaskHttpService) SetTaskItemStatus(ids []string, status int) error {
+func (t TaskHttpService) SetTaskItemStatus(ids []uint, status int) error {
 	rtu := e.HttpBaseData{}
 	client := resty.New()
 	requestUri := t.GetUrl(t.Address, "task")
@@ -33,7 +33,7 @@ func (t TaskHttpService) SetTaskItemStatus(ids []string, status int) error {
 }
 
 // SetTaskStatus 设置任务状态
-func (t TaskHttpService) SetTaskStatus(ids []string, status int) error {
+func (t TaskHttpService) SetTaskStatus(ids []uint, status int) error {
 	rtu := e.HttpBaseData{}
 	client := resty.New()
 	requestUri := t.GetUrl(t.Address, "task")

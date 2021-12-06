@@ -24,8 +24,10 @@ func migration() error {
 		&Device{},
 		&File{},
 		&Resource{},
+		Task{},
+		Event{},
 		&ResourceDistribution{},
-		)
+	)
 	if err != nil {
 		log.Fatalln("migration database fail", "error", err)
 	}

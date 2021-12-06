@@ -15,7 +15,7 @@ const (
 	ALL
 )
 
-type GeneratorFunction func(e.ExecuteType, string, string) (IExecute, error)
+type GeneratorFunction func(e.ExecuteType, uint, string) (IExecute, error)
 
 // IExecute 执行器接口
 type IExecute interface {
@@ -25,15 +25,15 @@ type IExecute interface {
 }
 
 // GenerateExecutorFactoryFunc 生成执行器工厂函数
-func GenerateExecutorFactoryFunc( taskService IService.TaskService, httpRequestUri string) GeneratorFunction {
-	return func(executorType e.ExecuteType, taskID string, option string) (IExecute, error) {
+func GenerateExecutorFactoryFunc(taskService IService.TaskService, httpRequestUri string) GeneratorFunction {
+	return func(executorType e.ExecuteType, taskID uint, option string) (IExecute, error) {
 		var err error
 		switch executorType {
 		case e.InstallProjectAction:
 			e := &InstallProjectExecutor{
-				TaskID:          taskID,
-				HttpRequestUri:  httpRequestUri,
-				TaskService:     taskService,
+				TaskID:         taskID,
+				HttpRequestUri: httpRequestUri,
+				TaskService:    taskService,
 			}
 			if err = e.BindOption(option); err != nil {
 				return nil, errors.New("install project action bind param error")
@@ -42,7 +42,7 @@ func GenerateExecutorFactoryFunc( taskService IService.TaskService, httpRequestU
 
 		case e.DeleteProject:
 			e := &DeleteProjectExecutor{
-				TaskID:          taskID,
+				TaskID: taskID,
 			}
 			if err = e.BindOption(option); err != nil {
 				return nil, errors.New("delete project action bind param error")
@@ -50,17 +50,16 @@ func GenerateExecutorFactoryFunc( taskService IService.TaskService, httpRequestU
 			return e, nil
 		case e.InstallResourceAction:
 			e := &InstallResourceExecutor{
-				taskID:          taskID,
-				taskService:     taskService,
-				HttpRequestUri:  httpRequestUri,
+				taskID:         taskID,
+				taskService:    taskService,
+				HttpRequestUri: httpRequestUri,
 			}
 			if err = e.BindOption(option); err != nil {
 				return nil, errors.New("install resource action bind param error")
 			}
 			return e, nil
 		case e.DeleteResource:
-			e := &DeleteResourceExecutor{
-			}
+			e := &DeleteResourceExecutor{}
 			if err = e.BindOption(option); err != nil {
 				return nil, errors.New("delete resource action bind param error")
 			}

@@ -1,6 +1,8 @@
 package engine
 
 import (
+	"context"
+	"github.com/wenchangshou2/vd-node-manage/common/logging"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/dto"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/engine/executor"
 	IService "github.com/wenchangshou2/vd-node-manage/module/agent-simple/service"
@@ -25,7 +27,7 @@ type TaskChangeEventInfo struct {
 // @param httpRequestUri http请求地址
 // @param rpcRequestUri rpc请求地址
 func NewTaskManage(count int32, httpRequest string, taskService IService.TaskService) (*TaskManage, error) {
-	g := executor.GenerateExecutorFactoryFunc( taskService, httpRequest)
+	g := executor.GenerateExecutorFactoryFunc(taskService, httpRequest)
 	GTaskExecute = &TaskManage{
 		maxExecutorCount:    count,
 		taskAddNotify:       make(chan dto.Task),
@@ -72,23 +74,23 @@ const (
 
 type TaskList struct {
 	sync.RWMutex
-	items map[string]TaskStatus
+	items map[uint]TaskStatus
 }
 
 func NewTaskList() *TaskList {
-	return &TaskList{items: make(map[string]TaskStatus)}
+	return &TaskList{items: make(map[uint]TaskStatus)}
 
 }
 
 //Delete 删除元素
-func (taskList *TaskList) Delete(id string) {
+func (taskList *TaskList) Delete(id uint) {
 	taskList.Lock()
 	defer taskList.Unlock()
 	delete(taskList.items, id)
 }
 
 // LoadAndDeleteByStatus  加载并且删除元素
-func (taskList *TaskList) LoadAndDeleteByStatus(status TaskStatus) (string, bool) {
+func (taskList *TaskList) LoadAndDeleteByStatus(status TaskStatus) (uint, bool) {
 	taskList.Lock()
 	defer taskList.Unlock()
 	for k, v := range taskList.items {
@@ -97,16 +99,16 @@ func (taskList *TaskList) LoadAndDeleteByStatus(status TaskStatus) (string, bool
 			return k, true
 		}
 	}
-	return "", false
+	return 0, false
 }
 
 // Store 存储元素
-func (taskList *TaskList) Store(id string, status TaskStatus) {
+func (taskList *TaskList) Store(id uint, status TaskStatus) {
 	taskList.Lock()
 	defer taskList.Unlock()
 	taskList.items[id] = status
 }
-func (taskList *TaskList) Get(id string) TaskStatus {
+func (taskList *TaskList) Get(id uint) TaskStatus {
 	taskList.RLock()
 	defer taskList.Unlock()
 	item, ok := taskList.items[id]
@@ -118,23 +120,24 @@ func (taskList *TaskList) Get(id string) TaskStatus {
 
 // execute 执行器
 func (manage *TaskManage) execute(task dto.Task) {
+
 	// 将任务设置成执行状态
-	//err := manage.taskService.SetTaskStatus([]{task.ID}, executor.EXECUTE)
-	//if err != nil {
-	//	logging.GLogger.Info("更新任务状态失败")
-	//	manage.taskService.SetTaskStatus([]uint{task.ID}, executor.ERROR)
-	//	return
-	//}
-	//ctx, cancel := context.WithCancel(context.Background())
-	//manage.cancelFuncMap.LoadOrStore(task.ID, cancel)
-	//group := NewTaskGroup(task, ctx, manage.generator)
-	//status := group.Start()
-	//select {
-	//case status := <-status:
-	//	manage.taskService.SetTaskStatus([]string{task.ID}, status)
-	//	atomic.AddInt32(&manage.executorCount, -1)
-	//	manage.TaskStatusList.Delete(task.ID)
-	//}
+	err := manage.taskService.SetTaskStatus([]uint{task.ID}, executor.EXECUTE)
+	if err != nil {
+		logging.GLogger.Info("更新任务状态失败")
+		//manage.taskService.SetTaskStatus([]uint{task.ID}, executor.ERROR)
+		return
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	manage.cancelFuncMap.LoadOrStore(task.ID, cancel)
+	group := NewTaskGroup(task, ctx, manage.generator)
+	status := group.Start()
+	select {
+	case status := <-status:
+		manage.taskService.SetTaskStatus([]uint{task.ID}, status)
+		atomic.AddInt32(&manage.executorCount, -1)
+		manage.TaskStatusList.Delete(task.ID)
+	}
 
 }
 
@@ -189,11 +192,11 @@ func (manage *TaskManage) AddTaskByExecuteList(task []dto.Task) {
 func (manage *TaskManage) AddTask(tasks []dto.Task) error {
 	manage.Lock()
 	defer manage.Unlock()
-	//for _, task := range tasks {
-		//atomic.AddInt32(&manage.waitCount, 1)
-		//manage.TaskStatusList.Store(task.ID, WAIT)
-		//manage.waitTask.LoadOrStore(task.ID, task)
-	//}
+	for _, task := range tasks {
+		atomic.AddInt32(&manage.waitCount, 1)
+		manage.TaskStatusList.Store(task.ID, WAIT)
+		manage.waitTask.LoadOrStore(task.ID, task)
+	}
 	return nil
 }
 func (manage *TaskManage) Start() {

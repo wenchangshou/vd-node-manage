@@ -11,12 +11,14 @@ import (
 
 type Device int
 type Task int
+type Event int
 
 func Start() {
 	addr := g.Config().Listen
 	server := rpc.NewServer()
 	server.Register(new(Device))
 	server.Register(new(Task))
+	server.Register(new(Event))
 	l, e := net.Listen("tcp", addr)
 	if e != nil {
 		log.Fatalln("listen error:", e)

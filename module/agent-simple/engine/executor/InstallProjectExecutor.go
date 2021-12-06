@@ -13,7 +13,7 @@ import (
 )
 
 type InstallProjectExecutor struct {
-	TaskID          string
+	TaskID          uint
 	HttpAddress     string
 	Options         InstallProjectOption
 	NotifyEvent     func(string, int, string)
@@ -61,16 +61,16 @@ func (executor *InstallProjectExecutor) Execute() error {
 	err = util.UnZip(dstPath, tmpPath)
 	if err != nil {
 		os.RemoveAll(tmpPath)
-		executor.TaskService.SetTaskItemStatus([]string{executor.TaskID}, ERROR)
+		executor.TaskService.SetTaskItemStatus([]uint{executor.TaskID}, ERROR)
 		return err
 	}
 	err = executor.ComputerService.AddComputerProject(executor.Options.ID)
 	if err != nil {
-		executor.TaskService.SetTaskItemStatus([]string{executor.TaskID}, ERROR)
+		executor.TaskService.SetTaskItemStatus([]uint{executor.TaskID}, ERROR)
 		return err
 	}
 	os.RemoveAll(tmpPath)
-	executor.TaskService.SetTaskItemStatus([]string{executor.TaskID}, DONE)
+	executor.TaskService.SetTaskItemStatus([]uint{executor.TaskID}, DONE)
 	return nil
 }
 
