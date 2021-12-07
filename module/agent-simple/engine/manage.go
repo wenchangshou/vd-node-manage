@@ -1,8 +1,8 @@
 package engine
 
 import (
-	"context"
 	"github.com/wenchangshou2/vd-node-manage/common/logging"
+	"github.com/wenchangshou2/vd-node-manage/common/model"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/dto"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/engine/executor"
 	IService "github.com/wenchangshou2/vd-node-manage/module/agent-simple/service"
@@ -119,25 +119,25 @@ func (taskList *TaskList) Get(id uint) TaskStatus {
 }
 
 // execute 执行器
-func (manage *TaskManage) execute(task dto.Task) {
-
+func (manage *TaskManage) execute(event model.Event) {
 	// 将任务设置成执行状态
-	err := manage.taskService.SetTaskStatus([]uint{task.ID}, executor.EXECUTE)
+	err := manage.taskService.SetTaskStatus([]uint{event.ID}, executor.EXECUTE)
 	if err != nil {
 		logging.GLogger.Info("更新任务状态失败")
 		//manage.taskService.SetTaskStatus([]uint{task.ID}, executor.ERROR)
 		return
 	}
-	ctx, cancel := context.WithCancel(context.Background())
-	manage.cancelFuncMap.LoadOrStore(task.ID, cancel)
-	group := NewTaskGroup(task, ctx, manage.generator)
-	status := group.Start()
-	select {
-	case status := <-status:
-		manage.taskService.SetTaskStatus([]uint{task.ID}, status)
-		atomic.AddInt32(&manage.executorCount, -1)
-		manage.TaskStatusList.Delete(task.ID)
-	}
+	//ctx, cancel := context.WithCancel(context.Background())
+	//manage.cancelFuncMap.LoadOrStore(event.ID, cancel)
+	//(*manage.generator)(event.Action, event.ID, event.Params)
+	//group := NewTaskGroup(task, ctx, manage.generator)
+	//status := group.Start()
+	//select {
+	//case status := <-status:
+	//	manage.taskService.SetTaskStatus([]uint{task.ID}, status)
+	//	atomic.AddInt32(&manage.executorCount, -1)
+	//	manage.TaskStatusList.Delete(task.ID)
+	//}
 
 }
 
@@ -157,7 +157,7 @@ func (manage *TaskManage) wake() {
 	var (
 		ok   bool
 		wc   int32
-		task dto.Task
+		task model.Event
 	)
 	wc = atomic.LoadInt32(&manage.waitCount)
 	// 如果没有等待的元素，直接退出
@@ -180,7 +180,7 @@ func (manage *TaskManage) wake() {
 	if !ok {
 		return
 	}
-	task = tmp.(dto.Task)
+	task = tmp.(model.Event)
 	manage.processTask.Store(id, task)
 	go manage.execute(task)
 }
@@ -189,7 +189,7 @@ func (manage *TaskManage) AddTaskByExecuteList(task []dto.Task) {
 	defer manage.Unlock()
 }
 
-func (manage *TaskManage) AddTask(tasks []dto.Task) error {
+func (manage *TaskManage) AddTask(tasks []model.Event) error {
 	manage.Lock()
 	defer manage.Unlock()
 	for _, task := range tasks {

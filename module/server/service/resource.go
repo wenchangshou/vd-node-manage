@@ -51,8 +51,14 @@ func (service DeviceResourceAddService) Add() serializer.Response {
 	//	Status:     model2.TaskInitialization,
 	//	Schedule:   0,
 	//}
+	resource, err := model.GetResourceById(service.ResourceID)
+	if err != nil {
+		return serializer.Err(serializer.CodeDBError, "获取资源失败", err)
+	}
 	params := make(map[string]interface{})
 	params["resource_id"] = service.ResourceID
+	params["uri"] = resource.Uri
+	params["name"] = resource.Name
 	m := model.Event{
 		DeviceID: service.DeviceID,
 		Active:   service.Active,
@@ -61,8 +67,7 @@ func (service DeviceResourceAddService) Add() serializer.Response {
 	}
 	b, _ := json.Marshal(params)
 	m.Params = string(b)
-	err := m.Add()
-	if err != nil {
+	if err = m.Add(); err != nil {
 		return serializer.Err(serializer.CodeDBError, "添加资源分发事件失败", err)
 	}
 	return serializer.Response{}

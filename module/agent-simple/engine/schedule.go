@@ -24,16 +24,17 @@ type Schedule struct {
 	taskManage      *TaskManage
 	RpcAddress      string
 	HttpAddress     string
+	EventService    *rpc.EventRpcService
 }
 
 func (schedule Schedule) TaskLoop() {
-	var (
-		idleCount int32
-	)
+	//var (
+	//	idleCount int32
+	//)
 	// 判断当前任务管理器是否有空闲的资源
-	if idleCount = schedule.taskManage.GetTaskExecuteLave(); idleCount <= 0 {
-		return
-	}
+	//if idleCount = schedule.taskManage.GetTaskExecuteLave(); idleCount <= 0 {
+	//	return
+	//}
 
 	//  获取根据剩余的资源来查询任务数
 	//tasks, err := schedule.TaskService.GetTasks(executor.INITIALIZE, int(idleCount))
@@ -50,27 +51,28 @@ func (schedule Schedule) TaskLoop() {
 }
 
 // 查询是否有新的分发任务
-func (schedule Schedule) queryResourceDistributionTask() {
-	tasks,err:=schedule.TaskService.GetTasks()
+func (schedule Schedule) queryTask() {
+	//tasks, err := schedule.TaskService.GetTasks()
+	tasks, err := schedule.EventService.QueryTasks()
 	schedule.taskManage.AddTask(tasks)
-	fmt.Println("tasks",tasks,err)
+	fmt.Println("tasks", tasks, err)
 
 }
 
 // loop 循环调度
 func (schedule *Schedule) loop() {
 	heartbeatTick := time.NewTicker(3 * time.Second)
-	taskTick := time.NewTicker(5 * time.Second)
+	//taskTick := time.NewTicker(5 * time.Second)
 	resourceDistributionTick := time.NewTicker(5 * time.Second)
 	//schedule.ComputerService.Report()
 	for {
 		select {
 		case <-heartbeatTick.C:
 			//schedule.ComputerService.Heartbeat()
-		case <-taskTick.C:
-			schedule.TaskLoop()
+		//case <-taskTick.C:
+		//	schedule.TaskLoop()
 		case <-resourceDistributionTick.C:
-			schedule.queryResourceDistributionTask()
+			schedule.queryTask()
 		}
 	}
 
@@ -83,16 +85,18 @@ func (schedule *Schedule) Start() {
 func InitSchedule(httpAddress string, rpcAddress string, id uint) error {
 	cfg := g.Config()
 	taskService := rpc.NewTaskRpcService(id)
+	eventService := rpc.NewEventRpcService(id)
 	taskManage, err := NewTaskManage(int32(cfg.Task.Count), cfg.Server.HttpAddress, taskService)
 	if err != nil {
 		return errors.Wrap(err, "创建任务管理器失败")
 	}
 	taskManage.Start()
 	schedule := &Schedule{
-		TaskService:     taskService,
-		taskManage:      taskManage,
-		HttpAddress:     httpAddress,
-		RpcAddress:      rpcAddress,
+		taskManage:   taskManage,
+		TaskService:  taskService,
+		EventService: eventService,
+		HttpAddress:  httpAddress,
+		RpcAddress:   rpcAddress,
 	}
 
 	schedule.Start()

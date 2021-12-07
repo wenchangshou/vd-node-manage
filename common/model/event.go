@@ -18,6 +18,7 @@ const (
 )
 
 type Event struct {
+	ID       uint                   `json:"id"`
 	Name     string                 `json:"name"`
 	Active   bool                   `json:"active"`
 	DeviceID uint                   `json:"deviceID"`
@@ -27,10 +28,15 @@ type Event struct {
 }
 
 type QueryDeviceEventRequest struct {
-	DeviceID uint `json:"device_id" gorm:"device_id"`
+	DeviceID uint `json:"device_id"`
 }
 type QueryDeviceEventResponse struct {
-	DeviceID uint    `json:"device_id" gorm:"device_id"`
+	DeviceID uint    `json:"device_id"`
 	Count    int     `json:"count"`
 	Events   []Event `json:"events"`
+}
+
+type DeviceSetEventStatusRequest struct {
+	EventID uint        `json:"event_id"`
+	Status  EventStatus `json:"status"`
 }

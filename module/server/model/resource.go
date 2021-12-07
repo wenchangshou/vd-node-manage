@@ -31,9 +31,9 @@ func (resources *Resource) Add() (uint, error) {
 	err := DB.Create(&resources).Error
 	return resources.ID, err
 }
-func GetResourceById(id string) (*Resource, error) {
+func GetResourceById(id uint) (*Resource, error) {
 	var resource *Resource
-	result := DB.Debug().Model(&Resource{}).Joins("File").Where("resources.id=?", id).Preload("Computers").First(&resource)
+	result := DB.Debug().Model(&Resource{}).Where("id=?", id).First(&resource)
 	return resource, result.Error
 }
 
