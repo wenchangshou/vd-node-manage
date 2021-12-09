@@ -26,9 +26,9 @@ func (event EventRpcService) SetEventStatus(id []uint, status model.EventStatus)
 		RpcServer: fmt.Sprintf(g.Config().Server.RpcAddress),
 		Timeout:   time.Second,
 	}
-	req := model.DeviceSetStatusRequest{
-		ID:     id,
-		Status: status,
+	req := model.DeviceSetEventStatusRequest{
+		EventID: id,
+		Status:  status,
 	}
 	reply := model.SimpleRpcResponse{}
 	return c.Call("Event.SetStatus", &req, &reply)

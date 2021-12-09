@@ -42,9 +42,12 @@ func (event Event) Query(args *model.QueryDeviceEventRequest, reply *model.Query
 }
 
 func (event Event) SetStatus(args *model.DeviceSetEventStatusRequest, reply *model.SimpleRpcResponse) error {
-	err := model2.SetDeviceEventStatus(args.EventID, args.Status)
-	if err != nil {
-		return err
+	for _, id := range args.EventID {
+		err := model2.SetDeviceEventStatus(id, args.Status)
+		if err != nil {
+			return err
+		}
+
 	}
 	return nil
 }

@@ -39,6 +39,6 @@ type QueryDeviceEventResponse struct {
 }
 
 type DeviceSetEventStatusRequest struct {
-	EventID uint        `json:"event_id"`
+	EventID []uint      `json:"event_id"`
 	Status  EventStatus `json:"status"`
 }
