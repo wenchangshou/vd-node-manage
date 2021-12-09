@@ -17,14 +17,14 @@ func (t TaskRpcService) SetTaskItemStatus(ids []uint, i int) error {
 	panic("implement me")
 }
 
-func (t TaskRpcService) SetTaskStatus(ids []uint, status int) error {
+func (t TaskRpcService) SetTaskStatus(ids []uint, status model2.EventStatus) error {
 	client := &g.SingleConnRpcClient{
 		RpcServer: fmt.Sprintf(g.Config().Server.RpcAddress),
 		Timeout:   time.Second,
 	}
 	req := model2.DeviceSetStatusRequest{
 		ID:     ids,
-		Status: uint(status),
+		Status: status,
 	}
 	response := model2.SimpleRpcResponse{}
 	err := client.Call("Task.SetResourceDistributionStatus", req, &response)

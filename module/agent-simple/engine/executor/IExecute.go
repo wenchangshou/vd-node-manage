@@ -25,7 +25,7 @@ type IExecute interface {
 }
 
 // GenerateExecutorFactoryFunc 生成执行器工厂函数
-func GenerateExecutorFactoryFunc(taskService IService.TaskService, httpRequestUri string) GeneratorFunction {
+func GenerateExecutorFactoryFunc(eventService IService.EventService, httpRequestUri string) GeneratorFunction {
 	return func(executorType model.EventStatus, taskID uint, option map[string]interface{}) (IExecute, error) {
 		//var err error
 		switch executorType {
@@ -33,7 +33,7 @@ func GenerateExecutorFactoryFunc(taskService IService.TaskService, httpRequestUr
 		//	e := &InstallProjectExecutor{
 		//		TaskID:         taskID,
 		//		HttpRequestUri: httpRequestUri,
-		//		TaskService:    taskService,
+		//		TaskService:    eventService,
 		//	}
 		//	if err = e.BindOption(option); err != nil {
 		//		return nil, errors.New("install project action bind param error")
@@ -51,7 +51,7 @@ func GenerateExecutorFactoryFunc(taskService IService.TaskService, httpRequestUr
 		case model.InstallResourceAction:
 			e := &InstallResourceExecutor{
 				taskID:         taskID,
-				taskService:    taskService,
+				eventService:   eventService,
 				HttpRequestUri: httpRequestUri,
 			}
 			//if err = e.BindOption(option); err != nil {

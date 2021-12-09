@@ -1,13 +1,14 @@
 package model
 
-type TaskStatus int
 type EventStatus int
 
 const (
-	Initializes TaskStatus = iota
+	Initializes EventStatus = iota
 	Progress
 	Done
 	Error
+	UNKNOWN
+	WAITING
 )
 const (
 	InstallProjectAction EventStatus = iota
@@ -23,12 +24,13 @@ type Event struct {
 	Active   bool                   `json:"active"`
 	DeviceID uint                   `json:"deviceID"`
 	Action   EventStatus            `json:"action" `
-	Status   TaskStatus             `json:"status" `
+	Status   EventStatus            `json:"status" `
 	Params   map[string]interface{} `json:"params" `
 }
 
 type QueryDeviceEventRequest struct {
-	DeviceID uint `json:"device_id"`
+	DeviceID uint        `json:"device_id"`
+	Status   EventStatus `json:"status"`
 }
 type QueryDeviceEventResponse struct {
 	DeviceID uint    `json:"device_id"`

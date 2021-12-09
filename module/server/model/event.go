@@ -11,7 +11,7 @@ type Event struct {
 	Active   bool              `gorm:"active" json:"active"`
 	DeviceID uint              `json:"deviceID" gorm:"deviceID"`
 	Action   model.EventStatus `json:"action" gorm:"action"`
-	Status   model.TaskStatus  `json:"status" gorm:"status"`
+	Status   model.EventStatus `json:"status" gorm:"status"`
 	Params   string            `json:"params" gorm:"params"`
 }
 
@@ -21,8 +21,12 @@ func (e Event) TableName() string {
 func (e Event) Add() error {
 	return DB.Create(&e).Error
 }
-func QueryDeviceEventByDeviceID(id uint) (tasks []Event, err error) {
+func QueryDeviceEventByDeviceIDAndStatus(id uint, status model.EventStatus) (tasks []Event, err error) {
 	var items []Event
-	err = DB.Debug().Model(&Event{}).Where("device_id=?", id).Find(&items).Error
+	err = DB.Debug().Model(&Event{}).Where("device_id=? AND status =?", id, status).Find(&items).Error
 	return items, err
+}
+
+func SetDeviceEventStatus(id uint, status model.EventStatus) error {
+	return DB.Debug().Model(&Event{}).Where("id=?", id).Update("status", status).Error
 }

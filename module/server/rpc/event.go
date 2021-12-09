@@ -16,7 +16,7 @@ func (event Event) Query(args *model.QueryDeviceEventRequest, reply *model.Query
 	if device == nil {
 		return errors.New("找不到指定的设备")
 	}
-	events, err := model2.QueryDeviceEventByDeviceID(args.DeviceID)
+	events, err := model2.QueryDeviceEventByDeviceIDAndStatus(args.DeviceID, args.Status)
 	if err != nil {
 		return errors.New("查询设备事件失败")
 	}
@@ -42,5 +42,9 @@ func (event Event) Query(args *model.QueryDeviceEventRequest, reply *model.Query
 }
 
 func (event Event) SetStatus(args *model.DeviceSetEventStatusRequest, reply *model.SimpleRpcResponse) error {
-
+	err := model2.SetDeviceEventStatus(args.EventID, args.Status)
+	if err != nil {
+		return err
+	}
+	return nil
 }

@@ -19,12 +19,12 @@ type Task struct {
 type TaskItem struct {
 	Base
 	TaskID   string
-	Action   uint             `gorm:"action" json:"action"`
-	Status   model.TaskStatus `gorm:"status" json:"status"`
-	Depend   string           `gorm:"depend" json:"depend"`
-	Options  string           `gorm:"options" json:"options"`
-	Message  string           `gorm:"message" json:"message"`
-	Schedule int              `gorm:"schedule" json:"schedule"`
+	Action   uint              `gorm:"action" json:"action"`
+	Status   model.EventStatus `gorm:"status" json:"status"`
+	Depend   string            `gorm:"depend" json:"depend"`
+	Options  string            `gorm:"options" json:"options"`
+	Message  string            `gorm:"message" json:"message"`
+	Schedule int               `gorm:"schedule" json:"schedule"`
 }
 
 func (taskItem *TaskItem) TableName() string {

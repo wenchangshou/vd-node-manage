@@ -1,6 +1,7 @@
 package model
 
 import (
+	"github.com/wenchangshou2/vd-node-manage/common/model"
 	"gorm.io/gorm"
 )
 
@@ -45,7 +46,7 @@ func (m ResourceDistribution) Add() error {
 //}
 
 // SetResourceDistributionStatus  设置任务的状态
-func SetResourceDistributionStatus(taskId []uint, status uint) error {
+func SetResourceDistributionStatus(taskId []uint, status model.EventStatus) error {
 	result := DB.Model(&ResourceDistribution{}).Where("id like   ? ", taskId).Update("status", status)
 	return result.Error
 }

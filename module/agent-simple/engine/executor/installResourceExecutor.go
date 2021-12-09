@@ -12,7 +12,7 @@ import (
 type InstallResourceExecutor struct {
 	Option          InstallResourceOption
 	HttpRequestUri  string
-	taskService     IService.TaskService
+	eventService    IService.EventService
 	computerService IService.ComputerService
 	Mac             string
 	taskID          uint
@@ -31,16 +31,16 @@ func (executor *InstallResourceExecutor) Execute() error {
 		fmt.Printf("download:len:%d,downLen:%d\n", length, downLen)
 	})
 	if err != nil {
-		executor.taskService.SetTaskItemStatus([]uint{executor.taskID}, ERROR)
+		//executor.eventService.SetTaskItemStatus([]uint{executor.taskID}, ERROR)
 		//executor.NotifyEvent(executor.TaskID, ERROR, "下载文件失败")
 		return err
 	}
 	err = executor.computerService.AddComputerResource(executor.Option.ID)
 	if err != nil {
-		executor.taskService.SetTaskItemStatus([]uint{executor.taskID}, ERROR)
+		//executor.eventService.SetTaskItemStatus([]uint{executor.taskID}, ERROR)
 		return err
 	}
-	executor.taskService.SetTaskItemStatus([]uint{executor.taskID}, DONE)
+	//executor.eventService.SetTaskItemStatus([]uint{executor.taskID}, DONE)
 	return nil
 }
 

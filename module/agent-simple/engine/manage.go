@@ -26,14 +26,14 @@ type TaskChangeEventInfo struct {
 // @param maxExecutorCount 允许同时执行任务数
 // @param httpRequestUri http请求地址
 // @param rpcRequestUri rpc请求地址
-func NewTaskManage(count int32, httpRequest string, taskService IService.TaskService) (*TaskManage, error) {
-	g := executor.GenerateExecutorFactoryFunc(taskService, httpRequest)
+func NewTaskManage(count int32, httpRequest string, eventService IService.EventService) (*TaskManage, error) {
+	g := executor.GenerateExecutorFactoryFunc(eventService, httpRequest)
 	GTaskExecute = &TaskManage{
 		maxExecutorCount:    count,
 		taskAddNotify:       make(chan dto.Task),
-		taskService:         taskService,
+		eventService:        eventService,
 		notifyExecuteChange: make(chan TaskChangeEventInfo),
-		TaskStatusList:      NewTaskList(),
+		EventStatusList:     NewTaskList(),
 		generator:           &g,
 	}
 	return GTaskExecute, nil
@@ -44,58 +44,49 @@ func init() {
 
 // TaskManage  任务管理
 type TaskManage struct {
-	maxExecutorCount int32 //最大执行数
-	executorCount    int32 //当前执行部数
-	waitCount        int32 //等待数
-
+	maxExecutorCount    int32    //最大执行数
+	executorCount       int32    //当前执行部数
+	waitCount           int32    //等待数
 	processTask         sync.Map //正在处理的任务列表
 	waitTask            sync.Map //等待任务队列
 	errorTask           sync.Map //错误队列
 	taskAddNotify       chan dto.Task
 	notifyExecuteChange chan TaskChangeEventInfo
 	cancelFuncMap       sync.Map //用来处理取消任务使用
-	TaskStatusList      *TaskList
+	EventStatusList     *EventList
 	ActiveProcessCount  uint
 	httpRequestUri      string
 	rpcRequestUri       string
-	taskService         IService.TaskService
+	eventService        IService.EventService
 	computerService     IService.ComputerService
 	sync.RWMutex
 	generator *executor.GeneratorFunction
 }
-type TaskStatus int
 
-const (
-	WAIT TaskStatus = iota
-	EXECUTE
-	ERROR
-	UNKNOWN
-)
-
-type TaskList struct {
+type EventList struct {
 	sync.RWMutex
-	items map[uint]TaskStatus
+	items map[uint]model.EventStatus
 }
 
-func NewTaskList() *TaskList {
-	return &TaskList{items: make(map[uint]TaskStatus)}
+func NewTaskList() *EventList {
+	return &EventList{items: make(map[uint]model.EventStatus)}
 
 }
 
 //Delete 删除元素
-func (taskList *TaskList) Delete(id uint) {
-	taskList.Lock()
-	defer taskList.Unlock()
-	delete(taskList.items, id)
+func (eventList *EventList) Delete(id uint) {
+	eventList.Lock()
+	defer eventList.Unlock()
+	delete(eventList.items, id)
 }
 
 // LoadAndDeleteByStatus  加载并且删除元素
-func (taskList *TaskList) LoadAndDeleteByStatus(status TaskStatus) (uint, bool) {
-	taskList.Lock()
-	defer taskList.Unlock()
-	for k, v := range taskList.items {
+func (eventList *EventList) LoadAndDeleteByStatus(status model.EventStatus) (uint, bool) {
+	eventList.Lock()
+	defer eventList.Unlock()
+	for k, v := range eventList.items {
 		if v == status {
-			delete(taskList.items, k)
+			delete(eventList.items, k)
 			return k, true
 		}
 	}
@@ -103,17 +94,17 @@ func (taskList *TaskList) LoadAndDeleteByStatus(status TaskStatus) (uint, bool) 
 }
 
 // Store 存储元素
-func (taskList *TaskList) Store(id uint, status TaskStatus) {
-	taskList.Lock()
-	defer taskList.Unlock()
-	taskList.items[id] = status
+func (eventList *EventList) Store(id uint, status model.EventStatus) {
+	eventList.Lock()
+	defer eventList.Unlock()
+	eventList.items[id] = status
 }
-func (taskList *TaskList) Get(id uint) TaskStatus {
-	taskList.RLock()
-	defer taskList.Unlock()
-	item, ok := taskList.items[id]
+func (eventList *EventList) Get(id uint) model.EventStatus {
+	eventList.RLock()
+	defer eventList.Unlock()
+	item, ok := eventList.items[id]
 	if !ok {
-		return UNKNOWN
+		return model.UNKNOWN
 	}
 	return item
 }
@@ -121,7 +112,7 @@ func (taskList *TaskList) Get(id uint) TaskStatus {
 // execute 执行器
 func (manage *TaskManage) execute(event model.Event) {
 	// 将任务设置成执行状态
-	err := manage.taskService.SetTaskStatus([]uint{event.ID}, executor.EXECUTE)
+	err := manage.eventService.SetEventStatus([]uint{event.ID}, executor.EXECUTE)
 	if err != nil {
 		logging.GLogger.Info("更新任务状态失败")
 		//manage.taskService.SetTaskStatus([]uint{task.ID}, executor.ERROR)
@@ -136,7 +127,7 @@ func (manage *TaskManage) execute(event model.Event) {
 	//case status := <-status:
 	//	manage.taskService.SetTaskStatus([]uint{task.ID}, status)
 	//	atomic.AddInt32(&manage.executorCount, -1)
-	//	manage.TaskStatusList.Delete(task.ID)
+	//	manage.EventStatusList.Delete(task.ID)
 	//}
 
 }
@@ -155,47 +146,42 @@ func (manage *TaskManage) Loop() {
 // wake 唤醒一个任务
 func (manage *TaskManage) wake() {
 	var (
-		ok   bool
-		wc   int32
-		task model.Event
+		ok    bool
+		wc    int32
+		event model.Event
+		id    uint
+		tmp   interface{}
 	)
-	wc = atomic.LoadInt32(&manage.waitCount)
-	// 如果没有等待的元素，直接退出
-	if wc == 0 {
-		return
-	}
-	// 如果没有空闲的执行者，诚直接不处理
-	if manage.GetTaskExecuteLave() <= 0 {
+	// 如果没有等待的任务或者可执行的任务为0
+	if wc = atomic.LoadInt32(&manage.waitCount); wc == 0 || manage.GetTaskExecuteLave() <= 0 {
 		return
 	}
 	// 从任务队列中指定状态的元素
-	id, ok := manage.TaskStatusList.LoadAndDeleteByStatus(WAIT)
-	// 如果没有任务元素，直接返回
-	if !ok {
+	if id, ok = manage.EventStatusList.LoadAndDeleteByStatus(model.WAITING); !ok {
 		return
 	}
 	atomic.AddInt32(&manage.waitCount, -1)
 	atomic.AddInt32(&manage.executorCount, 1)
-	tmp, ok := manage.waitTask.LoadAndDelete(id)
-	if !ok {
+	if tmp, ok = manage.waitTask.LoadAndDelete(id); !ok {
 		return
 	}
-	task = tmp.(model.Event)
-	manage.processTask.Store(id, task)
-	go manage.execute(task)
+	event = tmp.(model.Event)
+	manage.processTask.Store(id, event)
+	go manage.execute(event)
 }
 func (manage *TaskManage) AddTaskByExecuteList(task []dto.Task) {
 	manage.Lock()
 	defer manage.Unlock()
 }
 
-func (manage *TaskManage) AddTask(tasks []model.Event) error {
+// AddWaitExecuteEvent 添加任务到等待列表中
+func (manage *TaskManage) AddWaitExecuteEvent(events []model.Event) error {
 	manage.Lock()
 	defer manage.Unlock()
-	for _, task := range tasks {
+	for _, event := range events {
 		atomic.AddInt32(&manage.waitCount, 1)
-		manage.TaskStatusList.Store(task.ID, WAIT)
-		manage.waitTask.LoadOrStore(task.ID, task)
+		manage.EventStatusList.Store(event.ID, model.WAITING)
+		manage.waitTask.LoadOrStore(event.ID, event)
 	}
 	return nil
 }

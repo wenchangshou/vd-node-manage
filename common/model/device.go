@@ -2,8 +2,8 @@ package model
 
 // DeviceSetStatusRequest 设置任务状态
 type DeviceSetStatusRequest struct {
-	ID     []uint `json:"id"`
-	Status uint   `json:"status"`
+	ID     []uint      `json:"id"`
+	Status EventStatus `json:"status"`
 }
 
 // DeviceReportRequest  客户端上报信息

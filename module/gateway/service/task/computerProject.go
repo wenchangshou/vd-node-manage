@@ -93,7 +93,7 @@ func (service ComputerProject) Delete() serializer.Response {
 	// 	options["ID"] = projectRelease.ID
 	// 	options["File"] = projectRelease.File
 
-	// 	task, err := model.AddTask(fmt.Sprintf("删除%s项目", projectRelease.Project.Name), computer)
+	// 	task, err := model.AddWaitExecuteEvent(fmt.Sprintf("删除%s项目", projectRelease.Project.Name), computer)
 	// 	if err != nil {
 	// 		return serializer.Err(serializer.CodeDBError, "创建任务失败", err)
 	// 	}

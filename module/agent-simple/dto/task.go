@@ -7,5 +7,5 @@ type Task struct {
 	Action model.EventStatus `json:"action"`
 	ID     uint              `json:"id"`
 	Params map[string]interface{}
-	Status model.TaskStatus `json:"status"`
+	Status model.EventStatus `json:"status"`
 }

@@ -3,6 +3,7 @@ package engine
 import (
 	"fmt"
 	"github.com/pkg/errors"
+	"github.com/wenchangshou2/vd-node-manage/common/model"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/g"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/pkg/e"
 	IService "github.com/wenchangshou2/vd-node-manage/module/agent-simple/service"
@@ -47,16 +48,15 @@ func (schedule Schedule) TaskLoop() {
 	//}
 	//
 	//// 将任务管理器添加新的任务
-	//schedule.taskManage.AddTask(tasks)
+	//schedule.taskManage.AddWaitExecuteEvent(tasks)
 }
 
 // 查询是否有新的分发任务
 func (schedule Schedule) queryTask() {
 	//tasks, err := schedule.TaskService.GetTasks()
-	tasks, err := schedule.EventService.QueryTasks()
-	schedule.taskManage.AddTask(tasks)
+	tasks, err := schedule.EventService.QueryDeviceEvent(model.Initializes)
+	schedule.taskManage.AddWaitExecuteEvent(tasks)
 	fmt.Println("tasks", tasks, err)
-
 }
 
 // loop 循环调度
@@ -86,7 +86,7 @@ func InitSchedule(httpAddress string, rpcAddress string, id uint) error {
 	cfg := g.Config()
 	taskService := rpc.NewTaskRpcService(id)
 	eventService := rpc.NewEventRpcService(id)
-	taskManage, err := NewTaskManage(int32(cfg.Task.Count), cfg.Server.HttpAddress, taskService)
+	taskManage, err := NewTaskManage(int32(cfg.Task.Count), cfg.Server.HttpAddress, eventService)
 	if err != nil {
 		return errors.Wrap(err, "创建任务管理器失败")
 	}
