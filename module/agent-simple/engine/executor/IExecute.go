@@ -15,18 +15,18 @@ const (
 	ALL
 )
 
-type GeneratorFunction func(model.EventStatus, uint, map[string]interface{}) (IExecute, error)
+type GeneratorFunction func(model.EventAction, uint, interface{}) (IExecute, error)
 
 // IExecute 执行器接口
 type IExecute interface {
 	Execute() error
-	BindOption(string) error
+	BindOption(interface{}) error
 	Verification(string) bool
 }
 
 // GenerateExecutorFactoryFunc 生成执行器工厂函数
 func GenerateExecutorFactoryFunc(eventService IService.EventService, httpRequestUri string) GeneratorFunction {
-	return func(executorType model.EventStatus, taskID uint, option map[string]interface{}) (IExecute, error) {
+	return func(executorType model.EventAction, taskID uint, option interface{}) (IExecute, error) {
 		//var err error
 		switch executorType {
 		//case model.InstallProjectAction:
@@ -48,12 +48,14 @@ func GenerateExecutorFactoryFunc(eventService IService.EventService, httpRequest
 		//		return nil, errors.New("delete project action bind param error")
 		//	}
 		//	return e, nil
+
 		case model.InstallResourceAction:
 			e := &InstallResourceExecutor{
 				taskID:         taskID,
 				eventService:   eventService,
 				HttpRequestUri: httpRequestUri,
 			}
+			e.BindOption(option)
 			//if err = e.BindOption(option); err != nil {
 			//	return nil, errors.New("install resource action bind param error")
 			//}

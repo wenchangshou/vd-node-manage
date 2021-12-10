@@ -1,6 +1,8 @@
 package engine
 
 import (
+	"context"
+	"fmt"
 	"github.com/wenchangshou2/vd-node-manage/common/logging"
 	"github.com/wenchangshou2/vd-node-manage/common/model"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/dto"
@@ -34,7 +36,7 @@ func NewTaskManage(count int32, httpRequest string, eventService IService.EventS
 		eventService:        eventService,
 		notifyExecuteChange: make(chan TaskChangeEventInfo),
 		EventStatusList:     NewTaskList(),
-		generator:           &g,
+		generator:           g,
 	}
 	return GTaskExecute, nil
 }
@@ -60,7 +62,7 @@ type TaskManage struct {
 	eventService        IService.EventService
 	computerService     IService.ComputerService
 	sync.RWMutex
-	generator *executor.GeneratorFunction
+	generator executor.GeneratorFunction
 }
 
 type EventList struct {
@@ -115,13 +117,22 @@ func (manage *TaskManage) execute(event model.Event) {
 	err := manage.eventService.SetEventStatus([]uint{event.ID}, executor.EXECUTE)
 	if err != nil {
 		logging.GLogger.Info("更新任务状态失败")
-		//manage.taskService.SetTaskStatus([]uint{task.ID}, executor.ERROR)
+		manage.eventService.SetEventStatus([]uint{event.ID}, executor.ERROR)
 		return
 	}
-	//ctx, cancel := context.WithCancel(context.Background())
-	//manage.cancelFuncMap.LoadOrStore(event.ID, cancel)
-	//(*manage.generator)(event.Action, event.ID, event.Params)
-	//group := NewTaskGroup(task, ctx, manage.generator)
+	ctx, cancel := context.WithCancel(context.Background())
+	manage.cancelFuncMap.LoadOrStore(event.ID, cancel)
+	fmt.Println(ctx)
+	m := NewEventExecuteManage(event, ctx, manage.generator)
+	status := m.Start()
+	select {
+	case s := <-status:
+		manage.eventService.SetEventStatus([]uint{event.ID}, s)
+		atomic.AddInt32(&manage.executorCount, -1)
+		manage.EventStatusList.Delete(event.ID)
+	}
+	//e,err:=manage.generator(event.Action, event.ID, event.Params)
+	//group := NewEventExecuteManage(task, ctx, manage.generator)
 	//status := group.Start()
 	//select {
 	//case status := <-status:

@@ -2,38 +2,38 @@ package engine
 
 import (
 	"context"
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/dto"
+	"github.com/wenchangshou2/vd-node-manage/common/model"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/engine/executor"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/pkg/e"
 )
 
-type TaskGroup struct {
-	src        dto.Task
+type eventExecuteManage struct {
+	event      model.Event
 	ctx        context.Context
-	statusChan chan int
+	statusChan chan model.EventStatus
 	generator  executor.GeneratorFunction
 }
 
-func NewTaskGroup(task dto.Task, ctx context.Context, exec *executor.GeneratorFunction) *TaskGroup {
-	t := &TaskGroup{
-		src:        task,
+func NewEventExecuteManage(event model.Event, ctx context.Context, exec executor.GeneratorFunction) *eventExecuteManage {
+	t := &eventExecuteManage{
+		event:      event,
 		ctx:        ctx,
-		statusChan: make(chan int),
-		generator:  *exec,
+		statusChan: make(chan model.EventStatus),
+		generator:  exec,
 	}
 	return t
 }
-func (task *TaskGroup) loop() {
+func (task *eventExecuteManage) loop() {
 	select {
 	case <-task.ctx.Done():
 		task.statusChan <- executor.CANCEL
 	}
 
 }
-func (task TaskGroup) action(t e.TaskItem) {
+func (task eventExecuteManage) action(t e.TaskItem) {
 
 }
-func (task *TaskGroup) execute() {
+func (task *eventExecuteManage) execute() {
 	//l := NewTaskLinedList()
 	//for _, item := range task.src.Items {
 	//	// 如果
@@ -66,11 +66,22 @@ func (task *TaskGroup) execute() {
 	//})
 	//
 	//task.statusChan <- executor.DONE
+	e := task.event
+	execFunc, err := task.generator(e.Action, e.ID, e.Params)
+	if err != nil {
+		task.statusChan <- model.Error
+		return
+	}
+	if err = execFunc.Execute(); err != nil {
+		task.statusChan <- model.Error
+		return
+	}
+	task.statusChan <- model.Done
 }
 
 // Start 启动一个任务组
-func (task *TaskGroup) Start() chan int {
-	c := make(chan int)
+func (task *eventExecuteManage) Start() chan model.EventStatus {
+	c := make(chan model.EventStatus)
 	task.statusChan = c
 	go task.loop()
 	go task.execute()

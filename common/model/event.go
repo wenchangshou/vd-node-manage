@@ -1,6 +1,7 @@
 package model
 
 type EventStatus int
+type EventAction int
 
 const (
 	Initializes EventStatus = iota
@@ -11,7 +12,7 @@ const (
 	WAITING
 )
 const (
-	InstallProjectAction EventStatus = iota
+	InstallProjectAction EventAction = iota
 	InstallResourceAction
 	UpgradeProjectAction
 	DeleteResource
@@ -23,7 +24,7 @@ type Event struct {
 	Name     string                 `json:"name"`
 	Active   bool                   `json:"active"`
 	DeviceID uint                   `json:"deviceID"`
-	Action   EventStatus            `json:"action" `
+	Action   EventAction            `json:"action" `
 	Status   EventStatus            `json:"status" `
 	Params   map[string]interface{} `json:"params" `
 }
