@@ -1,61 +1,44 @@
 package engine
 
 import (
+	"context"
 	"fmt"
 	"github.com/pkg/errors"
+	"github.com/wenchangshou2/vd-node-manage/common/Event"
+	"github.com/wenchangshou2/vd-node-manage/common/logging"
 	"github.com/wenchangshou2/vd-node-manage/common/model"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/g"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/pkg/e"
 	IService "github.com/wenchangshou2/vd-node-manage/module/agent-simple/service"
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/service/impl/rpc"
 	"time"
 )
 
 // Schedule 全局执行
 type Schedule struct {
-	computerIp      string
-	computerMac     string
-	ComputerID      string
-	register        bool
-	lastReportTime  time.Time
-	ComputerService IService.ComputerService
-	TaskService     IService.TaskService
-	serverInfo      *e.ServerInfo
-	Count           int
-	taskManage      *TaskManage
-	RpcAddress      string
-	HttpAddress     string
-	EventService    *rpc.EventRpcService
-}
-
-func (schedule Schedule) TaskLoop() {
-	//var (
-	//	idleCount int32
-	//)
-	// 判断当前任务管理器是否有空闲的资源
-	//if idleCount = schedule.taskManage.GetTaskExecuteLave(); idleCount <= 0 {
-	//	return
-	//}
-
-	//  获取根据剩余的资源来查询任务数
-	//tasks, err := schedule.TaskService.GetTasks(executor.INITIALIZE, int(idleCount))
-	//if err != nil {
-	//	logging.GLogger.Warn(fmt.Sprintf("调用获取任务接口失败:%s", err.Error()))
-	//	return
-	//}
-	//if len(tasks) == 0 {
-	//	return
-	//}
-	//
-	//// 将任务管理器添加新的任务
-	//schedule.taskManage.AddWaitExecuteEvent(tasks)
+	ID             uint
+	computerIp     string
+	computerMac    string
+	ComputerID     string
+	register       bool
+	lastReportTime time.Time
+	TaskService    IService.TaskService
+	serverInfo     *e.ServerInfo
+	Count          int
+	taskManage     *TaskManage
+	RpcAddress     string
+	HttpAddress    string
+	ServerFactory  *IService.ServiceFactory
+	redisClient    *Event.RedisClient
 }
 
 // 查询是否有新的分发任务
 func (schedule Schedule) queryTask() {
-	//tasks, err := schedule.TaskService.GetTasks()
-	tasks, err := schedule.EventService.QueryDeviceEvent(model.Initializes)
-	schedule.taskManage.AddWaitExecuteEvent(tasks)
+	event := schedule.ServerFactory.Event
+	tasks, err := event.QueryDeviceEvent(model.Initializes)
+	if len(tasks) > 0 {
+		logging.GLogger.Info(fmt.Sprintf("当前有新的事件需要处理:%v", tasks))
+		schedule.taskManage.AddWaitExecuteEvent(tasks)
+	}
 	fmt.Println("tasks", tasks, err)
 }
 
@@ -77,26 +60,40 @@ func (schedule *Schedule) loop() {
 	}
 
 }
+func (schedule *Schedule) DeviceEvent(channel string, message []byte) error {
+
+}
 func (schedule *Schedule) Start() {
+	schedule.redisClient.Subscribe(context.TODO(), schedule.DeviceEvent, fmt.Sprintf("device-%d", schedule.ID))
 	go schedule.loop()
 }
 
 // InitSchedule 初始化调度程序
 func InitSchedule(httpAddress string, rpcAddress string, id uint) error {
 	cfg := g.Config()
-	taskService := rpc.NewTaskRpcService(id)
-	eventService := rpc.NewEventRpcService(id)
-	taskManage, err := NewTaskManage(int32(cfg.Task.Count), cfg.Server.HttpAddress, eventService)
+	rpcClient := &g.SingleConnRpcClient{
+		RpcServer: fmt.Sprintf(cfg.Server.RpcAddress),
+		Timeout:   time.Second,
+	}
+	serverFactory, err := IService.NewServiceFactory("rpc", id, rpcClient)
+	if err != nil {
+		return err
+	}
+	//taskService := rpc.NewTaskRpcService(id)
+	//eventService := rpc.NewEventRpcService(id, rpcClient)
+	taskManage, err := NewTaskManage(int32(cfg.Task.Count), cfg.Server.HttpAddress, serverFactory)
 	if err != nil {
 		return errors.Wrap(err, "创建任务管理器失败")
 	}
 	taskManage.Start()
+	redisClient := Event.NewRedisClient("192.168.10.31:30000", 0, "")
 	schedule := &Schedule{
-		taskManage:   taskManage,
-		TaskService:  taskService,
-		EventService: eventService,
-		HttpAddress:  httpAddress,
-		RpcAddress:   rpcAddress,
+		ID:            id,
+		taskManage:    taskManage,
+		HttpAddress:   httpAddress,
+		RpcAddress:    rpcAddress,
+		ServerFactory: serverFactory,
+		redisClient:   redisClient,
 	}
 
 	schedule.Start()

@@ -3,6 +3,7 @@ package rpc
 import (
 	"github.com/wenchangshou2/vd-node-manage/common/model"
 	"github.com/wenchangshou2/vd-node-manage/module/server/g"
+	model2 "github.com/wenchangshou2/vd-node-manage/module/server/model"
 	"github.com/wenchangshou2/vd-node-manage/module/server/service"
 )
 
@@ -42,4 +43,16 @@ func (device *Device) ReportStatus(args *model.DeviceReportRequest, reply *model
 }
 func (device *Device) QueryTask(args *model.DeviceReportRequest, reply *model.DeviceQueryStatusResponse) error {
 	return nil
+}
+
+// AddDeviceResource 添加设备资源
+func (device *Device) AddDeviceResource(args *model.DeviceAddResourceRequest, reply *model.SimpleRpcResponse) error {
+	if model2.IsDeviceResource(args.ID, args.ResourceID) {
+		return nil
+	}
+	dr := model2.DeviceResource{
+		DeviceID:   args.ID,
+		ResourceID: args.ResourceID,
+	}
+	return dr.Add()
 }

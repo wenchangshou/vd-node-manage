@@ -28,12 +28,12 @@ type TaskChangeEventInfo struct {
 // @param maxExecutorCount 允许同时执行任务数
 // @param httpRequestUri http请求地址
 // @param rpcRequestUri rpc请求地址
-func NewTaskManage(count int32, httpRequest string, eventService IService.EventService) (*TaskManage, error) {
-	g := executor.GenerateExecutorFactoryFunc(eventService, httpRequest)
+func NewTaskManage(count int32, httpRequest string, service *IService.ServiceFactory) (*TaskManage, error) {
+	g := executor.GenerateExecutorFactoryFunc(service, httpRequest)
 	GTaskExecute = &TaskManage{
 		maxExecutorCount:    count,
 		taskAddNotify:       make(chan dto.Task),
-		eventService:        eventService,
+		ServerFactory:       service,
 		notifyExecuteChange: make(chan TaskChangeEventInfo),
 		EventStatusList:     NewTaskList(),
 		generator:           g,
@@ -59,10 +59,9 @@ type TaskManage struct {
 	ActiveProcessCount  uint
 	httpRequestUri      string
 	rpcRequestUri       string
-	eventService        IService.EventService
-	computerService     IService.ComputerService
 	sync.RWMutex
-	generator executor.GeneratorFunction
+	generator     executor.GeneratorFunction
+	ServerFactory *IService.ServiceFactory
 }
 
 type EventList struct {
@@ -113,11 +112,12 @@ func (eventList *EventList) Get(id uint) model.EventStatus {
 
 // execute 执行器
 func (manage *TaskManage) execute(event model.Event) {
+	e := manage.ServerFactory.Event
 	// 将任务设置成执行状态
-	err := manage.eventService.SetEventStatus([]uint{event.ID}, executor.EXECUTE)
+	err := e.SetEventStatus([]uint{event.ID}, executor.EXECUTE)
 	if err != nil {
 		logging.GLogger.Info("更新任务状态失败")
-		manage.eventService.SetEventStatus([]uint{event.ID}, executor.ERROR)
+		e.SetEventStatus([]uint{event.ID}, executor.ERROR)
 		return
 	}
 	ctx, cancel := context.WithCancel(context.Background())
@@ -127,19 +127,11 @@ func (manage *TaskManage) execute(event model.Event) {
 	status := m.Start()
 	select {
 	case s := <-status:
-		manage.eventService.SetEventStatus([]uint{event.ID}, s)
+		e.SetEventStatus([]uint{event.ID}, s)
 		atomic.AddInt32(&manage.executorCount, -1)
 		manage.EventStatusList.Delete(event.ID)
+		//manage.ServerFactory.Device.AddComputerResource()
 	}
-	//e,err:=manage.generator(event.Action, event.ID, event.Params)
-	//group := NewEventExecuteManage(task, ctx, manage.generator)
-	//status := group.Start()
-	//select {
-	//case status := <-status:
-	//	manage.taskService.SetTaskStatus([]uint{task.ID}, status)
-	//	atomic.AddInt32(&manage.executorCount, -1)
-	//	manage.EventStatusList.Delete(task.ID)
-	//}
 
 }
 
@@ -190,6 +182,7 @@ func (manage *TaskManage) AddWaitExecuteEvent(events []model.Event) error {
 	manage.Lock()
 	defer manage.Unlock()
 	for _, event := range events {
+		logging.GLogger.Info(fmt.Sprintf("当前处理的任务信息:name:%s,id:%d,action:%d,status:%d", event.Name, event.ID, event.Action, event.Status))
 		atomic.AddInt32(&manage.waitCount, 1)
 		manage.EventStatusList.Store(event.ID, model.WAITING)
 		manage.waitTask.LoadOrStore(event.ID, event)

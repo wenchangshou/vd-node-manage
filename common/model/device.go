@@ -47,3 +47,12 @@ const (
 	Device_Register
 	Device_Disable
 )
+
+type DeviceAddResourceRequest struct {
+	ID         uint `json:"id"`
+	ResourceID uint `json:"resource_id"`
+}
+type DeviceDeleteResourceRequest struct {
+	ID         uint `json:"id"`
+	ResourceID uint `json:"resource_id"`
+}

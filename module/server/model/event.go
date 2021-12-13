@@ -10,7 +10,7 @@ type Event struct {
 	Name     string            `json:"name" gorm:"name"`
 	Active   bool              `gorm:"active" json:"active"`
 	DeviceID uint              `json:"deviceID" gorm:"deviceID"`
-	Action   model.EventStatus `json:"action" gorm:"action"`
+	Action   model.EventAction `json:"action" gorm:"action"`
 	Status   model.EventStatus `json:"status" gorm:"status"`
 	Params   string            `json:"params" gorm:"params"`
 }

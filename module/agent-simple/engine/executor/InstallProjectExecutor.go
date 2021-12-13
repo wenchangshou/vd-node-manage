@@ -2,25 +2,15 @@ package executor
 
 import (
 	"encoding/json"
-	"fmt"
-	"github.com/wenchangshou2/vd-node-manage/common/file"
-	"github.com/wenchangshou2/vd-node-manage/common/util"
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/g"
-	IService "github.com/wenchangshou2/vd-node-manage/module/agent-simple/service"
-	"github.com/wenchangshou2/zutil"
-	"os"
-	"path"
 )
 
 type InstallProjectExecutor struct {
-	TaskID          uint
-	HttpAddress     string
-	Options         InstallProjectOption
-	NotifyEvent     func(string, int, string)
-	ComputerService IService.ComputerService
-	TaskService     IService.TaskService
-	HttpRequestUri  string
-	Mac             string
+	TaskID         uint
+	HttpAddress    string
+	Options        InstallProjectOption
+	NotifyEvent    func(string, int, string)
+	HttpRequestUri string
+	Mac            string
 }
 type File struct {
 	Name       string `gorm:"name"`
@@ -39,7 +29,7 @@ func (file *File) GetApplicationPath() string {
 }
 
 type InstallProjectOption struct {
-	ID string `json:"id"`
+	ID uint `json:"id"`
 	//ProjectReleaseID string `json:"project_release_id"`
 	Uri    string `json:"uri"`
 	Source string `json:"source"`
@@ -47,30 +37,33 @@ type InstallProjectOption struct {
 }
 
 func (executor *InstallProjectExecutor) Execute() error {
-	cfg := g.Config()
-	requestUri := "http://" + executor.HttpRequestUri + "/" + executor.Options.Uri
-	dstPath := path.Join(cfg.Resource.Directory, "application", executor.Options.ID)
-	tmpPath := path.Join(cfg.Resource.Tmp, executor.Options.Source)
-	err := file.DownloadFile(requestUri, cfg.Resource.Tmp, executor.Options.Source, func(length, downLen int64) {
-
-	})
-	if err != nil {
-		fmt.Println("下载错误:", err)
-	}
-	zutil.IsNotExistMkDir(dstPath)
-	err = util.UnZip(dstPath, tmpPath)
-	if err != nil {
-		os.RemoveAll(tmpPath)
-		executor.TaskService.SetTaskItemStatus([]uint{executor.TaskID}, ERROR)
-		return err
-	}
-	err = executor.ComputerService.AddComputerProject(executor.Options.ID)
-	if err != nil {
-		executor.TaskService.SetTaskItemStatus([]uint{executor.TaskID}, ERROR)
-		return err
-	}
-	os.RemoveAll(tmpPath)
-	executor.TaskService.SetTaskItemStatus([]uint{executor.TaskID}, DONE)
+	//var (
+	//	err error
+	//)
+	//cfg := g.Config()
+	////requestUri := "http://" + executor.HttpRequestUri + "/" + executor.Options.Uri
+	//dstPath := path.Join(cfg.Resource.Directory, "application", string(executor.Options.ID))
+	//tmpPath := path.Join(cfg.Resource.Tmp, executor.Options.Source)
+	//err = file.DownloadFile(executor.Options.Uri, cfg.Resource.Tmp, executor.Options.Source, func(length, downLen int64) {
+	//
+	//})
+	//if err != nil {
+	//	fmt.Println("下载错误:", err)
+	//}
+	//zutil.IsNotExistMkDir(dstPath)
+	//err = util.UnZip(dstPath, tmpPath)
+	//if err != nil {
+	//	os.RemoveAll(tmpPath)
+	//	executor.TaskService.SetTaskItemStatus([]uint{executor.TaskID}, ERROR)
+	//	return err
+	//}
+	//err = executor.ComputerService.AddComputerProject(executor.Options.ID)
+	//if err != nil {
+	//	executor.TaskService.SetTaskItemStatus([]uint{executor.TaskID}, ERROR)
+	//	return err
+	//}
+	//os.RemoveAll(tmpPath)
+	//executor.TaskService.SetTaskItemStatus([]uint{executor.TaskID}, DONE)
 	return nil
 }
 

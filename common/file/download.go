@@ -1,6 +1,7 @@
 package file
 
 import (
+	"fmt"
 	"github.com/pkg/errors"
 	"github.com/wenchangshou2/zutil"
 	"io"
@@ -14,11 +15,14 @@ func DownloadFile(url string, dst string, sourceName string, fb func(length, dow
 		fsize   int64
 		buf     = make([]byte, 32*1024)
 		written int64
+		err     error
+		resp    *http.Response
+		file    *os.File
 	)
 	//创建一个http client
 	client := new(http.Client)
 	//get方法获取资源
-	resp, err := client.Get(url)
+	resp, err = client.Get(url)
 	if err != nil {
 		return err
 	}
@@ -29,8 +33,9 @@ func DownloadFile(url string, dst string, sourceName string, fb func(length, dow
 	// }
 	dstPath := path.Join(dst, sourceName)
 	zutil.IsExistDelete(dstPath)
+	fmt.Println("dstPath", dstPath)
 	//创建文件
-	file, err := os.Create(dstPath)
+	file, err = os.Create(dstPath)
 	if err != nil {
 		return err
 	}

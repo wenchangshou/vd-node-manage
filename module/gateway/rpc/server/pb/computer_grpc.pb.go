@@ -107,7 +107,7 @@ type UnimplementedComputerManagementServer struct {
 }
 
 func (UnimplementedComputerManagementServer) AddComputerResource(context.Context, *SetComputerResourceRequest) (*wrapperspb.BoolValue, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddComputerResource not implemented")
+	return nil, status.Errorf(codes.Unimplemented, "method AddDeviceResource not implemented")
 }
 func (UnimplementedComputerManagementServer) AddComputerProject(context.Context, *SetComputerProjectRequest) (*wrapperspb.BoolValue, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddComputerProject not implemented")

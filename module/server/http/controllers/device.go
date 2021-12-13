@@ -51,3 +51,14 @@ func AddDeviceResource(c *gin.Context) {
 		c.JSON(200, serializer.ErrorResponse(err))
 	}
 }
+
+func ListDeviceResource(c *gin.Context) {
+	s := service.DeviceResourceListService{}
+	if err := c.BindUri(&s); err == nil {
+		res := s.List()
+		c.JSON(200, res)
+	} else {
+		c.JSON(200, serializer.ErrorResponse(err))
+	}
+
+}

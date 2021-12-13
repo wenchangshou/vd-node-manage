@@ -25,17 +25,18 @@ func InitRouter() *gin.Engine {
 	v1 := r.Group("/api/v1")
 	{
 		v1.GET("/health", controllers.Health)
-		device:=v1.Group("/device")
+		device := v1.Group("/device")
 		{
-			device.POST("/list",controllers.ListDevice)
-			device.POST("",controllers.AddDevice)
-			device.POST("/register",controllers.RegisterDevice)
-			device.POST("/resource",controllers.AddDeviceResource)
+			device.POST("/list", controllers.ListDevice)
+			device.POST("", controllers.AddDevice)
+			device.POST("/register", controllers.RegisterDevice)
+			device.POST("/resource", controllers.AddDeviceResource)
+			device.GET("/:id/resource", controllers.ListDeviceResource)
 		}
-		resource:=v1.Group("/resource")
+		resource := v1.Group("/resource")
 		{
-			resource.POST("/upload",controllers.UploadFile)
-			resource.POST("",controllers.AddResource)
+			resource.POST("/upload", controllers.UploadFile)
+			resource.POST("", controllers.AddResource)
 		}
 	}
 	return r
@@ -45,12 +46,12 @@ func Start() {
 	if !g.Config().Http.Enabled {
 		return
 	}
-	addr:=g.Config().Http.Listen
-	if addr==""{
+	addr := g.Config().Http.Listen
+	if addr == "" {
 		return
 	}
-	r:=InitRouter()
-	if err:=r.Run(addr);err!=nil{
-		log.Fatalln("start http","err",err.Error())
+	r := InitRouter()
+	if err := r.Run(addr); err != nil {
+		log.Fatalln("start http", "err", err.Error())
 	}
 }
