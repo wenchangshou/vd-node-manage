@@ -1,0 +1,11 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "name": "vd",
+            "database": "${workspaceFolder:vd-node-manage}/vd.db"
+        }
+    ],
+    "sqltools.useNodeRuntime": true
+}

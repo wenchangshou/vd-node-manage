@@ -4,12 +4,11 @@ import (
 	"fmt"
 	"github.com/pkg/errors"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/pkg/e"
-	"sync"
-
 	"github.com/wenchangshou2/zutil"
+	"sync"
 )
 
-type Manage interface {
+type IManage interface {
 	GetLayoutID() string
 	OpenLayout(string, []Window) error
 	CloseLayout() error
@@ -60,14 +59,14 @@ func (manage *layoutManage) CloseLayout() error {
 	return nil
 }
 
-func InitLayoutManage() Manage {
+func InitLayoutManage() IManage {
 	return &layoutManage{
 		windows: make([]Window, 0),
 	}
 }
 
-// 当前布局信息
-type LayoutInfo struct {
+// Info 当前布局信息
+type Info struct {
 	// 布局id
 	LayoutId string
 	// 当前布局所打开的窗口

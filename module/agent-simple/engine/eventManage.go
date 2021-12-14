@@ -34,38 +34,6 @@ func (task eventExecuteManage) action(t e.TaskItem) {
 
 }
 func (task *eventExecuteManage) execute() {
-	//l := NewTaskLinedList()
-	//for _, item := range task.src.Items {
-	//	// 如果
-	//	if item.Depend == "" {
-	//		l.Append(&DoubleNode{Data: DoubleObject(item)})
-	//		continue
-	//	}
-	//	idx, exists := l.GetByTaskId(item.Depend)
-	//	if !exists {
-	//		l.Insert(0, &DoubleNode{Data: DoubleObject(item)})
-	//		continue
-	//	}
-	//	l.Insert(idx, &DoubleNode{Data: DoubleObject(item)})
-	//}
-	//l.Foreach(func(node *DoubleNode) bool {
-	//	item := node.Data
-	//	e, err := task.generator(e.ExecuteType(item.Action), item.ID, item.Options)
-	//	if err != nil {
-	//		logging.GLogger.Warn(fmt.Sprintf("生成类别错误:%s", err.Error()))
-	//		task.statusChan <- executor.ERROR
-	//		return false
-	//	}
-	//	err = e.Execute()
-	//	if err != nil {
-	//		task.statusChan <- executor.ERROR
-	//
-	//		return false
-	//	}
-	//	return true
-	//})
-	//
-	//task.statusChan <- executor.DONE
 	e := task.event
 	execFunc, err := task.generator(e.Action, e.ID, e.Params)
 	if err != nil {

@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/wenchangshou2/vd-node-manage/common/serializer"
 	"github.com/wenchangshou2/vd-node-manage/module/server/service"
+	"strconv"
 )
 
 func ListDevice(c *gin.Context) {
@@ -61,4 +62,21 @@ func ListDeviceResource(c *gin.Context) {
 		c.JSON(200, serializer.ErrorResponse(err))
 	}
 
+}
+
+func SetDeviceLayout(c *gin.Context) {
+	s := service.DeviceLayoutOpenService{}
+	if err := c.ShouldBindJSON(&s); err == nil {
+		id := c.Param("id")
+		_id, err := strconv.Atoi(id)
+		if err != nil {
+			c.JSON(200, serializer.Err(serializer.CodeDBError, "id错误", err))
+			return
+		}
+		s.ID = uint(_id)
+		res := s.Open()
+		c.JSON(200, res)
+	} else {
+		c.JSON(200, serializer.ErrorResponse(err))
+	}
 }

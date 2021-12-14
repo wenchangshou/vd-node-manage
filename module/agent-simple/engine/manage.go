@@ -15,7 +15,7 @@ import (
 
 var ActionGroup map[int]*executor.IExecute
 var (
-	GTaskExecute *TaskManage
+	GTaskExecute *EventManage
 )
 
 type TaskChangeEventInfo struct {
@@ -28,9 +28,9 @@ type TaskChangeEventInfo struct {
 // @param maxExecutorCount 允许同时执行任务数
 // @param httpRequestUri http请求地址
 // @param rpcRequestUri rpc请求地址
-func NewTaskManage(count int32, httpRequest string, service *IService.ServiceFactory) (*TaskManage, error) {
+func NewTaskManage(count int32, httpRequest string, service *IService.ServiceFactory) (*EventManage, error) {
 	g := executor.GenerateExecutorFactoryFunc(service, httpRequest)
-	GTaskExecute = &TaskManage{
+	GTaskExecute = &EventManage{
 		maxExecutorCount:    count,
 		taskAddNotify:       make(chan dto.Task),
 		ServerFactory:       service,
@@ -44,8 +44,8 @@ func NewTaskManage(count int32, httpRequest string, service *IService.ServiceFac
 func init() {
 }
 
-// TaskManage  任务管理
-type TaskManage struct {
+// EventManage  任务管理
+type EventManage struct {
 	maxExecutorCount    int32    //最大执行数
 	executorCount       int32    //当前执行部数
 	waitCount           int32    //等待数
@@ -111,7 +111,7 @@ func (eventList *EventList) Get(id uint) model.EventStatus {
 }
 
 // execute 执行器
-func (manage *TaskManage) execute(event model.Event) {
+func (manage *EventManage) execute(event model.Event) {
 	e := manage.ServerFactory.Event
 	// 将任务设置成执行状态
 	err := e.SetEventStatus([]uint{event.ID}, executor.EXECUTE)
@@ -122,7 +122,6 @@ func (manage *TaskManage) execute(event model.Event) {
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	manage.cancelFuncMap.LoadOrStore(event.ID, cancel)
-	fmt.Println(ctx)
 	m := NewEventExecuteManage(event, ctx, manage.generator)
 	status := m.Start()
 	select {
@@ -130,13 +129,12 @@ func (manage *TaskManage) execute(event model.Event) {
 		e.SetEventStatus([]uint{event.ID}, s)
 		atomic.AddInt32(&manage.executorCount, -1)
 		manage.EventStatusList.Delete(event.ID)
-		//manage.ServerFactory.Device.AddComputerResource()
 	}
 
 }
 
 // Loop 循环调度
-func (manage *TaskManage) Loop() {
+func (manage *EventManage) Loop() {
 	loopTicker := time.NewTicker(time.Second)
 	for {
 		select {
@@ -147,7 +145,7 @@ func (manage *TaskManage) Loop() {
 }
 
 // wake 唤醒一个任务
-func (manage *TaskManage) wake() {
+func (manage *EventManage) wake() {
 	var (
 		ok    bool
 		wc    int32
@@ -172,13 +170,13 @@ func (manage *TaskManage) wake() {
 	manage.processTask.Store(id, event)
 	go manage.execute(event)
 }
-func (manage *TaskManage) AddTaskByExecuteList(task []dto.Task) {
+func (manage *EventManage) AddTaskByExecuteList(task []dto.Task) {
 	manage.Lock()
 	defer manage.Unlock()
 }
 
 // AddWaitExecuteEvent 添加任务到等待列表中
-func (manage *TaskManage) AddWaitExecuteEvent(events []model.Event) error {
+func (manage *EventManage) AddWaitExecuteEvent(events []model.Event) error {
 	manage.Lock()
 	defer manage.Unlock()
 	for _, event := range events {
@@ -189,12 +187,12 @@ func (manage *TaskManage) AddWaitExecuteEvent(events []model.Event) error {
 	}
 	return nil
 }
-func (manage *TaskManage) Start() {
+func (manage *EventManage) Start() {
 	go manage.Loop()
 }
 
 // GetTaskExecuteLave 获取任务空闲数
-func (manage *TaskManage) GetTaskExecuteLave() int32 {
+func (manage *EventManage) GetTaskExecuteLave() int32 {
 	count := atomic.LoadInt32(&manage.executorCount)
 	return manage.maxExecutorCount - count
 }

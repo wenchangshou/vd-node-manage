@@ -3,7 +3,6 @@ package process
 import (
 	"fmt"
 	"os"
-	"strconv"
 	"strings"
 	"syscall"
 	"unsafe"
@@ -170,7 +169,6 @@ func DuplicateUserTokenFromSessionID(sessionId windows.Handle) (windows.Token, e
 	return userToken, nil
 }
 func StartProcessAsCurrentUser(appPath, cmdLine, workDir string, backstage bool) (uint32, error) {
-	logging.G_Logger.Info("StartProcessAsCurrentUser:" + appPath + "," + cmdLine + "," + workDir)
 	var (
 		sessionId windows.Handle
 		userToken windows.Token
@@ -186,11 +184,9 @@ func StartProcessAsCurrentUser(appPath, cmdLine, workDir string, backstage bool)
 		return 0, err
 	}
 	if userToken, err = DuplicateUserTokenFromSessionID(sessionId); err != nil {
-		logging.G_Logger.Error("get duplicate user token for current user session:" + err.Error())
 		return 0, fmt.Errorf("get duplicate user token for current user session:%s", err)
 	}
 	if returnCode, _, err := procCreateEnvironmentBlock.Call(uintptr(unsafe.Pointer(&envInfo)), uintptr(userToken), 0); returnCode == 0 {
-		logging.G_Logger.Error("create environment details for process:" + err.Error())
 		return 0, fmt.Errorf("create environment details for process:%s", err)
 	}
 	if backstage {
@@ -212,8 +208,6 @@ func StartProcessAsCurrentUser(appPath, cmdLine, workDir string, backstage bool)
 		uintptr(userToken), uintptr(unsafe.Pointer(windows.StringToUTF16Ptr(appPath))), commandLine, 0, 0, 0,
 		uintptr(creationFlags), uintptr(envInfo), workingDir, uintptr(unsafe.Pointer(&startupInfo)), uintptr(unsafe.Pointer(&processInfo)),
 	); returnCode == 0 {
-		logging.G_Logger.Error("create process as user:" + err.Error())
-
 		return 0, fmt.Errorf("create process as user:%s", err)
 	}
 	return processInfo.ProcessId, nil
@@ -319,7 +313,6 @@ func KillPPT() {
 	}
 }
 func KillUE4(processID uint32) {
-	logging.G_Logger.Info("killUE4")
 	tree, _ := SnapshotSysProcesses()
 	processName := ""
 	parentId := -1
@@ -327,14 +320,12 @@ func KillUE4(processID uint32) {
 		if ps.ProcessID == int(processID) {
 			processName = ps.ProcessName
 			parentId = ps.ProcessID
-			logging.G_Logger.Info("parent id:" + strconv.Itoa(ps.ParentProcessID) + ";processName:" + processName)
 		}
 	}
 	if len(processName) == 0 {
 		return
 	}
 	for _, ps := range tree {
-		logging.G_Logger.Info(fmt.Sprintf("process info: parent:%d,process name:%s,process id:%d,parentid:%d", ps.ParentProcessID, ps.ProcessName, ps.ProcessID, parentId))
 		if strings.Compare(processName, ps.ProcessName) == 0 || ps.ParentProcessID == parentId {
 			KillProcesses([]int{ps.ProcessID})
 		}
@@ -353,14 +344,12 @@ func GetUe4ProcessId(processID uint32) (int, error) {
 		if ps.ProcessID == int(processID) {
 			processName = ps.ProcessName
 			parentId = ps.ProcessID
-			logging.G_Logger.Info("parent id:" + strconv.Itoa(ps.ParentProcessID) + ";processName:" + processName)
 		}
 	}
 	if len(processName) == 0 {
 		return -1, errors.New("没有找到进程")
 	}
 	for _, ps := range tree {
-		logging.G_Logger.Info(fmt.Sprintf("process info: parent:%d,process name:%s,process id:%d,parentid:%d", ps.ParentProcessID, ps.ProcessName, ps.ProcessID, parentId))
 		if strings.Compare(processName, ps.ProcessName) == 0 || ps.ParentProcessID == parentId {
 			processArr = append(processArr, ps.ProcessID)
 		}

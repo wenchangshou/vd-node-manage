@@ -37,7 +37,7 @@ func (t TaskRpcService) SetTaskStatus(ids []uint, status model2.EventStatus) err
 // GetTasks 获取任务栏
 func (t TaskRpcService) GetTasks() ([]dto.Task, error) {
 	//rpcClient := &g.SingleConnRpcClient{
-	//	RpcServer: fmt.Sprintf(g.Config().Server.RpcAddress),
+	//	RpcServer: fmt.Sprintf(g.Config().Server.rpcAddress),
 	//	Timeout:   time.Second,
 	//}
 	//req := model2.QueryDeviceResourceDistributionRequest{DeviceID: t.ID}
