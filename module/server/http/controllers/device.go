@@ -80,3 +80,14 @@ func SetDeviceLayout(c *gin.Context) {
 		c.JSON(200, serializer.ErrorResponse(err))
 	}
 }
+
+func CloseDeviceLayout(c *gin.Context) {
+	s := service.DeviceLayoutCloseService{}
+	if err := c.ShouldBindUri(&s); err == nil {
+		res := s.Close()
+		c.JSON(200, res)
+	} else {
+		c.JSON(200, serializer.ErrorResponse(err))
+	}
+
+}

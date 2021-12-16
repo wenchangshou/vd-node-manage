@@ -21,21 +21,23 @@ type DatabaseConfig struct {
 	DBFile      string `json:"dbFile"`
 	Port        int    `json:"port"`
 }
-type RedisConfig struct{
-	Addr string `json:"addr"`
-	MaxIdle int `json:"maxIdle"`
+type RedisConfig struct {
+	Passwd     string   `json:"passwd"`
+	DB         int      `json:"db"`
+	Addr       string   `json:"addr"`
+	MaxIdle    int      `json:"maxIdle"`
 	HighQueues []string `json:"highQueues"`
-	LowQueues []string `json:"lowQueues"`
+	LowQueues  []string `json:"lowQueues"`
 }
 type GlobalConfig struct {
 	Debug    bool            `json:"debug"`
 	Hosts    string          `json:"hosts"`
-	MaxConns int             `json:"maxConns"`
+	MaxCons  int             `json:"maxCons"`
 	MaxIdle  int             `json:"maxIdle"`
 	Listen   string          `json:"listen"`
 	Http     *HttpConfig     `json:"http"`
 	Database *DatabaseConfig `json:"database"`
-	Redis *RedisConfig `json:"redis"`
+	Redis    *RedisConfig    `json:"redis"`
 }
 
 var (

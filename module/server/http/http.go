@@ -33,6 +33,7 @@ func InitRouter() *gin.Engine {
 			device.POST("/resource", controllers.AddDeviceResource)
 			device.GET("/:id/resource", controllers.ListDeviceResource)
 			device.POST("/:id/layout", controllers.SetDeviceLayout)
+			device.DELETE("/:id/layout", controllers.CloseDeviceLayout)
 		}
 		resource := v1.Group("/resource")
 		{

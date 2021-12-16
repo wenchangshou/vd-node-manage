@@ -22,14 +22,13 @@ func main() {
 	}
 	g.ParseConfig(*cfg)
 	model.InitDatabase()
-	g.InitRedisConnPool()
+	g.InitRedisClient(g.Config().Redis)
 	go http.Start()
 	go rpc.Start()
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
 		<-sigs
-		fmt.Println()
 		os.Exit(0)
 	}()
 	select {}

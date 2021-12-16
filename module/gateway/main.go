@@ -4,7 +4,7 @@ import (
 	"flag"
 	discover "github.com/wenchangshou2/vd-node-manage/common/discovery"
 	"github.com/wenchangshou2/vd-node-manage/common/logging"
-	"github.com/wenchangshou2/vd-node-manage/module/agent/pkg/e"
+	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/pkg/e"
 	"github.com/wenchangshou2/vd-node-manage/module/gateway/bootstrap"
 	"github.com/wenchangshou2/vd-node-manage/module/gateway/g"
 	"github.com/wenchangshou2/vd-node-manage/module/gateway/routers"
@@ -19,7 +19,7 @@ var (
 
 func init() {
 	cfg := flag.String("c", "cfg.json", "configuration file")
-	hardware:=flag.String("d","hardware.data","hardware file")
+	hardware := flag.String("d", "hardware.data", "hardware file")
 	flag.Parse()
 	g.ParseConfig(*cfg)
 	g.ParseHardware(*hardware)

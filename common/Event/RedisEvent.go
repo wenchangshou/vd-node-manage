@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/gomodule/redigo/redis"
-	"github.com/wenchangshou2/vd-node-manage/common/logging"
 	"time"
 )
 
@@ -32,7 +31,6 @@ func NewRedisClient(addr string, db int, passwd string) *RedisClient {
 			return err
 		},
 	}
-	logging.GLogger.Info("new redis pool at " + addr)
 	client := &RedisClient{
 		pool: pool,
 	}

@@ -1,9 +1,11 @@
 package service
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/wenchangshou2/vd-node-manage/common/model"
 	"github.com/wenchangshou2/vd-node-manage/common/serializer"
+	"github.com/wenchangshou2/vd-node-manage/module/server/g"
 	model2 "github.com/wenchangshou2/vd-node-manage/module/server/model"
 )
 
@@ -28,13 +30,18 @@ func (service DeviceLayoutOpenService) Open() serializer.Response {
 	mapDeviceResource := make(map[uint]model2.DeviceResource)
 	ids := make([]uint, 0)
 	for _, window := range service.Windows {
+		flag := true
 		if window.Source.Category != "id" {
 			continue
 		}
 		for _, v := range ids {
 			if window.Source.ID == v {
-				continue
+				flag = false
+				break
 			}
+		}
+		if !flag {
+			continue
 		}
 		ids = append(ids, window.Source.ID)
 	}
@@ -54,8 +61,14 @@ func (service DeviceLayoutOpenService) Open() serializer.Response {
 			Width:     window.Width,
 			Height:    window.Height,
 			Service:   window.Service,
-			Style:     window.Style,
-			Arguments: window.Arguments,
+			Style:     make(map[string]interface{}),
+			Arguments: make(map[string]interface{}),
+		}
+		if window.Style != nil {
+			w.Style = window.Style
+		}
+		if window.Arguments != nil {
+			w.Arguments = window.Arguments
 		}
 		r := mapDeviceResource[window.Source.ID]
 		if window.Service == "http" {
@@ -66,7 +79,23 @@ func (service DeviceLayoutOpenService) Open() serializer.Response {
 		windows = append(windows, w)
 	}
 	c.Windows = windows
-	return serializer.Response{
-		Data: c,
-	}
+	msg := model.EventRequest{}
+	msg.Action = "openLayout"
+	b1, _ := json.Marshal(c)
+	msg.Arguments = b1
+	b2, _ := json.Marshal(msg)
+	g.GRedis.Publish(fmt.Sprintf("device-%d", service.ID), string(b2))
+	return serializer.Response{}
+}
+
+type DeviceLayoutCloseService struct {
+	ID uint `json:"id" uri:"id"`
+}
+
+func (service DeviceLayoutCloseService) Close() serializer.Response {
+	msg := model.EventRequest{}
+	msg.Action = "closeLayout"
+	b2, _ := json.Marshal(msg)
+	g.GRedis.Publish(fmt.Sprintf("device-%d", service.ID), string(b2))
+	return serializer.Response{}
 }

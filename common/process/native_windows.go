@@ -231,7 +231,7 @@ func (t PsTree) findDescendants(pid int) []int {
 	return children
 }
 
-//获取当前所有的进程的信息
+// SnapshotSysProcesses 获取当前所有的进程的信息
 func SnapshotSysProcesses() (PsTree, error) {
 	ss, err := syscall.CreateToolhelp32Snapshot(syscall.TH32CS_SNAPPROCESS, 0)
 	if err != nil {
@@ -261,7 +261,7 @@ func SnapshotSysProcesses() (PsTree, error) {
 	}
 }
 
-// 杀死单个进程
+// KillProcesses 杀死单个进程
 func KillProcesses(ps []int) {
 	for _, pid := range ps {
 		p, err := os.FindProcess(pid)
@@ -291,7 +291,7 @@ func GetThreadName(id uint32) string {
 	return ""
 }
 
-// 杀死进程树
+// KillProcessTreeWindows 杀死进程树
 func KillProcessTreeWindows(p *os.Process) error {
 	ps, err := SnapshotSysProcesses()
 	if err != nil {
@@ -303,7 +303,7 @@ func KillProcessTreeWindows(p *os.Process) error {
 	return nil
 }
 
-//杀死PPT
+// KillPPT 杀死PPT
 func KillPPT() {
 	tree, _ := SnapshotSysProcesses()
 	for _, ps := range tree {

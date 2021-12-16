@@ -32,7 +32,7 @@ func IsDeviceResource(deviceID uint, resourceID uint) bool {
 // GetDeviceResources 通过设备id和资源id来检索资源
 func GetDeviceResources(deviceID uint, resourceIDS []uint) ([]DeviceResource, error) {
 	var res []DeviceResource
-	err := DB.Model(&DeviceResource{}).Where("device_id=? AND resource_id = ?", deviceID, resourceIDS).Preload("Resource").Find(&res).Error
+	err := DB.Model(&DeviceResource{}).Where("device_id=? AND resource_id in ?", deviceID, resourceIDS).Preload("Resource").Find(&res).Error
 	return res, err
 }
 
