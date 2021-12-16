@@ -2,9 +2,11 @@ package engine
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/engine/layout"
 	"time"
+
+	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/engine/layout"
 
 	"github.com/wenchangshou2/vd-node-manage/common/Event"
 	"github.com/wenchangshou2/vd-node-manage/common/logging"
@@ -29,7 +31,7 @@ type Schedule struct {
 	httpAddress    string
 	serverFactory  *IService.ServiceFactory
 	redisClient    *Event.RedisClient
-	wm             layout.IManage
+	layoutManage   layout.IManage
 }
 
 // 查询是否有新的分发任务
@@ -60,14 +62,28 @@ func (schedule *Schedule) loop() {
 		//case <-taskTick.C:
 		//	schedule.TaskLoop()
 		case <-resourceDistributionTick.C:
-			fmt.Println("query task")
 			schedule.queryTask()
 		}
 	}
 
 }
-func (schedule *Schedule) DeviceEvent(channel string, message []byte) error {
-	fmt.Printf("channel:%s,message:%s\n", channel, string(message))
+
+// DeviceEvent 接收服务端事件
+func (schedule *Schedule) DeviceEvent(channel string, message []byte) (err error) {
+	req := model.EventRequest{}
+	if err = json.Unmarshal(message, &req); err != nil {
+		return
+	}
+	if req.Action == "openLayout" {
+		args := model.OpenLayoutCmdParams{}
+		if err := json.Unmarshal(req.Arguments, &args); err != nil {
+			return err
+		}
+		fmt.Println("args", args, err)
+		schedule.layoutManage.OpenLayout(args)
+	} else if req.Action == "closeLayout" {
+		schedule.layoutManage.CloseLayout()
+	}
 	return nil
 }
 func (schedule *Schedule) Start() {
@@ -97,7 +113,7 @@ func InitSchedule(conf *g.GlobalConfig) error {
 		rpcAddress:    conf.Server.RpcAddress,
 		serverFactory: serverFactory,
 		redisClient:   redisClient,
-		wm:            layout.InitLayoutManage(),
+		layoutManage:  layout.InitLayoutManage(),
 		eventManage:   eventManage,
 	}
 

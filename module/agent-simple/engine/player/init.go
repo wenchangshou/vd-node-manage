@@ -6,40 +6,42 @@ import (
 	"github.com/wenchangshou2/zutil"
 )
 
-var PlayerMap map[string]IPlayer
+var executePath map[string]IPlayer
 
-// 获取播放器可执行路径
+// GetPlayerPath 获取播放器可执行路径
 func GetPlayerPath(service string) string {
+	p := ""
 	switch service {
 	case "video":
-		playerPath, _ := zutil.GetFullPath("app/VideoPlayer/ZOOLON_VideoPlayer")
-		return playerPath
+		p, _ = zutil.GetFullPath("app/VideoPlayer/ZOOLON_VideoPlayer")
 	case "http":
-		playerPath, _ := zutil.GetFullPath("app/WebPlayer/ZOOLON_WebPlayer")
-		return playerPath
+		p, _ = zutil.GetFullPath("app/WebPlayer/ZOOLON_WebPlayer")
 	case "pdf":
-		playerPath, _ := zutil.GetFullPath("app/PDFPlayer/ZOOLON_PDFPlayer")
-		return playerPath
+		p, _ = zutil.GetFullPath("app/PDFPlayer/ZOOLON_PDFPlayer")
 	case "ppt":
-		playerPath, _ := zutil.GetFullPath("app/PPTPlayer/ZOOLON_PPTPlayer")
-		return playerPath
+		p, _ = zutil.GetFullPath("app/PPTPlayer/ZOOLON_PPTPlayer")
 	default:
 		return ""
 	}
+	if runtime.GOOS == "windows" {
+		return p + ".exe"
+	} else {
+		return p
+	}
 }
 func initWindow() {
-	// PlayerMap["video"] = &VideoPlayer{
-	// 	playPath: GetPlayerPath("video") + ".exe",
-	// }
-	// PlayerMap["http"] = &HttpPlayer{
-	// 	playPath: GetPlayerPath("http") + ".exe",
-	// }
-	// PlayerMap["pdf"] = &PdfPlayer{
-	// 	playPath: GetPlayerPath("pdf") + ".exe",
-	// }
-	// PlayerMap["ppt"] = &PptPlayer{
-	// 	playPath: GetPlayerPath("ppt") + ".exe",
-	// }
+	//executePath["video"] = &VideoPlayer{
+	//	playPath: GetPlayerPath("video") + ".exe",
+	//}
+	//executePath["http"] = &HttpPlayer{
+	//	playPath: GetPlayerPath("http") + ".exe",
+	//}
+	//executePath["pdf"] = &PdfPlayer{
+	//	playPath: GetPlayerPath("pdf") + ".exe",
+	//}
+	//PlayerMap["ppt"] = &PptPlayer{
+	//	playPath: GetPlayerPath("ppt") + ".exe",
+	//}
 }
 func initLinux() {
 	// PlayerMap = make(map[string]AbstractPlayerFactory)

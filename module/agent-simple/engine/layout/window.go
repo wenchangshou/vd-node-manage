@@ -25,20 +25,27 @@ type Window struct {
 	Service   string
 	Status    WindowStatus
 	Style     WindowStyle
-	Arguments map[string]string
+	Arguments map[string]interface{}
 	Source    string
 	player    player.IPlayer
 }
 
-func (window *Window) Open(wg *sync.WaitGroup, port int) error {
+func (window *Window) Open(wg *sync.WaitGroup, port int) (int, error) {
 	return window.player.Open(wg, port)
+}
+func (window *Window) Close() error {
+	return window.player.Close()
 }
 
 func MakeWindow(id string, x int, y int, width int, height int, z int,
 	service string,
-	Arguments map[string]string,
+	Arguments map[string]interface{},
 	source string,
 ) (*Window, error) {
+	var (
+		_player player.IPlayer
+		err     error
+	)
 	windowInfo := e.Window{
 		X:      x,
 		Y:      y,
@@ -46,11 +53,11 @@ func MakeWindow(id string, x int, y int, width int, height int, z int,
 		Height: height,
 		Z:      z,
 	}
-	_player, err := player.MakePlayer(windowInfo, "", service, source)
-	if err != nil {
+	if _player, err = player.MakePlayer(windowInfo, "", service, source); err != nil {
 		return nil, err
 	}
 	return &Window{
+		ID:        id,
 		X:         x,
 		Y:         y,
 		Width:     width,

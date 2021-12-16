@@ -3,8 +3,10 @@ package player
 import (
 	"fmt"
 	"github.com/wenchangshou2/vd-node-manage/common/process"
+	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/g"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/pkg/e"
 	"github.com/wenchangshou2/zutil"
+	"path"
 	"sync"
 )
 
@@ -12,11 +14,11 @@ type ResourcePlayer struct {
 	e.Window
 	Source    string
 	Arguments map[string]interface{}
-	Pid       uint32
+	Pid       int
 	PlayPath  string
 }
 
-func (player *ResourcePlayer) GetThreadId() uint32 {
+func (player *ResourcePlayer) GetThreadId() int {
 	return player.Pid
 }
 func (player *ResourcePlayer) Check() (bool, error) {
@@ -24,18 +26,19 @@ func (player *ResourcePlayer) Check() (bool, error) {
 }
 
 // Open 打开一个播放器
-func (player *ResourcePlayer) Open(wg *sync.WaitGroup, port int) (err error) {
-	fmt.Println("open")
+func (player *ResourcePlayer) Open(wg *sync.WaitGroup, port int) (pid int, err error) {
+	e := process.StandardApplicationControl{}
 	defer wg.Done()
 	params := ""
 	if player.Arguments != nil && len(player.Arguments) > 0 {
 		params = zutil.MapToString(player.Arguments)
 	}
+	source := path.Join(g.Config().Resource.Directory, "resource", player.Source)
 	params = fmt.Sprintf("-w %d -h %d -x %d -y %d", player.Width, player.Height, player.X, player.Y)
-	params = fmt.Sprintf("%s -source %s", params, player.Source)
+	params = fmt.Sprintf("%s -source %s", params, source)
 	fmt.Println(player.PlayPath, params)
-	player.Pid, err = process.StartProcessAsCurrentUser(player.PlayPath, params, "", false)
-	return
+	player.Pid, err = e.StartProcessAsCurrentUser(player.PlayPath, params, "", false)
+	return player.Pid, err
 }
 
 func (player *ResourcePlayer) Close() error {
