@@ -41,8 +41,8 @@ func GetSpecifiedModuleExhibition(id string) ([]string, error) {
 	if result.Error != nil {
 		return ids, result.Error
 	}
-	for _, item := range items {
-		ids = append(ids, item.ExhibitionID)
+	for i := range items {
+		ids = append(ids, items[i].ExhibitionID)
 	}
 	return ids, nil
 }

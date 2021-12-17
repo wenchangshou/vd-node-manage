@@ -2,6 +2,7 @@ package task
 
 import (
 	"fmt"
+
 	"github.com/wenchangshou2/vd-node-manage/common/serializer"
 	"github.com/wenchangshou2/vd-node-manage/module/gateway/model"
 )
@@ -35,8 +36,8 @@ func (service ComputerProject) install() serializer.Response {
 	if err != nil {
 		return serializer.Err(serializer.CodeDBError, "获取项目对应的发行版本列表失败", err)
 	}
-	for _, pr := range projectReleaseList {
-		projectReleaseIds = append(projectReleaseIds, pr.ID)
+	for i := range projectReleaseList {
+		projectReleaseIds = append(projectReleaseIds, projectReleaseList[i].ID)
 	}
 	for _, computer := range service.Computers {
 		depend := ""

@@ -1,10 +1,11 @@
 package exhibition
 
 import (
+	"strings"
+
 	"github.com/gin-gonic/gin"
 	"github.com/wenchangshou2/vd-node-manage/common/serializer"
 	"github.com/wenchangshou2/vd-node-manage/module/gateway/model"
-	"strings"
 )
 
 type GetComputerExhibitionService struct {
@@ -246,7 +247,8 @@ func (service *GetExhibitionDetailsService) Get() serializer.Response {
 	result.Level = exhibition.Level
 	result.Encryption = exhibition.Encryption
 
-	for _, item := range items {
+	for i := range items {
+		item := &items[i]
 		var window *WindowInfo
 		resource := &ResourceInfo{}
 		window = result.GetWindow(item.WindowID)
