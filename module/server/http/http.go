@@ -2,13 +2,14 @@ package http
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	"github.com/julienschmidt/httprouter"
 	"github.com/wenchangshou2/vd-node-manage/module/server/g"
 	"github.com/wenchangshou2/vd-node-manage/module/server/http/controllers"
-	"log"
 )
 
 var router *httprouter.Router
@@ -26,20 +27,20 @@ func InitRouter() *gin.Engine {
 	{
 		v1.GET("/health", controllers.Health)
 		device := v1.Group("/device")
-		{
-			device.POST("/list", controllers.ListDevice)
-			device.POST("", controllers.AddDevice)
-			device.POST("/register", controllers.RegisterDevice)
-			device.POST("/resource", controllers.AddDeviceResource)
-			device.GET("/:id/resource", controllers.ListDeviceResource)
-			device.POST("/:id/layout", controllers.SetDeviceLayout)
-			device.DELETE("/:id/layout", controllers.CloseDeviceLayout)
-		}
+
+		device.POST("/list", controllers.ListDevice)
+		device.POST("", controllers.AddDevice)
+		device.POST("/register", controllers.RegisterDevice)
+		device.POST("/resource", controllers.AddDeviceResource)
+		device.GET("/:id/resource", controllers.ListDeviceResource)
+		device.POST("/:id/layout", controllers.SetDeviceLayout)
+		device.DELETE("/:id/layout", controllers.CloseDeviceLayout)
+
 		resource := v1.Group("/resource")
-		{
-			resource.POST("/upload", controllers.UploadFile)
-			resource.POST("", controllers.AddResource)
-		}
+
+		resource.POST("/upload", controllers.UploadFile)
+		resource.POST("", controllers.AddResource)
+
 	}
 	return r
 }
