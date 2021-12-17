@@ -14,7 +14,7 @@ func GetMacByIp(ip string) (mac string, err error) {
 	for _, netInterface := range netInterfaces {
 		addrs, _ := netInterface.Addrs()
 		macAddr := netInterface.HardwareAddr.String()
-		if len(macAddr) == 0 {
+		if macAddr == "" {
 			continue
 		}
 		for _, addr := range addrs {
