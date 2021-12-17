@@ -40,10 +40,10 @@ func (computer Computer) AppendNewResource(resource Resource) error {
 }
 
 // AddProject 添加新的项目
-func (computer Computer) AddProject(projectRelease ProjectRelease) error {
+func (computer Computer) AddProject(projectRelease *ProjectRelease) error {
 	return DB.Debug().Model(&computer).Omit("ProjectRelease.*").Association("ProjectRelease").Append(&projectRelease)
 }
-func (computer Computer) DeleteProject(projectRelease ProjectRelease) error {
+func (computer Computer) DeleteProject(projectRelease *ProjectRelease) error {
 	return DB.Debug().Model(&computer).Unscoped().Association("ProjectRelease").Delete(&projectRelease)
 }
 func (computer Computer) GetComputerProject(projectReleaseID string) (p *ProjectRelease, err error) {

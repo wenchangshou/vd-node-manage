@@ -80,9 +80,9 @@ func (schedule *Schedule) DeviceEvent(channel string, message []byte) (err error
 			return err
 		}
 		fmt.Println("args", args, err)
-		schedule.layoutManage.OpenLayout(args)
+		return schedule.layoutManage.OpenLayout(args)
 	} else if req.Action == "closeLayout" {
-		schedule.layoutManage.CloseLayout()
+		return schedule.layoutManage.CloseLayout()
 	}
 	return nil
 }

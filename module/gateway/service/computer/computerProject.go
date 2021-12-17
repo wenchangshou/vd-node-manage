@@ -22,7 +22,7 @@ type ApplicationItem struct {
 }
 type ApplicationList []ApplicationItem
 
-func (service *ApplicationList) Add(projectRelease model.ProjectRelease) {
+func (service *ApplicationList) Add(projectRelease *model.ProjectRelease) {
 	item := ApplicationItem{
 		ID:   projectRelease.ID,
 		Name: projectRelease.Project.Name,
