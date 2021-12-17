@@ -2,12 +2,13 @@ package player
 
 import (
 	"fmt"
+	"path"
+	"sync"
+
 	"github.com/wenchangshou2/vd-node-manage/common/process"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/g"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/pkg/e"
 	"github.com/wenchangshou2/zutil"
-	"path"
-	"sync"
 )
 
 type ResourcePlayer struct {
@@ -34,7 +35,7 @@ func (player *ResourcePlayer) Open(wg *sync.WaitGroup, port int) (pid int, err e
 		params = zutil.MapToString(player.Arguments)
 	}
 	source := path.Join(g.Config().Resource.Directory, "resource", player.Source)
-	params = fmt.Sprintf("-w %d -h %d -x %d -y %d", player.Width, player.Height, player.X, player.Y)
+	params = fmt.Sprintf("%s -w %d -h %d -x %d -y %d", params, player.Width, player.Height, player.X, player.Y)
 	params = fmt.Sprintf("%s -source %s", params, source)
 	fmt.Println(player.PlayPath, params)
 	player.Pid, err = e.StartProcessAsCurrentUser(player.PlayPath, params, "", false)

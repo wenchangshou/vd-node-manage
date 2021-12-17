@@ -2,10 +2,11 @@ package player
 
 import (
 	"fmt"
+	"sync"
+
 	"github.com/wenchangshou2/vd-node-manage/common/process"
 	"github.com/wenchangshou2/vd-node-manage/module/agent/pkg/e"
 	"github.com/wenchangshou2/zutil"
-	"sync"
 )
 
 type ResourcePlayer struct {
@@ -31,7 +32,7 @@ func (player *ResourcePlayer) Open(wg *sync.WaitGroup, port int) (err error) {
 	if player.Arguments != nil && len(player.Arguments) > 0 {
 		params = zutil.MapToString(player.Arguments)
 	}
-	params = fmt.Sprintf("-w %d -h %d -x %d -y %d", player.Width, player.Height, player.X, player.Y)
+	params += fmt.Sprintf("-w %d -h %d -x %d -y %d", player.Width, player.Height, player.X, player.Y)
 	params = fmt.Sprintf("%s -source %s", params, player.Source)
 	fmt.Println(player.PlayPath, params)
 	player.Pid, err = process.StartProcessAsCurrentUser(player.PlayPath, params, "", false)

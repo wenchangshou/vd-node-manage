@@ -2,6 +2,7 @@ package rpcServer
 
 import (
 	"context"
+
 	"github.com/wenchangshou2/vd-node-manage/module/gateway/model"
 	"github.com/wenchangshou2/vd-node-manage/module/gateway/rpc/server/pb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
@@ -41,7 +42,7 @@ func (s *TaskServer) ConvertTaskJsonToProtoBuf(task *model.Task, item []model.Ta
 	return result
 }
 func (s *TaskServer) GetTaskByComputerMac(ctx context.Context, request *pb.GetTaskRequest) (*pb.TasksResponse, error) {
-	tasks := make([]model.Task, 0)
+	// tasks := make([]model.Task, 0)
 	response := &pb.TasksResponse{}
 	items := make([]*pb.Task, 0)
 	computer, err := model.GetComputerByMac(request.Mac)

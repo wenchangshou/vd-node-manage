@@ -98,7 +98,7 @@ func StartProcessAsCurrentUser(appPath, cmdLine, workDir string, backstage bool)
 	//	return 0,err
 	//}
 	go func() {
-		err := cmd.Wait()
+		cmd.Wait()
 		pGid, err := syscall.Getpgid(cmd.Process.Pid)
 		if err == nil {
 			syscall.Kill(-pGid, 15)
