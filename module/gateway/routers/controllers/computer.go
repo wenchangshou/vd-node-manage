@@ -2,8 +2,9 @@ package controllers
 
 import (
 	"fmt"
-	computer2 "github.com/wenchangshou2/vd-node-manage/module/gateway/service/computer"
 	"strconv"
+
+	computer2 "github.com/wenchangshou2/vd-node-manage/module/gateway/service/computer"
 
 	"github.com/gin-gonic/gin"
 )
@@ -82,9 +83,9 @@ func GetCrossResources(c *gin.Context) {
 	c.JSON(200, res)
 }
 func OpenComputerExhibition(c *gin.Context) {
-	var service computer2.ComputerExhibitionOpenService
-	if err := c.ShouldBindUri(service); err == nil {
-	}
+	// var service computer2.computerexhibitionopenservice
+	// if err := c.shouldbinduri(service); err == nil {
+	// }
 }
 func GetComputerProjectDir(c *gin.Context) {
 	computerID := c.Param("id")

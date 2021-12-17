@@ -2,7 +2,6 @@ package model
 
 import (
 	"fmt"
-	"github.com/wenchangshou2/vd-node-manage/module/server/g"
 	"log"
 )
 
@@ -13,13 +12,13 @@ func migration() error {
 	var (
 		err error
 	)
-	config := g.Config()
+	// config := g.Config()
 	if !needMigration() {
 		return nil
 	}
-	if config.Database.Type == "mysql" {
-		//DB = DB.Set("gorm:table_options", "ENGINE=InnoDB")
-	}
+	// if config.Database.Type == "mysql" {
+	//DB = DB.Set("gorm:table_options", "ENGINE=InnoDB")
+	// }
 	err = DB.AutoMigrate(
 		&Device{},
 		&DeviceResource{},

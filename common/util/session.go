@@ -10,10 +10,12 @@ func SetSession(c *gin.Context, list map[string]interface{}) {
 	for key, value := range list {
 		s.Set(key, value)
 	}
-	err := s.Save()
-	if err != nil {
+	s.Save()
+	// if err := s.Save();err!=nil{
+	// }
+	// if err != nil {
 
-	}
+	// }
 }
 
 //GetSession 获取一个session
