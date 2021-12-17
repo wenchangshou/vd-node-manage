@@ -157,8 +157,7 @@ func GetProcessIdByName(name string) (int, error) {
 		return 0, nil
 	}
 	for x := range processList {
-		var process Process
-		process = processList[x]
+		var process Process = processList[x]
 		if process.Executable() == name {
 			return process.Pid(), nil
 		}
