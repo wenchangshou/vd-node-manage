@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"path"
+
 	"github.com/mitchellh/mapstructure"
 	"github.com/wenchangshou2/vd-node-manage/common/file"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/g"
 	IService "github.com/wenchangshou2/vd-node-manage/module/agent-simple/service"
-	"path"
 )
 
 type InstallResourceExecutor struct {
@@ -33,7 +34,7 @@ func (executor *InstallResourceExecutor) Execute() error {
 		fmt.Printf("download:len:%d,downLen:%d\n", length, downLen)
 	})
 	if err != nil {
-		return errors.New(fmt.Sprintf("%s:%v", "下载文件失败", err))
+		return fmt.Errorf("%s:%v", "下载文件失败", err)
 	}
 	if err = executor.DeviceService.AddComputerResource(executor.Option.ResourceID); err != nil {
 		return errors.New("添加设备资源失败:" + err.Error())
