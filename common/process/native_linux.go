@@ -108,10 +108,7 @@ func StartProcessAsCurrentUser(appPath, cmdLine, workDir string, backstage bool)
 }
 func CheckThreadExists(id uint32) bool {
 	_, err := syscall.Getpgid(int(id))
-	if err != nil {
-		return false
-	}
-	return true
+	return err == nil
 }
 func KillProcesses(ps []int) {
 	err := syscall.Kill(ps[0], 0)
