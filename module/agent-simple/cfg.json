@@ -1,1 +1,59 @@
-{"debug":false,"hostname":"","ip":"","log":{"name":"log","path":"logs","ext":"log","level":"debug","maxMsgSize":1048576},"server":{"address":"","mode":"manual","httpAddress":"192.168.10.121:6031","rpcAddress":"192.168.10.121:6030","register":true,"id":1,"reportInterval":60,"queryTaskInterval":60,"redis_address":"192.168.10.31:30000"},"rpc-old":null,"resource":{"directory":"c:/zoolon","tmp":"c:/zoolon/tmp"},"task":{"count":1},"heartbeat":{"enabled":true,"addr":"127.0.0.1:6030","interval":60,"timeout":1000},"http":{"enabled":true,"listen":"0.0.0.0:8888","backdoor":true}}
+{
+  "debug": false,
+  "hostname": "",
+  "ip": "",
+  "log": {
+    "name": "log",
+    "path": "logs",
+    "ext": "log",
+    "level": "debug",
+    "maxMsgSize": 1048576
+  },
+  "server": {
+    "address": "",
+    "mode": "manual",
+    "httpAddress": "192.168.10.121:6031",
+    "rpcAddress": "192.168.10.121:6030",
+    "register": true,
+    "id": 1,
+    "reportInterval": 60,
+    "queryTaskInterval": 60,
+    "redis_address": "192.168.10.31:30000"
+  },
+  "rpc-old": null,
+  "resource": {
+    "directory": "c:/zoolon",
+    "tmp": "c:/zoolon/tmp"
+  },
+  "task": {
+    "count": 1
+  },
+  "heartbeat": {
+    "enabled": true,
+    "addr": "127.0.0.1:6030",
+    "interval": 60,
+    "timeout": 1000
+  },
+  "http": {
+    "enabled": true,
+    "listen": "0.0.0.0:8888",
+    "backdoor": true
+  },
+  "player": {
+    "resource": [
+      {
+        "name": "video",
+        "describe": "视频播放器",
+        "path": "app/VideoPlayer/ZOOLON_VideoPlayer.exe"
+      },{
+        "name": "image",
+        "describe": "图片播放器",
+        "path": "app/ImagePlayer/ZOOLON_ImagePlayer.exe"
+      },{
+        "name": "ppt",
+        "describe": "ppt播放器",
+        "path": "app/"
+      }
+    ]
+  }
+}
