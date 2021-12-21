@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 func UnZip(dst, src string) error {
@@ -14,13 +15,17 @@ func UnZip(dst, src string) error {
 	if err != nil {
 		return err
 	}
+
 	if zr == nil {
 		return errors.New("无法打开压缩文件")
 	}
 	for _, file := range zr.File {
-		path := filepath.Join(dst, file.Name)
+		p := filepath.Join(dst, file.Name)
+		if !strings.Contains(p, "..") {
+			continue
+		}
 		if file.FileInfo().IsDir() {
-			if err := os.MkdirAll(path, file.Mode()); err != nil {
+			if err := os.MkdirAll(p, file.Mode()); err != nil {
 				return err
 			}
 			continue
@@ -29,7 +34,7 @@ func UnZip(dst, src string) error {
 		if err != nil {
 			return err
 		}
-		fw, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR|os.O_TRUNC, file.Mode())
+		fw, err := os.OpenFile(p, os.O_CREATE|os.O_RDWR|os.O_TRUNC, file.Mode())
 		if err != nil {
 			return err
 		}
