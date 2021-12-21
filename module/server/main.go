@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/wenchangshou2/vd-node-manage/module/server/event"
 	"github.com/wenchangshou2/vd-node-manage/module/server/g"
 	"github.com/wenchangshou2/vd-node-manage/module/server/http"
 	"github.com/wenchangshou2/vd-node-manage/module/server/model"
@@ -22,7 +23,7 @@ func main() {
 	}
 	g.ParseConfig(*cfg)
 	model.InitDatabase()
-	g.InitRedisClient(g.Config().Redis)
+	event.InitEvent(g.Config().Redis)
 	go http.Start()
 	go rpc.Start()
 	sigs := make(chan os.Signal, 1)

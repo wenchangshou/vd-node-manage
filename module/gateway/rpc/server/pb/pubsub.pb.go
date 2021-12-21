@@ -300,9 +300,9 @@ var file_rpc_server_pb_pubsub_proto_goTypes = []interface{}{
 	(*Empty)(nil),            // 3: Empty
 }
 var file_rpc_server_pb_pubsub_proto_depIdxs = []int32{
-	0, // 0: PubsubService.Publish:input_type -> PublishChannel
+	0, // 0: PubsubService.PublishEvent:input_type -> PublishChannel
 	1, // 1: PubsubService.Subscribe:input_type -> SubscribeChannel
-	3, // 2: PubsubService.Publish:output_type -> Empty
+	3, // 2: PubsubService.PublishEvent:output_type -> Empty
 	2, // 3: PubsubService.Subscribe:output_type -> SubscribeResult
 	2, // [2:4] is the sub-list for method output_type
 	0, // [0:2] is the sub-list for method input_type

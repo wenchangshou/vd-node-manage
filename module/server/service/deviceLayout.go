@@ -1,11 +1,12 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/wenchangshou2/vd-node-manage/common/model"
 	"github.com/wenchangshou2/vd-node-manage/common/serializer"
-	"github.com/wenchangshou2/vd-node-manage/module/server/g"
+	"github.com/wenchangshou2/vd-node-manage/module/server/event"
 	model2 "github.com/wenchangshou2/vd-node-manage/module/server/model"
 )
 
@@ -18,6 +19,10 @@ type DeviceLayoutOpenService struct {
 }
 
 func (service DeviceLayoutOpenService) Open() serializer.Response {
+	var (
+		resources []model2.DeviceResource
+		err       error
+	)
 	c := model.OpenLayoutCmdParams{
 		ID:    service.LayoutID,
 		Kill:  service.Kill,
@@ -45,8 +50,7 @@ func (service DeviceLayoutOpenService) Open() serializer.Response {
 		}
 		ids = append(ids, window.Source.ID)
 	}
-	resources, err := model2.GetDeviceResources(service.ID, ids)
-	if err != nil {
+	if resources, err = model2.GetDeviceResources(service.ID, ids); err != nil {
 		return serializer.Err(serializer.CodeDBError, "获取设备资源失败", err)
 	}
 	for _, resource := range resources {
@@ -79,13 +83,17 @@ func (service DeviceLayoutOpenService) Open() serializer.Response {
 		windows = append(windows, w)
 	}
 	c.Windows = windows
-	msg := model.EventRequest{}
-	msg.Action = "openLayout"
+	//msg := model.EventRequest{}
+	//msg.Action = "openLayout"
 	b1, _ := json.Marshal(c)
-	msg.Arguments = b1
-	b2, _ := json.Marshal(msg)
-	g.GRedis.Publish(fmt.Sprintf("device-%d", service.ID), string(b2))
-	return serializer.Response{}
+	ctx := context.TODO()
+	reply, err := event.GManage.PublishEvent(ctx, "openLayout", fmt.Sprintf("device-%d", service.ID), b1, true)
+	if err != nil {
+		return serializer.Err(serializer.CodeRedisError, "redis publish event error", err)
+	}
+	return serializer.Response{
+		Data: reply,
+	}
 }
 
 type DeviceLayoutCloseService struct {
@@ -93,9 +101,11 @@ type DeviceLayoutCloseService struct {
 }
 
 func (service DeviceLayoutCloseService) Close() serializer.Response {
-	msg := model.EventRequest{}
-	msg.Action = "closeLayout"
-	b2, _ := json.Marshal(msg)
-	g.GRedis.Publish(fmt.Sprintf("device-%d", service.ID), string(b2))
-	return serializer.Response{}
+	reply, err := event.GManage.PublishEvent(context.TODO(), "closeLayout", fmt.Sprintf("device-%d", service.ID), nil, true)
+	if err != nil {
+		return serializer.Err(serializer.CodeRedisError, "redis publish event error", err)
+	}
+	return serializer.Response{
+		Data: reply,
+	}
 }

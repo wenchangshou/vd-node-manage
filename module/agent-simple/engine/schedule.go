@@ -67,23 +67,61 @@ func (schedule *Schedule) loop() {
 	}
 
 }
+func (schedule *Schedule) openLayout(req model.EventRequest) model.EventReply {
+	var (
+		err error
+	)
+	reply := model.EventReply{EventID: req.EventID}
+	args := model.OpenLayoutCmdParams{}
+	if err := json.Unmarshal(req.Arguments, &args); err != nil {
+		reply.Err = err
+		reply.Msg = "解析json错误"
+		return reply
+	}
+	if err = schedule.layoutManage.OpenLayout(args); err != nil {
+		reply.Err = err
+		reply.Msg = "打开布局失败"
+		return reply
+	}
+	return model.GenerateSimpleSuccessEventReply(req.EventID)
+	//schedule.redisClient.Publish(fmt.Sprintf("server"), string(reply))
+}
+func (schedule *Schedule) closeLayout(req model.EventRequest) model.EventReply {
+	var (
+		err error
+	)
+	reply := model.EventReply{EventID: req.EventID}
+	if err = schedule.layoutManage.CloseLayout(); err != nil {
+		reply.Err = err
+		reply.Msg = "关闭布局失败"
+		return reply
+	}
+	return model.GenerateSimpleSuccessEventReply(req.EventID)
+
+}
+
+func (schedule *Schedule) control(req model.EventRequest) model.EventReply {
+	return model.GenerateSimpleSuccessEventReply(req.EventID)
+}
 
 // DeviceEvent 接收服务端事件
 func (schedule *Schedule) DeviceEvent(_ string, message []byte) (err error) {
 	req := model.EventRequest{}
+	reply := model.EventReply{}
 	if err = json.Unmarshal(message, &req); err != nil {
 		return
 	}
 	if req.Action == "openLayout" {
-		args := model.OpenLayoutCmdParams{}
-		if err := json.Unmarshal(req.Arguments, &args); err != nil {
-			return err
-		}
-		fmt.Println("args", args, err)
-		return schedule.layoutManage.OpenLayout(args)
+		reply = schedule.openLayout(req)
 	} else if req.Action == "closeLayout" {
-		return schedule.layoutManage.CloseLayout()
+		reply = schedule.closeLayout(req)
+	} else if req.Action == "control" {
 	}
+	if !req.Reply {
+		return nil
+	}
+	b, _ := json.Marshal(reply)
+	schedule.redisClient.Publish(fmt.Sprintf("server"), string(b))
 	return nil
 }
 func (schedule *Schedule) Start() {

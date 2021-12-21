@@ -124,8 +124,8 @@ func (manage *EventManage) execute(event model.Event) {
 	ctx, cancel := context.WithCancel(context.Background())
 	manage.cancelFuncMap.LoadOrStore(event.ID, cancel)
 	m := NewEventExecuteManage(event, ctx, manage.generator)
-	status := m.Start()
-	s := <-status
+	m.Start()
+	//s := <-status
 
 }
 

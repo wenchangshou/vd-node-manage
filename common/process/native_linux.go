@@ -77,7 +77,7 @@ func GetUe4ProcessId(_ uint32) (int, error) {
 
 func StartProcessAsCurrentUser(appPath, cmdLine, _ string, _ bool) (uint32, error) {
 	cwd, _ := os.Getwd()
-	re, _ := regexp.Compile("\\s{2,}")
+	re, _ := regexp.Compile(`\\s{2,}`)
 	re2, _ := regexp.Compile("\"")
 	cmdLine = re.ReplaceAllString(cmdLine, " ")
 	cmdLine = re2.ReplaceAllString(cmdLine, "")

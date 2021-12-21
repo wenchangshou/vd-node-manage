@@ -18,6 +18,3 @@ func VersionMsg() string {
 func init() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 }
-func InitRedisClient(cfg *RedisConfig) {
-	GRedis = Event.NewRedisClient(cfg.Addr, cfg.DB, cfg.Passwd)
-}

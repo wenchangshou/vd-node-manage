@@ -9,6 +9,7 @@ import (
 
 var LocalIp string
 
+// InitLocalIp 初始化本地ip
 func InitLocalIp() {
 	if Config().Server.Register {
 		conn, err := net.DialTimeout("tcp", Config().Server.HttpAddress, time.Second*10)

@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/g/gui/icon"
 	"log"
 	"os"
 	"path"
@@ -16,7 +17,6 @@ import (
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/cron"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/engine"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/g"
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/gui/icon"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/http"
 	"github.com/wenchangshou2/zutil"
 )
@@ -62,7 +62,6 @@ func InitSystemInfo(cfg *string, hardware *string) {
 	g.ParseHardware(*hardware)
 	go http.Start()
 	<-waitRegister()
-	fmt.Println("注册成功")
 	g.InitLocalIp()
 	g.InitRpcClients()
 	cron.ReportDeviceStatus()

@@ -108,7 +108,7 @@
 // a Pool have the concurrency restrictions described in the previous
 // paragraph.
 //
-// Publish and Subscribe
+// PublishEvent and Subscribe
 //
 // Use the Send, Flush and Receive methods to implement Pub/Sub subscribers.
 //

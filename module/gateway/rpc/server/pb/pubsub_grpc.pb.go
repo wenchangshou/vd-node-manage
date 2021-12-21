@@ -32,7 +32,7 @@ func NewPubsubServiceClient(cc grpc.ClientConnInterface) PubsubServiceClient {
 
 func (c *pubsubServiceClient) Publish(ctx context.Context, in *PublishChannel, opts ...grpc.CallOption) (*Empty, error) {
 	out := new(Empty)
-	err := c.cc.Invoke(ctx, "/PubsubService/Publish", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/PubsubService/PublishEvent", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +85,7 @@ type UnimplementedPubsubServiceServer struct {
 }
 
 func (UnimplementedPubsubServiceServer) Publish(context.Context, *PublishChannel) (*Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Publish not implemented")
+	return nil, status.Errorf(codes.Unimplemented, "method PublishEvent not implemented")
 }
 func (UnimplementedPubsubServiceServer) Subscribe(*SubscribeChannel, PubsubService_SubscribeServer) error {
 	return status.Errorf(codes.Unimplemented, "method Subscribe not implemented")
@@ -113,7 +113,7 @@ func _PubsubService_Publish_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/PubsubService/Publish",
+		FullMethod: "/PubsubService/PublishEvent",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PubsubServiceServer).Publish(ctx, req.(*PublishChannel))
@@ -150,7 +150,7 @@ var PubsubService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*PubsubServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Publish",
+			MethodName: "PublishEvent",
 			Handler:    _PubsubService_Publish_Handler,
 		},
 	},
