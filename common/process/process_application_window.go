@@ -14,9 +14,9 @@ func (p StandardApplicationControl) StartProcessAsCurrentUser(appPath, cmdLine, 
 		result []byte
 		err    error
 	)
-	cmds := strings.Split(cmdLine, " ")
-	fmt.Println("exec", appPath, cmds)
-	cmd := exec.Command(appPath, cmds...)
+	params := strings.Split(cmdLine, " ")
+	fmt.Println("exec", appPath, params)
+	cmd := exec.Command(appPath, params...)
 	cmd.Dir = workDir
 	if err = cmd.Start(); err != nil {
 		return 0, err

@@ -13,6 +13,7 @@ type IPlayer interface {
 	Close() error
 	// Check  error
 	Check() (bool, error)
+	Control(string) (string, error)
 	// OpenCheck() (bool, error)
 }
 
