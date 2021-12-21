@@ -3,14 +3,15 @@ package engine
 import (
 	"context"
 	"fmt"
+	"sync"
+	"sync/atomic"
+	"time"
+
 	"github.com/wenchangshou2/vd-node-manage/common/logging"
 	"github.com/wenchangshou2/vd-node-manage/common/model"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/dto"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/engine/executor"
 	IService "github.com/wenchangshou2/vd-node-manage/module/agent-simple/service"
-	"sync"
-	"sync/atomic"
-	"time"
 )
 
 var ActionGroup map[int]*executor.IExecute
@@ -170,7 +171,7 @@ func (manage *EventManage) wake() {
 	manage.processTask.Store(id, event)
 	go manage.execute(event)
 }
-func (manage *EventManage) AddTaskByExecuteList(task []dto.Task) {
+func (manage *EventManage) AddTaskByExecuteList(_ []dto.Task) {
 	manage.Lock()
 	defer manage.Unlock()
 }

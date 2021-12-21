@@ -9,7 +9,7 @@ func (executor *UnknownExecutor) Execute() error {
 func (executor *UnknownExecutor) Cancel() error {
 	return nil
 }
-func (executor *UnknownExecutor) Verification(option string) bool {
+func (executor *UnknownExecutor) Verification(_ string) bool {
 	return false
 }
 func (executor *UnknownExecutor) SubscribeNotifyStatusChange(func(string, int, string)) {
@@ -17,6 +17,6 @@ func (executor *UnknownExecutor) SubscribeNotifyStatusChange(func(string, int, s
 }
 
 // BindOption  检验任务参数
-func (executor *UnknownExecutor) BindOption(option string) error {
+func (executor *UnknownExecutor) BindOption(_ string) error {
 	return nil
 }

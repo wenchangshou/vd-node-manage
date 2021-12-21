@@ -2,17 +2,18 @@ package rpc
 
 import (
 	"fmt"
+	"time"
+
 	model2 "github.com/wenchangshou2/vd-node-manage/common/model"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/dto"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/g"
-	"time"
 )
 
 type TaskRpcService struct {
 	ID uint `json:"id"`
 }
 
-func (t TaskRpcService) SetTaskItemStatus(ids []uint, i int) error {
+func (t TaskRpcService) SetTaskItemStatus(_ []uint, _ int) error {
 
 	panic("implement me")
 }

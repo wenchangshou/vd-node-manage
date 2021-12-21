@@ -14,7 +14,7 @@ import (
 	"syscall"
 )
 
-func KillUE4(processID uint32) {
+func KillUE4(_ uint32) {
 
 }
 
@@ -71,11 +71,11 @@ func newUnixProcess(pid int) (*UnixProcess, error) {
 	p := &UnixProcess{pid: pid}
 	return p, p.Refresh()
 }
-func GetUe4ProcessId(processID uint32) (int, error) {
+func GetUe4ProcessId(_ uint32) (int, error) {
 	return -1, nil
 }
 
-func StartProcessAsCurrentUser(appPath, cmdLine, workDir string, backstage bool) (uint32, error) {
+func StartProcessAsCurrentUser(appPath, cmdLine, _ string, _ bool) (uint32, error) {
 	cwd, _ := os.Getwd()
 	re, _ := regexp.Compile("\\s{2,}")
 	re2, _ := regexp.Compile("\"")

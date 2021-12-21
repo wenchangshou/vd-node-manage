@@ -2,8 +2,9 @@ package executor
 
 import (
 	"encoding/json"
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/g"
 	"path"
+
+	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/g"
 
 	"github.com/wenchangshou2/zutil"
 )
@@ -27,7 +28,7 @@ func (executor *DeleteProjectExecutor) Execute() error {
 func (executor *DeleteProjectExecutor) Cancel() error {
 	return nil
 }
-func (executor *DeleteProjectExecutor) Verification(option string) bool {
+func (executor *DeleteProjectExecutor) Verification(_ string) bool {
 	return true
 }
 func (executor *DeleteProjectExecutor) SubscribeNotifyStatusChange(func(string, int, string)) {

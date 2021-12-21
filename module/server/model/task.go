@@ -3,9 +3,10 @@ package model
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
+
 	"github.com/wenchangshou2/vd-node-manage/common/logging"
 	"github.com/wenchangshou2/vd-node-manage/common/model"
-	"strings"
 )
 
 type Task struct {
@@ -44,7 +45,7 @@ func (task *Task) Add() (int, error) {
 }
 
 // AddTaskItem 添加任务项
-func AddTaskItem(taskId string, action uint, options map[string]interface{}, active bool, depend string) (TaskItem, error) {
+func AddTaskItem(taskId string, action uint, options map[string]interface{}, _ bool, depend string) (TaskItem, error) {
 	jsonStr, _ := json.Marshal(options)
 	taskItem := TaskItem{
 		TaskID:   taskId,
@@ -74,7 +75,7 @@ func GetTaskListByCid(computerId string) ([]Task, error) {
 	result := DB.Debug().Model(&Task{}).Where("computer_id = ?", computerId).Find(&tasks)
 	return tasks, result.Error
 }
-func GetTaskListByComputerID(Page int, size int, orderBy string, conditions map[string]string, searches map[string]string) ([]Task, int64) {
+func GetTaskListByComputerID(Page int, size int, orderBy string, conditions map[string]string, _ map[string]string) ([]Task, int64) {
 	var res []Task
 	var total int64
 	tx := DB.Model(&Task{})
@@ -145,7 +146,7 @@ func GetTasksByDependID(id string) ([]Task, int64) {
 	return res, total
 }
 
-func ListTask(Page int, size int, orderBy string, conditions map[string]string, searches map[string]string) ([]Task, int64) {
+func ListTask(Page int, size int, orderBy string, conditions map[string]string, _ map[string]string) ([]Task, int64) {
 	var res []Task
 	var total int64
 	tx := DB.Model(&Task{})

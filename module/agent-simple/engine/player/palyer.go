@@ -2,8 +2,9 @@ package player
 
 import (
 	"errors"
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/pkg/e"
 	"sync"
+
+	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/pkg/e"
 )
 
 type IPlayer interface {
@@ -15,7 +16,7 @@ type IPlayer interface {
 	// OpenCheck() (bool, error)
 }
 
-func MakePlayer(windowInfo e.Window, params string, service string, source string) (IPlayer, error) {
+func MakePlayer(windowInfo e.Window, _ string, service string, source string) (IPlayer, error) {
 	// 先处理标准player
 	playerPath := GetPlayerPath(service)
 	if playerPath == "" {

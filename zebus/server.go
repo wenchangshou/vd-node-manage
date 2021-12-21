@@ -53,7 +53,7 @@ func (zebus *Zebus) GetClients() (*GetClientForm, error) {
 	fmt.Println(form)
 	return form, nil
 }
-func (zebus *Zebus) PutV2(topic string, body string, timeOut int, deferNum int, result interface{}) error {
+func (zebus *Zebus) PutV2(topic string, body string, _ int, _ int, result interface{}) error {
 	client := resty.New()
 	dstAddr := fmt.Sprintf("http://%s:%d/pubV2?topic=%s", zebus.Ip, zebus.HttpPort, topic)
 	resp, err := client.R().SetResult(&result).

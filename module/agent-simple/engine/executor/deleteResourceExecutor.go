@@ -1,9 +1,10 @@
 package executor
 
 import (
+	"path"
+
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/g"
 	"github.com/wenchangshou2/zutil"
-	"path"
 )
 
 type DeleteResourceExecutor struct {
@@ -20,7 +21,7 @@ func (executor *DeleteResourceExecutor) Execute() error {
 func (executor *DeleteResourceExecutor) Cancel() error {
 	return nil
 }
-func (executor *DeleteResourceExecutor) Verification(option string) bool {
+func (executor *DeleteResourceExecutor) Verification(_ string) bool {
 	return true
 }
 func (executor *DeleteResourceExecutor) SubscribeNotifyStatusChange(func(string, int, string)) {
@@ -28,6 +29,6 @@ func (executor *DeleteResourceExecutor) SubscribeNotifyStatusChange(func(string,
 }
 
 // BindOption 检验任务参数
-func (executor *DeleteResourceExecutor) BindOption(option interface{}) error {
+func (executor *DeleteResourceExecutor) BindOption(_ interface{}) error {
 	return nil
 }

@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+
 	"github.com/wenchangshou2/vd-node-manage/common/model"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/engine/executor"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/pkg/e"
@@ -30,7 +31,7 @@ func (task *eventExecuteManage) loop() {
 	}
 
 }
-func (task eventExecuteManage) action(t e.TaskItem) {
+func (task eventExecuteManage) action(_ e.TaskItem) {
 
 }
 func (task *eventExecuteManage) execute() {

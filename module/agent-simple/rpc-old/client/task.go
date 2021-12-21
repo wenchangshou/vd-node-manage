@@ -2,8 +2,9 @@ package rpcClient
 
 import (
 	"context"
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/rpc-old/client/pb"
 	"time"
+
+	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/rpc-old/client/pb"
 
 	"google.golang.org/grpc"
 )
@@ -12,7 +13,7 @@ type TaskServer struct {
 	address string
 }
 
-func (server *TaskServer) GetTaskById(id string) error {
+func (server *TaskServer) GetTaskById(_ string) error {
 	return nil
 }
 

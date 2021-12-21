@@ -2,6 +2,6 @@ package g
 
 import "testing"
 
-func TestHardware(t *testing.T) {
+func TestHardware(_ *testing.T) {
 	ParseHardware("hardware.data")
 }

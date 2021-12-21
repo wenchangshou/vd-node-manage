@@ -3,6 +3,7 @@ package rpc
 import (
 	"encoding/json"
 	"errors"
+
 	"github.com/wenchangshou2/vd-node-manage/common/model"
 	model2 "github.com/wenchangshou2/vd-node-manage/module/server/model"
 )
@@ -41,7 +42,7 @@ func (event Event) Query(args *model.QueryDeviceEventRequest, reply *model.Query
 	return nil
 }
 
-func (event Event) SetStatus(args *model.DeviceSetEventStatusRequest, reply *model.SimpleRpcResponse) error {
+func (event Event) SetStatus(args *model.DeviceSetEventStatusRequest, _ *model.SimpleRpcResponse) error {
 	for _, id := range args.EventID {
 		err := model2.SetDeviceEventStatus(id, args.Status)
 		if err != nil {

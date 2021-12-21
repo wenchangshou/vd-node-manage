@@ -9,7 +9,7 @@ import (
 type StandardApplicationControl struct {
 }
 
-func (p StandardApplicationControl) StartProcessAsCurrentUser(appPath, cmdLine, workDir string, backstage bool) (int, error) {
+func (p StandardApplicationControl) StartProcessAsCurrentUser(appPath, cmdLine, workDir string, _ bool) (int, error) {
 	var (
 		result []byte
 		err    error
