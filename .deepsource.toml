@@ -1,4 +1,5 @@
 version = 1
+exclude_patterns = ["vendor/**","module/agent","module/player","module/gateway"]
 
 [[analyzers]]
 name = "go"
