@@ -3,6 +3,7 @@ package discover
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/pkg/e"
 	"golang.org/x/net/ipv4"
 
@@ -108,13 +109,10 @@ func (invention Invention) MakeServerInfo(ip string, port uint) []byte {
 }
 func (invention Invention) Server(serverInfo e.ServerInfo) {
 	go invention.receiveBroadcasts(invention.conn)
-	for {
-		select {
-		case addr := <-invention.regRequestMsg:
-			buf := invention.MakeServerInfo(serverInfo.Ip, serverInfo.Port)
-			fmt.Printf("发送11,buf:%s,addr:%s\n", buf, addr.String())
-			invention.conn.WriteTo(buf, addr)
-		}
+	for addr := range invention.regRequestMsg {
+		buf := invention.MakeServerInfo(serverInfo.Ip, serverInfo.Port)
+		fmt.Printf("发送11,buf:%s,addr:%s\n", buf, addr.String())
+		invention.conn.WriteTo(buf, addr)
 	}
 }
 

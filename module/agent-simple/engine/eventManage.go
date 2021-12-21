@@ -25,10 +25,7 @@ func NewEventExecuteManage(event model.Event, ctx context.Context, exec executor
 	return t
 }
 func (task *eventExecuteManage) loop() {
-	select {
-	case <-task.ctx.Done():
-		task.statusChan <- executor.CANCEL
-	}
+	<-task.ctx.Done()
 
 }
 func (task eventExecuteManage) action(_ e.TaskItem) {

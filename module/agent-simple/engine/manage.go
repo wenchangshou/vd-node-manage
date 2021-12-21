@@ -125,23 +125,15 @@ func (manage *EventManage) execute(event model.Event) {
 	manage.cancelFuncMap.LoadOrStore(event.ID, cancel)
 	m := NewEventExecuteManage(event, ctx, manage.generator)
 	status := m.Start()
-	select {
-	case s := <-status:
-		e.SetEventStatus([]uint{event.ID}, s)
-		atomic.AddInt32(&manage.executorCount, -1)
-		manage.EventStatusList.Delete(event.ID)
-	}
+	s := <-status
 
 }
 
 // Loop 循环调度
 func (manage *EventManage) Loop() {
 	loopTicker := time.NewTicker(time.Second)
-	for {
-		select {
-		case <-loopTicker.C:
-			manage.wake()
-		}
+	for range loopTicker.C {
+		manage.wake()
 	}
 }
 
