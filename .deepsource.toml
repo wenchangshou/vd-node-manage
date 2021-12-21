@@ -1,5 +1,11 @@
 version = 1
-exclude_patterns = ["vendor/**","module/agent","module/player","module/gateway"]
+
+exclude_patterns = [
+  "vendor/**",
+  "module/agent/**",
+  "module/player/**",
+  "module/gateway/**"
+]
 
 [[analyzers]]
 name = "go"
@@ -7,4 +13,3 @@ enabled = true
 
   [analyzers.meta]
   import_root = "github.com/wenchangshou/vd-node-manage"
-  dependencies_vendored = false
