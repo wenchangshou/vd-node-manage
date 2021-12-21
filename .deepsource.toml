@@ -4,7 +4,8 @@ exclude_patterns = [
   "vendor/**",
   "module/agent/**",
   "module/player/**",
-  "module/gateway/**"
+  "module/gateway/**",
+  "module/agent-simple/rpc-old/**"
 ]
 
 [[analyzers]]
