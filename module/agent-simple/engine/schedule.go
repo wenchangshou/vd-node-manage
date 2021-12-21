@@ -69,7 +69,7 @@ func (schedule *Schedule) loop() {
 }
 
 // DeviceEvent 接收服务端事件
-func (schedule *Schedule) DeviceEvent(channel string, message []byte) (err error) {
+func (schedule *Schedule) DeviceEvent(_ string, message []byte) (err error) {
 	req := model.EventRequest{}
 	if err = json.Unmarshal(message, &req); err != nil {
 		return

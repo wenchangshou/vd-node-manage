@@ -27,7 +27,7 @@ func (player *ResourcePlayer) Check() (bool, error) {
 }
 
 // Open 打开一个播放器
-func (player *ResourcePlayer) Open(wg *sync.WaitGroup, port int) (pid int, err error) {
+func (player *ResourcePlayer) Open(wg *sync.WaitGroup, _ int) (pid int, err error) {
 	e := process.StandardApplicationControl{}
 	defer wg.Done()
 	params := ""

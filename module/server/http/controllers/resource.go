@@ -15,6 +15,6 @@ func AddResource(c *gin.Context) {
 		c.JSON(200, serializer.ErrorResponse(err))
 	}
 }
-func UploadFile(c *gin.Context) {
+func UploadFile(_ *gin.Context) {
 
 }

@@ -1,8 +1,9 @@
 package cache
 
 import (
-	"github.com/wenchangshou2/vd-node-manage/common/model"
 	"sync"
+
+	"github.com/wenchangshou2/vd-node-manage/common/model"
 )
 
 type SafeDevices struct {
@@ -15,9 +16,10 @@ var Devices = NewSafeDevices()
 func NewSafeDevices() *SafeDevices {
 	return &SafeDevices{M: make(map[string]*model.DeviceUpdateInfo)}
 }
-func (device *SafeDevices) Put(req *model.DeviceReportRequest) {
+func (device *SafeDevices) Put(_ *model.DeviceReportRequest) {
 
 }
+
 // Get 获取指定的硬件id的元素
 func (device *SafeDevices) Get(hid string) (*model.DeviceUpdateInfo, bool) {
 	device.RLock()

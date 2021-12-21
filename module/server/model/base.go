@@ -1,8 +1,9 @@
 package model
 
 import (
-	"gorm.io/gorm"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type Base struct {
@@ -12,7 +13,7 @@ type Base struct {
 	ID        int
 }
 
-func (base *Base) BeforeCreate(tx *gorm.DB) (err error) {
+func (base *Base) BeforeCreate(_ *gorm.DB) (err error) {
 	//var (
 	//	uuid2 uuid.UUID
 	//)

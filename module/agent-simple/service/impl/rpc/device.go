@@ -15,17 +15,17 @@ func (service DeviceRpcService) Heartbeat() error {
 	panic("implement me")
 }
 
-func (service DeviceRpcService) AddComputerProject(id uint) error {
+func (service DeviceRpcService) AddComputerProject(_ uint) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (service DeviceRpcService) DeleteComputerProject(id uint) error {
+func (service DeviceRpcService) DeleteComputerProject(_ uint) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (service DeviceRpcService) ReportServiceInfo(id uint, ip string, mac string, name string) error {
+func (service DeviceRpcService) ReportServiceInfo(_ uint, _ string, _ string, _ string) error {
 	return nil
 }
 func (service DeviceRpcService) Report() error {
@@ -48,7 +48,7 @@ func (service DeviceRpcService) AddComputerResource(resourceID uint) error {
 	}
 	return nil
 }
-func (service DeviceRpcService) DeleteComputerResource(resourceID uint) error {
+func (service DeviceRpcService) DeleteComputerResource(_ uint) error {
 	return nil
 }
 

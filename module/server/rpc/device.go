@@ -27,7 +27,7 @@ func (device *Device) Register(args *model.DeviceRegisterRequest, reply *model.D
 	}
 	return nil
 }
-func (device *Device) Ping(args *model.NullRpcRequest, reply *model.SimpleRpcResponse) error {
+func (device *Device) Ping(_ *model.NullRpcRequest, reply *model.SimpleRpcResponse) error {
 	reply.Code = 0
 	return nil
 }
@@ -41,12 +41,12 @@ func (device *Device) ReportStatus(args *model.DeviceReportRequest, reply *model
 	//cache.Devices.Put(args)
 	return nil
 }
-func (device *Device) QueryTask(args *model.DeviceReportRequest, reply *model.DeviceQueryStatusResponse) error {
+func (device *Device) QueryTask(_ *model.DeviceReportRequest, _ *model.DeviceQueryStatusResponse) error {
 	return nil
 }
 
 // AddDeviceResource 添加设备资源
-func (device *Device) AddDeviceResource(args *model.DeviceAddResourceRequest, reply *model.SimpleRpcResponse) error {
+func (device *Device) AddDeviceResource(args *model.DeviceAddResourceRequest, _ *model.SimpleRpcResponse) error {
 	if model2.IsDeviceResource(args.ID, args.ResourceID) {
 		return nil
 	}

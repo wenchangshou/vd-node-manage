@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestGetProcessIdByName(t *testing.T) {
+func TestGetProcessIdByName(_ *testing.T) {
 	pid, err := GetProcessIdByName("zebus")
 	fmt.Println(pid, err)
 }
