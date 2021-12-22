@@ -101,6 +101,23 @@ func (schedule *Schedule) closeLayout(req model.EventRequest) model.EventReply {
 }
 
 func (schedule *Schedule) control(req model.EventRequest) model.EventReply {
+	reply := model.EventReply{
+		EventID: req.EventID,
+	}
+	m := schedule.layoutManage
+	args := model.ControlWindowCmdParams{}
+	err := json.Unmarshal(req.Arguments, &args)
+	if err != nil {
+		reply.Err = err
+		reply.Msg = "解析控制命令失败"
+		return reply
+	}
+	err = m.Control(args, false)
+	if err != nil {
+		reply.Err = err
+		reply.Msg = "控制窗口失败"
+		return reply
+	}
 	return model.GenerateSimpleSuccessEventReply(req.EventID)
 }
 
@@ -116,6 +133,7 @@ func (schedule *Schedule) DeviceEvent(_ string, message []byte) (err error) {
 	} else if req.Action == "closeLayout" {
 		reply = schedule.closeLayout(req)
 	} else if req.Action == "control" {
+		reply = schedule.control(req)
 	}
 	if !req.Reply {
 		return nil

@@ -17,14 +17,16 @@ func init() {
 	configSystemRoutes()
 }
 func RenderJson(w http.ResponseWriter, v interface{}) {
-	bs, err := json.Marshal(v)
-	if err != nil {
+	var (
+		bs  []byte
+		err error
+	)
+	if bs, err = json.Marshal(v); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.Write(bs)
-
 }
 func RenderDataJson(w http.ResponseWriter, data interface{}) {
 	RenderJson(w, Dto{Msg: "success", Data: data})

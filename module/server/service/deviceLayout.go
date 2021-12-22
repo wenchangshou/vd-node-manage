@@ -109,3 +109,24 @@ func (service DeviceLayoutCloseService) Close() serializer.Response {
 		Data: reply,
 	}
 }
+
+type DeviceLayoutControlService struct {
+	ID   uint   `json:"id"`
+	Lid  string `json:"layout_id"`
+	Wid  string `json:"window_id"`
+	Body string `json:"body"`
+}
+
+func (service DeviceLayoutControlService) Control() serializer.Response {
+	c := model.ControlWindowCmdParams{
+		ID:   service.Lid,
+		Wid:  service.Wid,
+		Body: service.Body,
+	}
+	b1, _ := json.Marshal(c)
+	reply, err := event.GManage.PublishEvent(context.TODO(), "control", fmt.Sprintf("device-%d", service.ID), b1, true)
+	if err != nil {
+		return serializer.Err(serializer.CodeRedisError, "redis publish event error", err)
+	}
+	return serializer.Response{Data: reply}
+}

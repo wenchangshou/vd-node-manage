@@ -60,6 +60,7 @@ func (manage *Manage) PublishEvent(ctx context.Context, action string, topic str
 	)
 	msg.Action = action
 	msg.Arguments = body
+	msg.Reply = reply
 	uid, err := uuid.NewRandom()
 	if err != nil {
 		return "", err
@@ -100,11 +101,11 @@ var (
 	GManage *Manage
 )
 
-//func InitRedisClient(cfg *RedisConfig) {
+//func InitRedisClient(cfg *CacheConfig) {
 //	GRedis = Event.NewRedisClient(cfg.Addr, cfg.DB, cfg.Passwd)
 //}
 
-func InitEvent(cfg *g.RedisConfig) {
+func InitEvent(cfg *g.CacheConfig) {
 	c := Event.NewRedisClient(cfg.Addr, cfg.DB, cfg.Passwd)
 	GManage = &Manage{
 		client:                c,

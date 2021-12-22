@@ -1,6 +1,7 @@
 package cron
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/wenchangshou2/vd-node-manage/common/model"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/g"
@@ -22,15 +23,18 @@ func ReportDeviceStatus() {
 //reportAgentStatus  上报节点状态
 func reportAgentStatus(interval time.Duration) {
 	for {
+		r := make(map[string]interface{})
 		hostname, err := g.Hostname()
-		hid := g.Hardware().ID
+		hid := g.Config().Server.ID
 		if err != nil {
 			hostname = fmt.Sprintf("error:%s", err.Error())
 		}
+		r["hostname"] = hostname
+		r["ip"] = g.IP()
+		b, _ := json.Marshal(r)
 		req := model.DeviceReportRequest{
-			ID:       hid,
-			Hostname: hostname,
-			Ip:       g.IP(),
+			ID:   hid,
+			Info: string(b),
 		}
 		var resp model.SimpleRpcResponse
 		err = g.ServerRpcClient.Call("Device.ReportStatus", req, &resp)
@@ -39,5 +43,10 @@ func reportAgentStatus(interval time.Duration) {
 		}
 		fmt.Println("req", req)
 		time.Sleep(interval)
+	}
+}
+func reportWindowsStatus(interval time.Duration) {
+	for {
+
 	}
 }

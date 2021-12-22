@@ -30,3 +30,8 @@ type OpenLayoutCmdParams struct {
 	Style   map[string]interface{} `json:"style"`
 	Windows []OpenWindowInfo       `json:"windows"`
 }
+type ControlWindowCmdParams struct {
+	ID   string `json:"id"`
+	Wid  string `json:"wid"`
+	Body string `json:"body"`
+}

@@ -21,6 +21,14 @@ type DatabaseConfig struct {
 	DBFile      string `json:"dbFile"`
 	Port        int    `json:"port"`
 }
+type CacheConfig struct {
+	Passwd     string   `json:"passwd"`
+	DB         int      `json:"db"`
+	Addr       string   `json:"addr"`
+	MaxIdle    int      `json:"maxIdle"`
+	HighQueues []string `json:"highQueues"`
+	LowQueues  []string `json:"lowQueues"`
+}
 type RedisConfig struct {
 	Passwd     string   `json:"passwd"`
 	DB         int      `json:"db"`
@@ -37,6 +45,7 @@ type GlobalConfig struct {
 	Listen   string          `json:"listen"`
 	Http     *HttpConfig     `json:"http"`
 	Database *DatabaseConfig `json:"database"`
+	Cache    *CacheConfig    `json:"cache"`
 	Redis    *RedisConfig    `json:"redis"`
 }
 

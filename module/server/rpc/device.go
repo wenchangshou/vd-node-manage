@@ -1,6 +1,8 @@
 package rpc
 
 import (
+	"fmt"
+	"github.com/wenchangshou2/vd-node-manage/common/cache"
 	"github.com/wenchangshou2/vd-node-manage/common/model"
 	"github.com/wenchangshou2/vd-node-manage/module/server/g"
 	model2 "github.com/wenchangshou2/vd-node-manage/module/server/model"
@@ -34,10 +36,11 @@ func (device *Device) Ping(_ *model.NullRpcRequest, reply *model.SimpleRpcRespon
 
 // ReportStatus 上报状态
 func (device *Device) ReportStatus(args *model.DeviceReportRequest, reply *model.SimpleRpcResponse) error {
-	if args.ID == "" {
+	if args.ID == 0 {
 		reply.Code = 1
 		return nil
 	}
+	cache.Set(fmt.Sprintf("device-%d", args.ID), args.Info, 60)
 	//cache.Devices.Put(args)
 	return nil
 }
@@ -50,6 +53,7 @@ func (device *Device) AddDeviceResource(args *model.DeviceAddResourceRequest, _ 
 	if model2.IsDeviceResource(args.ID, args.ResourceID) {
 		return nil
 	}
+
 	dr := model2.DeviceResource{
 		DeviceID:   args.ID,
 		ResourceID: args.ResourceID,

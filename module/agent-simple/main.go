@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/buff"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/g/gui/icon"
 	"log"
 	"os"
@@ -48,6 +49,7 @@ func InitSystemInfo(cfg *string, hardware *string) {
 	var (
 		err error
 	)
+	buff.InitGlobalBuffer()
 	g.InitApplication()
 	g.ParseConfig(*cfg)
 	conf := g.Config()

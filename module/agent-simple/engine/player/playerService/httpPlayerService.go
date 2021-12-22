@@ -17,11 +17,14 @@ func (svr HttpPlayerService) Ping() (bool, error) {
 		return false, err
 	}
 	return string(resp.Body()) == "pong", nil
+
 }
 func (svr HttpPlayerService) Control(body string) (reply string, err error) {
+	var (
+		resp *resty.Response
+	)
 	client := resty.New().SetTimeout(500 * time.Millisecond)
-	resp, err := client.R().SetBody(body).Post(fmt.Sprintf("http://localhost:%d/control"))
-	if err != nil {
+	if resp, err = client.R().SetBody(body).Post(fmt.Sprintf("http://localhost:%d/control", svr.Port)); err != nil {
 		return "", err
 	}
 	return string(resp.Body()), nil

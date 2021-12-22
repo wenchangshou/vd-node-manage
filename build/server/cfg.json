@@ -21,5 +21,12 @@
     "addr": "192.168.10.31:30000",
     "db": 0,
     "maxIdle": 5
+  },
+  "cache": {
+    "provider": "redis",
+    "passwd": "",
+    "addr": "192.168.10.31:30000",
+    "db": 1,
+    "maxIdle": 5
   }
 }

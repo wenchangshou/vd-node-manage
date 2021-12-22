@@ -36,6 +36,9 @@ func (window *Window) Open(wg *sync.WaitGroup, port int) (int, error) {
 func (window *Window) Close() error {
 	return window.player.Close()
 }
+func (window *Window) Control(body string) (string, error) {
+	return window.player.Control(body)
+}
 
 func MakeWindow(id string, x int, y int, width int, height int, z int,
 	service string,

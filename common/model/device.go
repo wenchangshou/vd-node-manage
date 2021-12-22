@@ -8,9 +8,10 @@ type DeviceSetStatusRequest struct {
 
 // DeviceReportRequest  客户端上报信息
 type DeviceReportRequest struct {
-	ID       string
-	Hostname string
-	Ip       string
+	ID   uint
+	Info string
+	//Hostname string
+	//Ip       string
 }
 type DeviceRegisterRequest struct {
 	Code         string `json:"code"`

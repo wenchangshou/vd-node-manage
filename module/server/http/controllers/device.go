@@ -80,6 +80,18 @@ func SetDeviceLayout(c *gin.Context) {
 		c.JSON(200, serializer.ErrorResponse(err))
 	}
 }
+func ControlLayout(c *gin.Context) {
+	s := service.DeviceLayoutControlService{}
+	if err := c.ShouldBindJSON(&s); err == nil {
+		id := c.Param("id")
+		_id, _ := strconv.Atoi(id)
+		s.ID = uint(_id)
+		res := s.Control()
+		c.JSON(200, res)
+	} else {
+		c.JSON(200, serializer.ErrorResponse(err))
+	}
+}
 
 func CloseDeviceLayout(c *gin.Context) {
 	s := service.DeviceLayoutCloseService{}
