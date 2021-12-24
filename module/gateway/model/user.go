@@ -31,7 +31,7 @@ type User struct {
 
 func GetUserByUsername(username string) (User, error) {
 	var user User
-	result := DB.Debug().Where("username=?", username).First(&user)
+	result := DB.Where("username=?", username).First(&user)
 	return user, result.Error
 }
 

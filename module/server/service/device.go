@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"github.com/google/uuid"
 	model2 "github.com/wenchangshou2/vd-node-manage/common/model"
 	"github.com/wenchangshou2/vd-node-manage/common/serializer"
 	"github.com/wenchangshou2/vd-node-manage/module/server/model"
@@ -35,7 +36,6 @@ func (service *DeviceListService) List() serializer.Response {
 		tx = tx.Where(search)
 	}
 	tx.Count(&total)
-
 	tx.Limit(service.PageSize).Offset((service.Page - 1) * service.PageSize).Find(&res)
 	return serializer.Response{Data: map[string]interface{}{
 		"total": total,
@@ -60,7 +60,7 @@ func (service DeviceRegisterService) Register() (uint, error) {
 	if err != nil || device.ID <= 0 {
 		return 0, errors.New("找不到对应授权id的设备")
 	}
-	err = model.DB.Debug().Model(device).Updates(map[string]interface{}{
+	err = model.DB.Model(device).Updates(map[string]interface{}{
 		"status":        model2.Device_Register,
 		"conn_type":     service.ConnType,
 		"hardware_code": service.HardwareCode,
@@ -79,25 +79,74 @@ type DeviceCreateService struct {
 }
 
 func (service DeviceCreateService) Create() serializer.Response {
-	if model.IsExistsCode(service.Code) {
-		return serializer.Err(serializer.CodeDeviceCodeRepeatErr, "授权id已存在", nil)
-	}
+	var (
+		uid uuid.UUID
+		err error
+	)
+	//if model.IsExistsCode(service.Code) {
+	//	return serializer.Err(serializer.CodeDeviceCodeRepeatErr, "授权id已存在", nil)
+	//}
 	device := model.Device{
-		Code:     service.Code,
 		ConnType: service.ConnType,
 		Name:     service.Name,
 		Status:   0,
 	}
+	if uid, err = uuid.NewUUID(); err != nil {
+		return serializer.Err(serializer.CodeRedisError, "生成授权码失败", err)
+	}
+	device.Code = uid.String()
 	if service.ConnType == "gateway" {
 		device.RegionId = service.RegionID
 	}
-	err := device.Create()
+	err = device.Create()
 	if err != nil {
 		return serializer.Err(serializer.CodeDBError, "创建设备失败", err)
 	}
-	return serializer.Response{}
+	return serializer.Response{
+		Data: map[string]interface{}{
+			"id": device.ID,
+		},
+	}
 }
 func (service DeviceCreateService) List() serializer.Response {
-
 	return serializer.Response{}
+}
+
+type DeviceDeleteService struct {
+	ID uint `json:"id" uri:"id"`
+}
+
+// Delete 删除设备
+func (service DeviceDeleteService) Delete() serializer.Response {
+	device, err := model.GetDeviceByID(service.ID)
+	if err != nil {
+		return serializer.Err(serializer.CodeDBError, "获取设备失败", err)
+	}
+	if device == nil {
+		return serializer.Err(serializer.CodeNotFindDeviceErr, "没有找到指定的设备", err)
+	}
+	if err := model.DeleteDeviceResource(service.ID); err != nil {
+		return serializer.Err(serializer.CodeDBError, "删除设备对应的资源失败", err)
+	}
+	if err := device.Delete(); err != nil {
+		return serializer.Err(serializer.CodeDBError, "删除设备失败", err)
+	}
+	return serializer.Response{}
+}
+
+type DeviceGetService struct {
+	ID uint `uri:"id"`
+}
+
+func (service DeviceGetService) Get() serializer.Response {
+	device, err := model.GetDeviceByID(service.ID)
+	if err != nil {
+		return serializer.Err(serializer.CodeDBError, "获取设备失败", err)
+	}
+	if device == nil {
+		return serializer.Err(serializer.CodeNotFindDeviceErr, "没有找到指定的设备", err)
+	}
+	return serializer.Response{
+		Data: device,
+	}
 }

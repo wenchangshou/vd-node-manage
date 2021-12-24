@@ -7,12 +7,12 @@ import (
 )
 
 type HttpPlayerService struct {
-	Port int `json:"port"`
+	port int `json:"port"`
 }
 
 func (svr HttpPlayerService) Ping() (bool, error) {
 	client := resty.New().SetTimeout(500 * time.Millisecond)
-	resp, err := client.R().Get(fmt.Sprintf("http://localhost:%d/ping", svr.Port))
+	resp, err := client.R().Get(fmt.Sprintf("http://localhost:%d/ping", svr.port))
 	if err != nil {
 		return false, err
 	}
@@ -24,7 +24,7 @@ func (svr HttpPlayerService) Control(body string) (reply string, err error) {
 		resp *resty.Response
 	)
 	client := resty.New().SetTimeout(500 * time.Millisecond)
-	if resp, err = client.R().SetBody(body).Post(fmt.Sprintf("http://localhost:%d/control", svr.Port)); err != nil {
+	if resp, err = client.R().SetBody(body).Post(fmt.Sprintf("http://localhost:%d/control", svr.port)); err != nil {
 		return "", err
 	}
 	return string(resp.Body()), nil

@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package control;
+option go_package="./;playerRpc";
+
+service RpcCall {
+    rpc Call(RpcRequest)returns (RpcResponse);
+    rpc Close(EmptyMessage)returns (SimpleResponse);
+    rpc Ping(EmptyMessage)returns(SimpleResponse);
+}
+
+message RpcRequest{
+    string body=1;
+}
+message RpcResponse {
+    int32 code=1;
+    string msg = 2;
+    string payload = 3;
+}
+message EmptyMessage {
+
+}
+message SimpleResponse {
+    int32 code=1;
+    string msg=2;
+}

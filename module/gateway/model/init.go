@@ -18,7 +18,7 @@ func Init() error {
 		db  *gorm.DB
 		err error
 	)
-	cfg:=g.Config()
+	cfg := g.Config()
 	logging.GLogger.Info("初始化数据库连接")
 	if gin.Mode() == gin.TestMode {
 		db, err = gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
@@ -46,10 +46,6 @@ func Init() error {
 	// _db.SetMaxIdleConns(50)
 	// _db.SetMaxOpenConns(100)
 	// _db.SetConnMaxLifetime(time.Second * 30)
-	DB = db
-	err = migration()
-	if err != nil {
-		return err
-	}
-	return nil
+	DB = db.Debug()
+	return migration()
 }

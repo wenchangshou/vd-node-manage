@@ -33,7 +33,7 @@ func (resources *Resource) Add() (uint, error) {
 }
 func GetResourceById(id uint) (*Resource, error) {
 	var resource *Resource
-	result := DB.Debug().Model(&Resource{}).Where("id=?", id).First(&resource)
+	result := DB.Model(&Resource{}).Where("id=?", id).First(&resource)
 	return resource, result.Error
 }
 

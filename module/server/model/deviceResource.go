@@ -38,6 +38,12 @@ func GetDeviceResources(deviceID uint, resourceIDS []uint) ([]DeviceResource, er
 
 func GetDeviceResourcesByDeviceID(deviceID uint) ([]DeviceResource, error) {
 	var res []DeviceResource
-	err := DB.Debug().Model(&DeviceResource{}).Where("device_id=?", deviceID).Preload("Resource").Find(&res).Error
+	err := DB.Model(&DeviceResource{}).Where("device_id=?", deviceID).Preload("Resource").Find(&res).Error
 	return res, err
+}
+
+// DeleteDeviceResource 删除设备资源
+func DeleteDeviceResource(deviceID uint) error {
+	r := DeviceResource{}
+	return DB.Delete(&r, "device_id=?", deviceID).Error
 }

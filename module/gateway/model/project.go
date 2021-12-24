@@ -62,7 +62,7 @@ func GetProjects(Page int, size int, orderBy string, conditions map[string]strin
 }
 func GetProjectByIds(ids []string) ([]Project, error) {
 	var projects []Project
-	result := DB.Debug().Model(&Project{}).Where("project.id in  ? ", ids).Joins("File").Find(&projects)
+	result := DB.Model(&Project{}).Where("project.id in  ? ", ids).Joins("File").Find(&projects)
 	for key, project := range projects {
 		if project.File.ID != "" {
 			projects[key].CoverImageUrl = "upload/" + project.File.SourceName

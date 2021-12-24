@@ -41,42 +41,42 @@ func (computer Computer) AppendNewResource(resource Resource) error {
 
 // AddProject 添加新的项目
 func (computer Computer) AddProject(projectRelease *ProjectRelease) error {
-	return DB.Debug().Model(&computer).Omit("ProjectRelease.*").Association("ProjectRelease").Append(&projectRelease)
+	return DB.Model(&computer).Omit("ProjectRelease.*").Association("ProjectRelease").Append(&projectRelease)
 }
 func (computer Computer) DeleteProject(projectRelease *ProjectRelease) error {
-	return DB.Debug().Model(&computer).Unscoped().Association("ProjectRelease").Delete(&projectRelease)
+	return DB.Model(&computer).Unscoped().Association("ProjectRelease").Delete(&projectRelease)
 }
 func (computer Computer) GetComputerProject(projectReleaseID string) (p *ProjectRelease, err error) {
-	err = DB.Debug().Model(&computer).Where("id=?", projectReleaseID).Association("ProjectRelease").Find(&p)
+	err = DB.Model(&computer).Where("id=?", projectReleaseID).Association("ProjectRelease").Find(&p)
 	return
 }
 func (computer Computer) GetTasks(status TaskStatus, count int) ([]Task, error) {
 	var task []Task
-	//err:= DB.Debug().Model(&Task{}).Joins("left join task_items on task.id=task_items.task_id").Where("computer_id=? AND task.status=?",computer.ID,status).Limit(count).Find(&res).Error
-	err := DB.Debug().Where("computer_id=?AND task.status=?", computer.ID, status).Limit(count).Preload("TaskItems").Find(&task).Error
+	//err:= DB.Model(&Task{}).Joins("left join task_items on task.id=task_items.task_id").Where("computer_id=? AND task.status=?",computer.ID,status).Limit(count).Find(&res).Error
+	err := DB.Where("computer_id=?AND task.status=?", computer.ID, status).Limit(count).Preload("TaskItems").Find(&task).Error
 	return task, err
 }
 func (computer Computer) ListComputerResource() (resources []Resource, err error) {
-	err = DB.Debug().Model(&computer).Association("Resources").Find(&resources)
+	err = DB.Model(&computer).Association("Resources").Find(&resources)
 	return
 }
 
 func (computer Computer) ListComputerProject() ([]ProjectRelease, error) {
 	var computerProjectList []ProjectRelease
-	err := DB.Debug().Model(&computer).Association("ProjectRelease").Find(&computerProjectList)
+	err := DB.Model(&computer).Association("ProjectRelease").Find(&computerProjectList)
 	return computerProjectList, err
 }
 
 //DeleteResource 删除资源
 func (computer Computer) DeleteResource(resource Resource) error {
-	return DB.Debug().Model(&computer).Unscoped().Association("Resources").Delete(&resource)
+	return DB.Model(&computer).Unscoped().Association("Resources").Delete(&resource)
 }
 func (computer *Computer) AddResource(resource Resource) error {
-	return DB.Debug().Model(computer).Omit("Resources.*").Association("Resources").Append(&resource)
+	return DB.Model(computer).Omit("Resources.*").Association("Resources").Append(&resource)
 }
 func (computer *Computer) IsExistByMac() bool {
 	var client2 Computer
-	err := DB.Debug().Select("mac").Where("mac = ?", computer.Mac).First(&client2).Error
+	err := DB.Select("mac").Where("mac = ?", computer.Mac).First(&client2).Error
 	if err != nil && err == gorm.ErrRecordNotFound {
 		return false
 	}
@@ -84,7 +84,7 @@ func (computer *Computer) IsExistByMac() bool {
 }
 func (computer Computer) Heartbeat() error {
 	now := time.Now()
-	return DB.Debug().Model(&computer).Update("last_online_time", now).Error
+	return DB.Model(&computer).Update("last_online_time", now).Error
 }
 
 func (computer *Computer) UpdateByMac() error {
@@ -132,6 +132,6 @@ func CheckComputerProjectRelease(computerID string, ids []string) (p []ProjectRe
 	if err != nil {
 		return nil, err
 	}
-	err = DB.Debug().Model(computer).Association("ProjectRelease").Find(&p)
+	err = DB.Model(computer).Association("ProjectRelease").Find(&p)
 	return
 }

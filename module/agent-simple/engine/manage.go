@@ -47,6 +47,7 @@ func init() {
 
 // EventManage  任务管理
 type EventManage struct {
+	sync.RWMutex
 	maxExecutorCount    int32    //最大执行数
 	executorCount       int32    //当前执行部数
 	waitCount           int32    //等待数
@@ -60,9 +61,8 @@ type EventManage struct {
 	ActiveProcessCount  uint
 	httpRequestUri      string
 	rpcRequestUri       string
-	sync.RWMutex
-	generator     executor.GeneratorFunction
-	ServerFactory *IService.ServiceFactory
+	generator           executor.GeneratorFunction
+	ServerFactory       *IService.ServiceFactory
 }
 
 type EventList struct {
@@ -124,9 +124,16 @@ func (manage *EventManage) execute(event model.Event) {
 	ctx, cancel := context.WithCancel(context.Background())
 	manage.cancelFuncMap.LoadOrStore(event.ID, cancel)
 	m := NewEventExecuteManage(event, ctx, manage.generator)
-	m.Start()
-	//s := <-status
-
+	s := m.Start()
+	for {
+		select {
+		case status := <-s:
+			e.SetEventStatus([]uint{event.ID}, status)
+			goto END
+		}
+	}
+END:
+	atomic.AddInt32(&manage.executorCount, -1)
 }
 
 // Loop 循环调度

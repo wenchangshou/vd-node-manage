@@ -91,6 +91,7 @@ type DB struct {
 	clone        int
 }
 
+
 // Session session config when create session with Session() method
 type Session struct {
 	DryRun                   bool

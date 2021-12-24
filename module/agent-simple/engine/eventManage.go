@@ -25,8 +25,10 @@ func NewEventExecuteManage(event model.Event, ctx context.Context, exec executor
 	return t
 }
 func (task *EventExecuteManage) loop() {
-	<-task.ctx.Done()
-
+	select {
+	case <-task.ctx.Done():
+		task.statusChan <- executor.CANCEL
+	}
 }
 func (task EventExecuteManage) action(_ e.TaskItem) {
 
@@ -40,6 +42,7 @@ func (task *EventExecuteManage) execute() {
 	}
 	if err = execFunc.Execute(); err != nil {
 		task.statusChan <- model.Error
+
 		return
 	}
 	task.statusChan <- model.Done

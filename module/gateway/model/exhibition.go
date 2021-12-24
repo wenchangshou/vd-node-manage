@@ -27,7 +27,7 @@ func (exhibition *Exhibition) Update(val map[string]interface{}) error {
 //GetExhibitionByCategory 通过类别获取展项
 func GetExhibitionByCategory(categoryId string) ([]Exhibition, error) {
 	var exhibitionList []Exhibition
-	result := DB.Debug().Model(&Exhibition{}).Where("category_id=?", categoryId).Find(&exhibitionList)
+	result := DB.Model(&Exhibition{}).Where("category_id=?", categoryId).Find(&exhibitionList)
 	return exhibitionList, result.Error
 }
 

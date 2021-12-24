@@ -27,7 +27,7 @@ func (resources *Resource) Create() (string, error) {
 }
 func GetResourceById(id string) (*Resource, error) {
 	var resource *Resource
-	result := DB.Debug().Model(&Resource{}).Joins("File").Where("resources.id=?", id).Preload("Computers").First(&resource)
+	result := DB.Model(&Resource{}).Joins("File").Where("resources.id=?", id).Preload("Computers").First(&resource)
 	return resource, result.Error
 }
 

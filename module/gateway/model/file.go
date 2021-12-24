@@ -26,7 +26,7 @@ func (file *File) Create() (string, error) {
 	return file.ID, nil
 }
 func (file *File) Delete() error {
-	return DB.Debug().Where("id=?", file.ID).Delete(&file).Error
+	return DB.Where("id=?", file.ID).Delete(&file).Error
 }
 func GetFileByUidAndId(id string, uid string) (File, error) {
 	var file File

@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/wenchangshou2/vd-node-manage/common/serializer"
 	"github.com/wenchangshou2/vd-node-manage/module/server/service"
@@ -18,10 +19,31 @@ func ListDevice(c *gin.Context) {
 		c.JSON(200, serializer.ErrorResponse(err))
 	}
 }
+func GetDevice(c *gin.Context) {
+	var (
+		service service.DeviceGetService
+	)
+	if err := c.ShouldBindUri(&service); err == nil {
+		res := service.Get()
+		c.JSON(200, res)
+	} else {
+		c.JSON(200, serializer.ErrorResponse(err))
+
+	}
+}
 func AddDevice(c *gin.Context) {
 	ser := &service.DeviceCreateService{}
 	if err := c.BindJSON(&ser); err == nil {
 		res := ser.Create()
+		c.JSON(200, res)
+	} else {
+		c.JSON(200, serializer.ErrorResponse(err))
+	}
+}
+func DeleteDevice(c *gin.Context) {
+	s := &service.DeviceDeleteService{}
+	if err := c.ShouldBindUri(&s); err == nil {
+		res := s.Delete()
 		c.JSON(200, res)
 	} else {
 		c.JSON(200, serializer.ErrorResponse(err))
@@ -46,6 +68,12 @@ func RegisterDevice(c *gin.Context) {
 func AddDeviceResource(c *gin.Context) {
 	s := &service.DeviceResourceAddService{}
 	if err := c.BindJSON(&s); err == nil {
+		id := c.Param("id")
+		_id, err := strconv.Atoi(id)
+		s.ID = uint(_id)
+		if err != nil {
+			c.JSON(200, serializer.ErrorResponse(errors.New("id类型错误")))
+		}
 		res := s.Add()
 		c.JSON(200, res)
 	} else {

@@ -23,10 +23,10 @@ func (e Event) Add() error {
 }
 func QueryDeviceEventByDeviceIDAndStatus(id uint, status model.EventStatus) (tasks []Event, err error) {
 	var items []Event
-	err = DB.Debug().Model(&Event{}).Where("device_id=? AND status =?", id, status).Find(&items).Error
+	err = DB.Model(&Event{}).Where("device_id=? AND status =?", id, status).Find(&items).Error
 	return items, err
 }
 
 func SetDeviceEventStatus(id uint, status model.EventStatus) error {
-	return DB.Debug().Model(&Event{}).Where("id=?", id).Update("status", status).Error
+	return DB.Model(&Event{}).Where("id=?", id).Update("status", status).Error
 }

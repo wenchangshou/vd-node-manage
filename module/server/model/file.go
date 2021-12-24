@@ -5,7 +5,7 @@ import "gorm.io/gorm"
 type File struct {
 	gorm.Model
 	Name       string `gorm:"name" json:"name"`
-	Category string
+	Category   string
 	Mode       string `gorm:"mode" json:"mode"`
 	SourceName string `gorm:"source_name" json:"sourceName"`
 	Size       uint   `gorm:"size" json:"size"`
@@ -20,10 +20,10 @@ func (file *File) Create() (uint, error) {
 	if err := DB.Create(file).Error; err != nil {
 		return 0, err
 	}
-	return file.ID,nil
+	return file.ID, nil
 }
 func (file *File) Delete() error {
-	return DB.Debug().Where("id=?", file.ID).Delete(&file).Error
+	return DB.Where("id=?", file.ID).Delete(&file).Error
 }
 func GetFileByUidAndId(id string, uid string) (File, error) {
 	var file File

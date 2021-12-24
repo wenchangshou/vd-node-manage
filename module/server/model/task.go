@@ -72,7 +72,7 @@ func AddTask(name string, computerID string) (Task, error) {
 
 func GetTaskListByCid(computerId string) ([]Task, error) {
 	var tasks []Task
-	result := DB.Debug().Model(&Task{}).Where("computer_id = ?", computerId).Find(&tasks)
+	result := DB.Model(&Task{}).Where("computer_id = ?", computerId).Find(&tasks)
 	return tasks, result.Error
 }
 func GetTaskListByComputerID(Page int, size int, orderBy string, conditions map[string]string, _ map[string]string) ([]Task, int64) {
@@ -91,7 +91,7 @@ func GetTaskListByComputerID(Page int, size int, orderBy string, conditions map[
 }
 func GetTaskListByCidFilterStatus(computerId string, status int) ([]Task, error) {
 	var tasks []Task
-	result := DB.Debug().Model(&Task{}).Where("computer_id = ? AND status = ?", computerId, status).Find(&tasks)
+	result := DB.Model(&Task{}).Where("computer_id = ? AND status = ?", computerId, status).Find(&tasks)
 	return tasks, result.Error
 }
 

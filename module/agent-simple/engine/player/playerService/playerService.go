@@ -9,7 +9,9 @@ type IPlayerService interface {
 
 func GeneratePlayerService(service string, port int) (IPlayerService, error) {
 	if service == "http" {
-		return &HttpPlayerService{Port: port}, nil
+		return &HttpPlayerService{port}, nil
+	} else if service == "rpc" {
+		return &RpcPlayerService{port: port}, nil
 	}
 	return nil, errors.New("未知服务")
 }

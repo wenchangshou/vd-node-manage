@@ -1,0 +1,3 @@
+[submodule "player/zoolon_video"]
+	path = player/zoolon_video
+	url = https://github.com/wenchangshou/zoolon_video.git

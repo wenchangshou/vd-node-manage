@@ -1,8 +1,8 @@
 package model
 
 import (
-"fmt"
-"github.com/wenchangshou2/vd-node-manage/common/logging"
+	"fmt"
+	"github.com/wenchangshou2/vd-node-manage/common/logging"
 )
 
 // CustomLayout 自定义布局
@@ -31,7 +31,7 @@ func (customLayout *CustomLayout) Create() (string, error) {
 // GetComputerCustomLayout 获取计算机自定义布局
 func (customLayout *CustomLayout) GetComputerCustomLayout() ([]CustomLayout, error) {
 	var layouts []CustomLayout
-	result := DB.Debug().Model(&CustomLayout{}).Where("computer_id=?", customLayout.ComputerID).Find(&layouts)
+	result := DB.Model(&CustomLayout{}).Where("computer_id=?", customLayout.ComputerID).Find(&layouts)
 	return layouts, result.Error
 }
 func GetCustomLayoutMaxId() float64 {

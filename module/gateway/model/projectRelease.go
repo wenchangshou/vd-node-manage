@@ -31,13 +31,13 @@ func (projectRelease *ProjectRelease) Delete() error {
 }
 func GetProjectReleaseByID(id string) (ProjectRelease, error) {
 	var projectRelease ProjectRelease
-	result := DB.Debug().Model(ProjectRelease{}).Joins("File").Joins("Project").Where("project_releases.ID = ?", id).First(&projectRelease)
+	result := DB.Model(ProjectRelease{}).Joins("File").Joins("Project").Where("project_releases.ID = ?", id).First(&projectRelease)
 	return projectRelease, result.Error
 }
 
 func GetProjectReleaseByIdAndProjectId(projectID string, projectReleaseID string) (ProjectRelease, error) {
 	var projectRelease ProjectRelease
-	result := DB.Debug().Model(ProjectRelease{}).Where("project_id = ? AND project_releases.id = ?", projectID, projectReleaseID).Joins("File").Joins("Project").First(&projectRelease)
+	result := DB.Model(ProjectRelease{}).Where("project_id = ? AND project_releases.id = ?", projectID, projectReleaseID).Joins("File").Joins("Project").First(&projectRelease)
 	return projectRelease, result.Error
 
 }
@@ -45,6 +45,6 @@ func GetProjectReleaseByIdAndProjectId(projectID string, projectReleaseID string
 // GetProjectReleaseListByProjectID 获取项目所有的发行信息
 func GetProjectReleaseListByProjectID(id string) ([]ProjectRelease, error) {
 	projectList := make([]ProjectRelease, 0)
-	result := DB.Debug().Model(ProjectRelease{}).Where("project_id = ?", id).Joins("File").Find(&projectList)
+	result := DB.Model(ProjectRelease{}).Where("project_id = ?", id).Joins("File").Find(&projectList)
 	return projectList, result.Error
 }

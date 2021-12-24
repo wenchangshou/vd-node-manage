@@ -24,7 +24,7 @@ func (m ResourceDistribution) Add() error {
 
 //func QueryResourceDistributionByDeviceID(id uint) (tasks []dto.Task, err error) {
 //var items []ResourceDistribution
-//err = DB.Debug().Model(&ResourceDistribution{}).Where("device_id=?", id).Preload("Resource").Find(&items).Error
+//err = DB.Model(&ResourceDistribution{}).Where("device_id=?", id).Preload("Resource").Find(&items).Error
 //if err != nil {
 //	return nil, err
 //}

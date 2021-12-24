@@ -37,31 +37,38 @@ func (service *ResourceAddService) Add() serializer.Response {
 }
 
 type DeviceResourceAddService struct {
-	DeviceID   uint `json:"device_id" binding:"required"`
-	ResourceID uint `json:"resource_id" binding:"required""`
-	Status     int  `json:"status"`
-	Active     bool `json:"active"`
+	ID       uint   `json:"id" uri:"id"`
+	Service  string `json:"service"`
+	Category string `json:"category" default:"link"`
+	Name     string `json:"name"`
+	URI      string `json:"uri" binding:"required"`
+	//ResourceID uint `json:"resource_id" binding:"required""`
+	//Status     int  `json:"status"`
+	//Active     bool `json:"active"`
 }
 
 // Add 添加设备资源
 func (service DeviceResourceAddService) Add() serializer.Response {
-	//task := model.ResourceDistribution{
-	//	DeviceID:   service.DeviceID,
-	//	ResourceID: service.ResourceID,
-	//	Status:     model2.TaskInitialization,
-	//	Schedule:   0,
-	//}
-	resource, err := model.GetResourceById(service.ResourceID)
-	if err != nil {
-		return serializer.Err(serializer.CodeDBError, "获取资源失败", err)
+	var (
+		rid uint
+		err error
+	)
+	resource := model.Resource{
+		Name:     service.Name,
+		Service:  service.Service,
+		Category: service.Category,
+		Uri:      service.URI,
+	}
+	if rid, err = resource.Add(); err != nil {
+		return serializer.Err(serializer.CodeDBError, "添加资源失败", err)
 	}
 	params := make(map[string]interface{})
-	params["resource_id"] = service.ResourceID
+	params["resource_id"] = rid
 	params["uri"] = resource.Uri
 	params["name"] = resource.Name
 	m := model.Event{
-		DeviceID: service.DeviceID,
-		Active:   service.Active,
+		DeviceID: service.ID,
+		Active:   false,
 		Action:   model2.InstallResourceAction,
 		Status:   model2.Initializes,
 	}
@@ -70,5 +77,9 @@ func (service DeviceResourceAddService) Add() serializer.Response {
 	if err = m.Add(); err != nil {
 		return serializer.Err(serializer.CodeDBError, "添加资源分发事件失败", err)
 	}
-	return serializer.Response{}
+	return serializer.Response{
+		Data: map[string]interface{}{
+			"id": rid,
+		},
+	}
 }
