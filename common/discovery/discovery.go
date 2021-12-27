@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/pkg/e"
+	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/pkg2/e"
 	"golang.org/x/net/ipv4"
 
 	"net"

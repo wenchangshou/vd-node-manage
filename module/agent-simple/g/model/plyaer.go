@@ -1,4 +1,4 @@
-package e
+package model
 
 type PlayerArgumentInfo struct {
 	ProcessId int

@@ -4,7 +4,7 @@ import (
 	"flag"
 	discover "github.com/wenchangshou2/vd-node-manage/common/discovery"
 	"github.com/wenchangshou2/vd-node-manage/common/logging"
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/pkg/e"
+	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/pkg2/e"
 	"github.com/wenchangshou2/vd-node-manage/module/gateway/bootstrap"
 	"github.com/wenchangshou2/vd-node-manage/module/gateway/g"
 	"github.com/wenchangshou2/vd-node-manage/module/gateway/routers"

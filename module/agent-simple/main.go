@@ -3,23 +3,23 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/buff"
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/g/gui/icon"
-	"log"
-	"os"
-	"path"
-	"time"
-
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 	"github.com/getlantern/systray"
+	"github.com/wenchangshou2/vd-node-manage/common/cache"
 	"github.com/wenchangshou2/vd-node-manage/common/logging"
+	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/buff"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/cron"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/engine"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/g"
+	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/g/gui/icon"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/http"
 	"github.com/wenchangshou2/zutil"
+	"log"
+	"os"
+	"path"
+	"time"
 )
 
 var (
@@ -28,23 +28,39 @@ var (
 	uninstallFlag bool
 )
 
-// waitRegister 等待注册
-func waitRegister() <-chan bool {
-	result := make(chan bool)
+//// waitRegister 等待注册
+//func waitRegister() <-chan bool {
+//	result := make(chan bool)
+//	go func() {
+//		timeTicker := time.NewTicker(time.Millisecond * 500)
+//		for {
+//			select {
+//			case <-timeTicker.C:
+//				if g.Config().Server.Register {
+//					result <- true
+//				}
+//			}
+//		}
+//	}()
+//
+//	return result
+//}
+func first() chan bool {
+	r := make(chan bool)
 	go func() {
 		timeTicker := time.NewTicker(time.Millisecond * 500)
 		for {
 			select {
 			case <-timeTicker.C:
 				if g.Config().Server.Register {
-					result <- true
+					r <- true
 				}
 			}
 		}
 	}()
-
-	return result
+	return r
 }
+
 func InitSystemInfo(cfg *string, hardware *string) {
 	var (
 		err error
@@ -63,9 +79,10 @@ func InitSystemInfo(cfg *string, hardware *string) {
 	zutil.IsNotExistMkDir(rp)
 	g.ParseHardware(*hardware)
 	go http.Start()
-	<-waitRegister()
+	<-first()
 	g.InitLocalIp()
 	g.InitRpcClients()
+	cache.InitCache("redis", g.Config().Server.RedisAddress, "", 0)
 	cron.ReportDeviceStatus()
 	if err = engine.InitSchedule(conf); err != nil {
 		log.Fatalln("初始化调度失败")

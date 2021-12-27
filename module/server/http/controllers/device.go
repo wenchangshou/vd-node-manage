@@ -92,6 +92,9 @@ func ListDeviceResource(c *gin.Context) {
 
 }
 
+func GetDeviceLayout(c *gin.Context) {
+	//s := service.DeviceLayoutOpenService{}
+}
 func SetDeviceLayout(c *gin.Context) {
 	s := service.DeviceLayoutOpenService{}
 	if err := c.ShouldBindJSON(&s); err == nil {

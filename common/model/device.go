@@ -27,6 +27,15 @@ type DeviceRegisterResponse struct {
 	HttpAddress  string `json:"httpAddress"`
 	RedisAddress string `json:"redis_address"`
 }
+type DeviceSyncConfResponse struct {
+	//ID           uint   `json:"id"`
+	//Status       int    `json:"status"`
+	Code         int    `json:"code"`
+	Msg          string `json:"msg"`
+	RpcAddress   string `json:"rpcAddress"`
+	HttpAddress  string `json:"httpAddress"`
+	RedisAddress string `json:"redis_address"`
+}
 
 // DeviceQueryStatusRequest 设备查询任务请求结构体
 type DeviceQueryStatusRequest struct {

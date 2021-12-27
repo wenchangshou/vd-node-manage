@@ -7,6 +7,8 @@ service RpcCall {
     rpc Call(RpcRequest)returns (RpcResponse);
     rpc Close(EmptyMessage)returns (SimpleResponse);
     rpc Ping(EmptyMessage)returns(SimpleResponse);
+    rpc Get(RpcGetRequest)returns(RpcGetResponse);
+
 }
 
 message RpcRequest{
@@ -23,4 +25,12 @@ message EmptyMessage {
 message SimpleResponse {
     int32 code=1;
     string msg=2;
+}
+message RpcGetRequest {
+    string payload =1;
+}
+message RpcGetResponse {
+    int32 code=1;
+    string msg=2;
+    string payload=3;
 }

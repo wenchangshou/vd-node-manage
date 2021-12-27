@@ -21,6 +21,7 @@ type RpcCallClient interface {
 	Call(ctx context.Context, in *RpcRequest, opts ...grpc.CallOption) (*RpcResponse, error)
 	Close(ctx context.Context, in *EmptyMessage, opts ...grpc.CallOption) (*SimpleResponse, error)
 	Ping(ctx context.Context, in *EmptyMessage, opts ...grpc.CallOption) (*SimpleResponse, error)
+	Get(ctx context.Context, in *RpcGetRequest, opts ...grpc.CallOption) (*RpcGetResponse, error)
 }
 
 type rpcCallClient struct {
@@ -58,6 +59,15 @@ func (c *rpcCallClient) Ping(ctx context.Context, in *EmptyMessage, opts ...grpc
 	return out, nil
 }
 
+func (c *rpcCallClient) Get(ctx context.Context, in *RpcGetRequest, opts ...grpc.CallOption) (*RpcGetResponse, error) {
+	out := new(RpcGetResponse)
+	err := c.cc.Invoke(ctx, "/control.RpcCall/Get", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // RpcCallServer is the server API for RpcCall service.
 // All implementations must embed UnimplementedRpcCallServer
 // for forward compatibility
@@ -65,6 +75,7 @@ type RpcCallServer interface {
 	Call(context.Context, *RpcRequest) (*RpcResponse, error)
 	Close(context.Context, *EmptyMessage) (*SimpleResponse, error)
 	Ping(context.Context, *EmptyMessage) (*SimpleResponse, error)
+	Get(context.Context, *RpcGetRequest) (*RpcGetResponse, error)
 	mustEmbedUnimplementedRpcCallServer()
 }
 
@@ -80,6 +91,9 @@ func (UnimplementedRpcCallServer) Close(context.Context, *EmptyMessage) (*Simple
 }
 func (UnimplementedRpcCallServer) Ping(context.Context, *EmptyMessage) (*SimpleResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Ping not implemented")
+}
+func (UnimplementedRpcCallServer) Get(context.Context, *RpcGetRequest) (*RpcGetResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
 }
 func (UnimplementedRpcCallServer) mustEmbedUnimplementedRpcCallServer() {}
 
@@ -148,6 +162,24 @@ func _RpcCall_Ping_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
+func _RpcCall_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RpcGetRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RpcCallServer).Get(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/control.RpcCall/Get",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RpcCallServer).Get(ctx, req.(*RpcGetRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // RpcCall_ServiceDesc is the grpc.ServiceDesc for RpcCall service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -166,6 +198,10 @@ var RpcCall_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Ping",
 			Handler:    _RpcCall_Ping_Handler,
+		},
+		{
+			MethodName: "Get",
+			Handler:    _RpcCall_Get_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

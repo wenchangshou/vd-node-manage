@@ -29,6 +29,13 @@ func (device *Device) Register(args *model.DeviceRegisterRequest, reply *model.D
 	}
 	return nil
 }
+func (device *Device) SyncConf(_ model.NullRpcRequest, reply *model.DeviceSyncConfResponse) error {
+	reply.HttpAddress = g.Config().Http.Listen
+	reply.RpcAddress = g.Config().Listen
+	reply.RedisAddress = g.Config().Redis.Addr
+	reply.Code = 0
+	return nil
+}
 func (device *Device) Ping(_ *model.NullRpcRequest, reply *model.SimpleRpcResponse) error {
 	reply.Code = 0
 	return nil

@@ -2,9 +2,8 @@ package player
 
 import (
 	"errors"
+	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/g/model"
 	"sync"
-
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/pkg/e"
 )
 
 type IPlayer interface {
@@ -14,10 +13,11 @@ type IPlayer interface {
 	// Check  error
 	Check() (bool, error)
 	Control(string) (string, error)
+	Get() (string, error)
 	// OpenCheck() (bool, error)
 }
 
-func MakePlayer(windowInfo e.Window, _ string, service string, source string) (IPlayer, error) {
+func MakePlayer(windowInfo model.Window, _ string, service string, source string) (IPlayer, error) {
 	// 先处理标准player
 	playerPath := GetPlayerPath(service)
 	if playerPath == "" {
@@ -28,6 +28,7 @@ func MakePlayer(windowInfo e.Window, _ string, service string, source string) (I
 			Window:   windowInfo,
 			PlayPath: playerPath,
 			Source:   source,
+			end:      make(chan bool),
 		}
 		return &resourcePlayer, nil
 	}

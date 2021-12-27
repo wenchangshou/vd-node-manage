@@ -2,7 +2,7 @@ package layout
 
 import (
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/engine/player"
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/pkg/e"
+	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/g/model"
 	"sync"
 )
 
@@ -39,6 +39,12 @@ func (window *Window) Close() error {
 func (window *Window) Control(body string) (string, error) {
 	return window.player.Control(body)
 }
+func (window *Window) Get() (string, error) {
+	return window.player.Get()
+}
+func (window *Window) GetRunStatus() (bool, error) {
+	return window.player.Check()
+}
 
 func MakeWindow(id string, x int, y int, width int, height int, z int,
 	service string,
@@ -49,7 +55,7 @@ func MakeWindow(id string, x int, y int, width int, height int, z int,
 		_player player.IPlayer
 		err     error
 	)
-	windowInfo := e.Window{
+	windowInfo := model.Window{
 		X:      x,
 		Y:      y,
 		Width:  width,

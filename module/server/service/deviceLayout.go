@@ -4,12 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/wenchangshou2/vd-node-manage/common/cache"
 	"github.com/wenchangshou2/vd-node-manage/common/model"
 	"github.com/wenchangshou2/vd-node-manage/common/serializer"
 	"github.com/wenchangshou2/vd-node-manage/module/server/event"
 	model2 "github.com/wenchangshou2/vd-node-manage/module/server/model"
 )
 
+// DeviceLayoutOpenService 打开设备布局服务
 type DeviceLayoutOpenService struct {
 	ID       uint                   `json:"id" uri:"id"`
 	LayoutID string                 `json:"layout_id" binding:"required"`
@@ -129,4 +131,13 @@ func (service DeviceLayoutControlService) Control() serializer.Response {
 		return serializer.Err(serializer.CodeRedisError, "redis publish event error", err)
 	}
 	return serializer.Response{Data: reply}
+}
+
+type DeviceLayoutGetService struct {
+	ID       int    `json:"id" uri:"id"`
+	LayoutID string `json:"layout_id" uri:"layout_id"`
+}
+
+func (service DeviceLayoutGetService) Get() {
+	cache.Get()
 }

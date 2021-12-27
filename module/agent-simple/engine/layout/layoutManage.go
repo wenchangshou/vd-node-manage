@@ -1,16 +1,42 @@
 package layout
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/wenchangshou2/vd-node-manage/common/model"
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/pkg/e"
+	model2 "github.com/wenchangshou2/vd-node-manage/module/agent-simple/g/model"
 	"github.com/wenchangshou2/zutil"
 	"sync"
 )
 
+const (
+	Run = iota
+	Close
+)
+
+type WindowRunInfo struct {
+	Run    bool   `json:"run"`
+	Info   string `json:"info"`
+	Source *Window
+}
+type ActiveWindowInfo struct {
+	ID   string `json:"id"`
+	Code int    `json:"code"`
+	Msg  string `json:"msg"`
+	Info string `json:"info"`
+	Run  bool   `json:"run"`
+}
+type ActiveLayoutInfo struct {
+	ID      string `json:"active_id"`
+	Status  bool   `json:"status"`
+	Windows map[string]ActiveWindowInfo
+}
+
+type WindowMap map[string]WindowRunInfo
 type IManage interface {
 	GetLayoutID() string
+	GetLayoutRunInfo() (map[string]string, error)
 	OpenLayout(params model.OpenLayoutCmdParams) error
 	Control(params model.ControlWindowCmdParams, reply bool) error
 	CloseLayout() error
@@ -18,8 +44,35 @@ type IManage interface {
 type layoutManage struct {
 	sync.RWMutex
 	layoutID string
-	windows  map[string]*Window
+	windows  map[string]WindowRunInfo
 	wSync    *sync.RWMutex
+}
+
+func (manage *layoutManage) GetLayoutRunInfo() (map[string]string, error) {
+	result := make(map[string]string)
+	for wid, win := range manage.windows {
+		var (
+			info   string
+			err    error
+			status bool
+		)
+		sid := fmt.Sprintf("%s-%s", manage.layoutID, wid)
+		aWindow := ActiveWindowInfo{ID: wid, Code: 0, Msg: "success"}
+		if info, err = win.Source.Get(); err != nil {
+			continue
+		}
+		aWindow.Info = info
+		if status, err = win.Source.GetRunStatus(); err != nil {
+			continue
+		}
+		aWindow.Run = status
+		b, err := json.Marshal(aWindow)
+		if err != nil {
+			continue
+		}
+		result[sid] = string(b)
+	}
+	return result, nil
 }
 
 // GetLayoutID 获取布局ID
@@ -33,8 +86,8 @@ func (manage *layoutManage) GetLayoutID() string {
 func (manage *layoutManage) Kill() {
 	manage.Lock()
 	defer manage.Unlock()
-	for _, win := range manage.windows {
-		win.Close()
+	for _, dst := range manage.windows {
+		dst.Source.Close()
 		delete(manage.windows, manage.layoutID)
 	}
 
@@ -47,19 +100,24 @@ func (manage *layoutManage) Control(params model.ControlWindowCmdParams, reply b
 	if win == nil {
 		return errors.New("未找到指定的窗口")
 	}
-	win.Control(params.Body)
+	win.Source.Control(params.Body)
 	return nil
 }
 
 func (manage *layoutManage) setWindow(wid string, win *Window) {
 	manage.wSync.Lock()
 	defer manage.wSync.Unlock()
-	manage.windows[wid] = win
+	info := WindowRunInfo{Run: false, Source: win}
+	manage.windows[wid] = info
 }
-func (manage *layoutManage) getWindow(wid string) *Window {
+func (manage *layoutManage) getWindow(wid string) *WindowRunInfo {
 	manage.wSync.RLock()
 	defer manage.wSync.RUnlock()
-	return manage.windows[wid]
+	w, ok := manage.windows[wid]
+	if !ok {
+		return nil
+	}
+	return &w
 }
 
 // OpenLayout 打开布局
@@ -91,12 +149,6 @@ func (manage *layoutManage) OpenLayout(params model.OpenLayoutCmdParams) error {
 		manage.setWindow(win.ID, win)
 	}
 	manage.setLayout(params.ID)
-	//for k, win := range windows {
-	//	go func(win Window, port int) {
-	//		fmt.Printf("open port:%d\n", port)
-	//		win.Open(&wg, port)
-	//	}(win, ports[k])
-	//}
 	wg.Wait()
 	//manage.setLayout(id, windows)
 	return nil
@@ -108,15 +160,15 @@ func (manage *layoutManage) setLayout(id string) {
 }
 func (manage *layoutManage) CloseLayout() error {
 	for _, window := range manage.windows {
-		fmt.Println(window.player.GetThreadId())
-		window.player.Close()
+		fmt.Println(window.Source.player.GetThreadId())
+		window.Source.player.Close()
 	}
 	return nil
 }
 
 func InitLayoutManage() IManage {
 	return &layoutManage{
-		windows: make(map[string]*Window),
+		windows: make(map[string]WindowRunInfo),
 		wSync:   new(sync.RWMutex),
 	}
 }
@@ -126,18 +178,18 @@ type Info struct {
 	// 布局id
 	LayoutId string
 	// 当前布局所打开的窗口
-	Windows map[string]e.Win
+	Windows map[string]model2.Win
 }
 type ApplicationStatusChangeMsg struct {
 	WinId     string
 	ProcessId int
-	Result    e.PlayerArgumentInfo
+	Result    model2.PlayerArgumentInfo
 	Type      string
 }
-type WindowMap map[string]e.Win
 
-func (w *WindowMap) Iterator(handle func(e.Win) error) {
-	for _, win := range *w {
-		handle(win)
-	}
+func (w *WindowMap) Iterator(handle func(model2.Win) error) {
+	//for _, win := range *w {
+	//handle(win)
+	//}
+
 }

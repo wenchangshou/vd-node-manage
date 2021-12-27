@@ -45,3 +45,20 @@ func (r RpcPlayerService) Control(payload string) (string, error) {
 	}
 	return res.Payload, nil
 }
+
+func (r RpcPlayerService) Get() (string, error) {
+	conn, err := grpc.Dial(fmt.Sprintf("localhost:%d", r.port), grpc.WithInsecure())
+	if err != nil {
+		return "", errors.New("connect grpc server fail:" + err.Error())
+	}
+	defer conn.Close()
+	c := playerRpc.NewRpcCallClient(conn)
+	ctx, cancel := context.WithTimeout(context.TODO(), time.Second)
+	defer cancel()
+	res, err := c.Get(ctx, &playerRpc.RpcGetRequest{})
+	if err != nil {
+		return "", errors.New("call remote control cmd fail:" + err.Error())
+	}
+	fmt.Println(res.Msg)
+	return res.Payload, nil
+}

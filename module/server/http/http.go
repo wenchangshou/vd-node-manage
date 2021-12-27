@@ -37,6 +37,8 @@ func InitRouter() *gin.Engine {
 		device.POST("/:id/layout", controllers.SetDeviceLayout)
 		device.DELETE("/:id/layout", controllers.CloseDeviceLayout)
 		device.POST("/:id/control", controllers.ControlLayout)
+		layout := v1.Group("/layout")
+		layout.GET("/:id/:layout_id", controllers.GetDeviceLayout)
 		resource := v1.Group("/resource")
 		resource.POST("/upload", controllers.UploadFile)
 		resource.POST("", controllers.AddResource)

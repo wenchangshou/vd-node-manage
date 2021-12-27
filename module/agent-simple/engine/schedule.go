@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/wenchangshou2/vd-node-manage/common/cache"
 	"time"
 
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/engine/layout"
@@ -12,7 +13,6 @@ import (
 	"github.com/wenchangshou2/vd-node-manage/common/logging"
 	"github.com/wenchangshou2/vd-node-manage/common/model"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/g"
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/pkg/e"
 	IService "github.com/wenchangshou2/vd-node-manage/module/agent-simple/service"
 )
 
@@ -24,7 +24,6 @@ type Schedule struct {
 	ComputerID     string
 	register       bool
 	lastReportTime time.Time
-	serverInfo     *e.ServerInfo
 	Count          int
 	eventManage    *EventManage
 	rpcAddress     string
@@ -55,17 +54,26 @@ func (schedule Schedule) queryTask() {
 func (schedule *Schedule) loop() {
 	heartbeatTick := time.NewTicker(3 * time.Second)
 	resourceDistributionTick := time.NewTicker(5 * time.Second)
+	playerActiveInfoTick := time.NewTicker(time.Second)
 	for {
 		select {
 		case <-heartbeatTick.C:
-			//schedule.ComputerService.Heartbeat()
-		//case <-taskTick.C:
-		//	schedule.TaskLoop()
+		case <-playerActiveInfoTick.C:
+			schedule.reportPlayerRunInfo()
 		case <-resourceDistributionTick.C:
 			schedule.queryTask()
 		}
 	}
 
+}
+func (schedule *Schedule) reportPlayerRunInfo() {
+	res, err := schedule.layoutManage.GetLayoutRunInfo()
+	if err != nil {
+		return
+	}
+	for k, w := range res {
+		cache.Set(fmt.Sprintf("device-%d-%s", schedule.ID, k), w, 60)
+	}
 }
 func (schedule *Schedule) openLayout(req model.EventRequest) model.EventReply {
 	var (
@@ -84,7 +92,6 @@ func (schedule *Schedule) openLayout(req model.EventRequest) model.EventReply {
 		return reply
 	}
 	return model.GenerateSimpleSuccessEventReply(req.EventID)
-	//schedule.redisClient.Publish(fmt.Sprintf("server"), string(reply))
 }
 func (schedule *Schedule) closeLayout(req model.EventRequest) model.EventReply {
 	var (
@@ -97,7 +104,6 @@ func (schedule *Schedule) closeLayout(req model.EventRequest) model.EventReply {
 		return reply
 	}
 	return model.GenerateSimpleSuccessEventReply(req.EventID)
-
 }
 
 func (schedule *Schedule) control(req model.EventRequest) model.EventReply {

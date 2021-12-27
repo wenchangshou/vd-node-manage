@@ -10,6 +10,11 @@ type HttpPlayerService struct {
 	port int `json:"port"`
 }
 
+func (svr HttpPlayerService) Get() (string, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (svr HttpPlayerService) Ping() (bool, error) {
 	client := resty.New().SetTimeout(500 * time.Millisecond)
 	resp, err := client.R().Get(fmt.Sprintf("http://localhost:%d/ping", svr.port))

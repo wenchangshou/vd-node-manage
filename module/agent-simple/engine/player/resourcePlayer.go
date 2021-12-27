@@ -4,23 +4,30 @@ import (
 	"fmt"
 	"github.com/wenchangshou2/vd-node-manage/common/logging"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/engine/player/playerService"
+	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/g/model"
 	"path"
 	"sync"
+	"time"
 
 	"github.com/wenchangshou2/vd-node-manage/common/process"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/g"
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/pkg/e"
 	"github.com/wenchangshou2/zutil"
 )
 
 type ResourcePlayer struct {
-	e.Window
+	model.Window
 	Source    string
 	Arguments map[string]interface{}
 	Pid       int
 	port      int
 	PlayPath  string
 	service   playerService.IPlayerService
+	end       chan bool
+	info      string
+}
+
+func (player *ResourcePlayer) Get() (string, error) {
+	return player.service.Get()
 }
 
 func (player *ResourcePlayer) Control(body string) (string, error) {
@@ -29,7 +36,20 @@ func (player *ResourcePlayer) Control(body string) (string, error) {
 	}
 	return player.service.Control(body)
 }
-
+func (player *ResourcePlayer) Loop() {
+	d := time.Tick(time.Second)
+	for {
+		select {
+		case <-d:
+			if info, err := player.service.Get(); err == nil {
+				player.info = info
+			}
+		case <-player.end:
+			return
+		}
+		time.Sleep(time.Second)
+	}
+}
 func (player *ResourcePlayer) GetThreadId() int {
 	return player.Pid
 }
@@ -60,7 +80,7 @@ func (player *ResourcePlayer) Open(wg *sync.WaitGroup, p int) (pid int, err erro
 		return 0, err
 	}
 	player.service = service
-
+	go player.Loop()
 	return player.Pid, err
 }
 
@@ -71,5 +91,8 @@ func (player *ResourcePlayer) Close() error {
 		return nil
 	}
 	process.KillProcesses([]int{int(player.Pid)})
+	go func() {
+		player.end <- true
+	}()
 	return nil
 }

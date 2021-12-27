@@ -5,7 +5,6 @@ import (
 
 	"github.com/wenchangshou2/vd-node-manage/common/model"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/engine/executor"
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/pkg/e"
 )
 
 type EventExecuteManage struct {
@@ -29,9 +28,6 @@ func (task *EventExecuteManage) loop() {
 	case <-task.ctx.Done():
 		task.statusChan <- executor.CANCEL
 	}
-}
-func (task EventExecuteManage) action(_ e.TaskItem) {
-
 }
 func (task *EventExecuteManage) execute() {
 	e := task.event
