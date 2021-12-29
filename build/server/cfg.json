@@ -26,7 +26,7 @@
     "provider": "redis",
     "passwd": "",
     "addr": "192.168.0.222:6379",
-    "db": 1,
+    "db": 0,
     "maxIdle": 5
   }
 }

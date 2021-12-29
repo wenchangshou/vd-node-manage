@@ -2,10 +2,10 @@ package http
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/wenchangshou2/vd-node-manage/common/model"
 	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/g"
+	model2 "github.com/wenchangshou2/vd-node-manage/module/agent-simple/g/model"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -14,6 +14,7 @@ import (
 
 func configSystemRoutes() {
 	http.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
+		setupHeader(w, r)
 		req := make(map[string]interface{})
 		defer r.Body.Close()
 		body, _ := ioutil.ReadAll(r.Body)
@@ -24,12 +25,12 @@ func configSystemRoutes() {
 		}
 		server, ok := req["server"]
 		if !ok {
-			AutoRender(w, nil, errors.New("server 必须填写"))
+			RenderCustomMsgJson(w, 400, "server 必须填写")
 			return
 		}
 		code, ok := req["code"]
 		if !ok {
-			AutoRender(w, nil, errors.New("code 必须填写"))
+			RenderCustomMsgJson(w, 400, "code 必须填写")
 			return
 		}
 		rpcClient := &g.SingleConnRpcClient{
@@ -39,7 +40,7 @@ func configSystemRoutes() {
 		r3 := model.SimpleRpcResponse{}
 		err = rpcClient.Call("Device.Ping", &model.NullRpcRequest{}, &r3)
 		if err != nil {
-			AutoRender(w, nil, errors.New("服务端通讯异常"))
+			RenderCustomMsgJson(w, 400, "服务端通讯异常:"+err.Error())
 			return
 		}
 		var resp *model.DeviceRegisterResponse
@@ -51,13 +52,34 @@ func configSystemRoutes() {
 		err = rpcClient.Call("Device.Register", r2, &resp)
 		if err != nil || resp.Code != 0 {
 			log.Println("call Device.Request fail:", err, "Request:", req, "Response:", resp)
-			AutoRender(w, nil, errors.New("注册失败:"+resp.Msg))
+			RenderCustomMsgJson(w, 400, "注册失败:"+resp.Msg)
 			return
 		}
-		g.SetRegisterStatus(true, resp.ID, resp.HttpAddress, resp.RpcAddress, resp.RedisAddress)
-		RenderMsgJson(w, "success")
+		g.SetRegisterStatus(true, server.(string), resp.ID, resp.HttpAddress, resp.RpcAddress, resp.RedisAddress)
+		RenderCustomMsgJson(w, 0, "success")
+	})
+
+	http.HandleFunc("/get", func(w http.ResponseWriter, r *http.Request) {
+		setupHeader(w, r)
+		cfg := g.Config()
+		info := model2.ServerInfo{
+			Name:     "主机",
+			Register: cfg.Server.Register,
+			Address:  cfg.Server.Address,
+			Expired:  -1,
+		}
+		info.Detailed.Communication = true
+		info.Detailed.Server = true
+		//rtu["register"] = cfg.Server.Register
+		//rtu["address"] = cfg.Server.Address
+		//rtu["expired"] = -1
+		//rtu["detailed"] = struc
+
+		RenderDataJson(w, info)
 	})
 	http.HandleFunc("/reset", func(w http.ResponseWriter, r *http.Request) {
-		g.SetRegisterStatus(false, 0, "", "", "")
+		setupHeader(w, r)
+		g.SetRegisterStatus(false, "", 0, "", "", "")
+		RenderCustomMsgJson(w, 0, "success")
 	})
 }

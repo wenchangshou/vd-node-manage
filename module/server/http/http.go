@@ -27,21 +27,29 @@ func InitRouter() *gin.Engine {
 	{
 		v1.GET("/health", controllers.Health)
 		device := v1.Group("/device")
-		device.POST("/list", controllers.ListDevice)
-		device.POST("", controllers.AddDevice)
-		device.DELETE("/:id", controllers.DeleteDevice)
-		device.GET("/:id", controllers.GetDevice)
-		device.POST("/register", controllers.RegisterDevice)
-		device.POST("/:id/resource", controllers.AddDeviceResource)
-		device.GET("/:id/resource", controllers.ListDeviceResource)
-		device.POST("/:id/layout", controllers.SetDeviceLayout)
-		device.DELETE("/:id/layout", controllers.CloseDeviceLayout)
-		device.POST("/:id/control", controllers.ControlLayout)
+		{
+			device.GET("", controllers.ListDevice)
+			device.POST("", controllers.AddDevice)
+			device.DELETE("/:id", controllers.DeleteDevice)
+			device.GET("/:id", controllers.GetDevice)
+			device.POST("/register", controllers.RegisterDevice)
+			device.POST("/:id/resource", controllers.AddDeviceResource)
+			device.GET("/:id/resource", controllers.ListDeviceResource)
+
+		}
 		layout := v1.Group("/layout")
-		layout.GET("/:id/:layout_id", controllers.GetDeviceLayout)
+		{
+			layout.POST("/:id/:layout_id", controllers.SetDeviceLayout)
+			layout.DELETE("/:id/:layout_id", controllers.CloseDeviceLayout)
+			layout.GET("/:id/:layout_id", controllers.GetDeviceLayout)
+			layout.GET("/:id/:layout_id/:wid", controllers.GetDeviceLayoutWindow)
+			layout.POST("/:id/:layout_id/:window_id/control", controllers.ControlLayout)
+		}
 		resource := v1.Group("/resource")
-		resource.POST("/upload", controllers.UploadFile)
-		resource.POST("", controllers.AddResource)
+		{
+			resource.POST("/upload", controllers.UploadFile)
+			resource.POST("", controllers.AddResource)
+		}
 	}
 	return r
 }

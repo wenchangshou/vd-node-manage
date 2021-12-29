@@ -3,6 +3,7 @@ package g
 import (
 	"encoding/json"
 	"github.com/toolkits/file"
+	"io/ioutil"
 	"log"
 	"os"
 	"sync"
@@ -54,6 +55,13 @@ type HeartbeatConfig struct {
 	Interval int    `json:"interval"`
 	Timeout  int    `json:"timeout"`
 }
+type PlayerConfig struct {
+	Name       string `json:"name"`
+	Service    string `json:"service"`
+	Path       string `json:"path"`
+	Version    string `json:"version"`
+	UpdateTime int64  `json:"update_time"`
+}
 type GlobalConfig struct {
 	Debug     bool             `json:"debug"`
 	Hostname  string           `json:"hostname"`
@@ -65,6 +73,7 @@ type GlobalConfig struct {
 	Task      *TaskConfig      `json:"task"`
 	Heartbeat *HeartbeatConfig `json:"heartbeat"`
 	Http      *HttpConfig      `json:"http"`
+	Player    *[]PlayerConfig  `json:"player"`
 }
 
 var (
@@ -79,16 +88,30 @@ func Config() *GlobalConfig {
 	defer configLock.RUnlock()
 	return config
 }
-func SetRegisterStatus(status bool, id uint, httpAddress, rpcAddress, redisAddress string) {
+
+// Save 保存配置信息
+func (g *GlobalConfig) Save() {
 	configLock.Lock()
 	defer configLock.Unlock()
+	b, err := json.Marshal(g)
+	if err != nil {
+		return
+	}
+	ioutil.WriteFile(ConfigFile, b, 0755)
+}
+func SetRegisterStatus(status bool, server string, id uint, httpAddress, rpcAddress, redisAddress string) {
+	configLock.Lock()
 	config.Server.Register = status
 	config.Server.ID = id
 	config.Server.HttpAddress = httpAddress
 	config.Server.RpcAddress = rpcAddress
 	config.Server.RedisAddress = redisAddress
-	b, _ := json.Marshal(config)
-	file.WriteString(ConfigFile, string(b))
+	config.Server.Address = server
+	configLock.Unlock()
+	config.Save()
+}
+func reload() {
+	ParseConfig(ConfigFile)
 }
 
 // ParseConfig 解析配置文件

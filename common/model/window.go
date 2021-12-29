@@ -29,3 +29,10 @@ type OpenWindowInfo struct {
 	Arguments map[string]interface{}
 	Source    string `json:"source"`
 }
+type ActiveWindowInfo struct {
+	ID string `json:"id"`
+	//Code int    `json:"code"`
+	//Msg  string `json:"msg"`
+	Info string `json:"info"`
+	Run  bool   `json:"run"`
+}

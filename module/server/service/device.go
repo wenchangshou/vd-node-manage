@@ -6,40 +6,32 @@ import (
 	model2 "github.com/wenchangshou2/vd-node-manage/common/model"
 	"github.com/wenchangshou2/vd-node-manage/common/serializer"
 	"github.com/wenchangshou2/vd-node-manage/module/server/model"
-	"strings"
+	"github.com/wenchangshou2/vd-node-manage/module/server/vo"
 )
 
 type DeviceListService struct {
-	Page       int               `json:"page" binding:"min=1,required"`
-	PageSize   int               `json:"page_size" binding:"min=1,required"`
-	OrderBy    string            `json:"order_by"`
-	Conditions map[string]string `form:"conditions"`
-	Searches   map[string]string `form:"searches"`
+	Page     int `json:"page" binding:"min=1,required" form:"page"`
+	PageSize int `json:"pageSize" binding:"min=1,required" form:"pageSize"`
+	//OrderBy    string            `json:"order_by"`
+	//Conditions map[string]string `form:"conditions"`
+	//Searches   map[string]string `form:"searches"`
 }
 
 func (service *DeviceListService) List() serializer.Response {
 	var res []model.Device
+	rtu := make([]*vo.DeviceVo, 0)
 	var total int64 = 0
 	tx := model.DB.Model(&model.Device{})
-	if service.OrderBy != "" {
-		tx = tx.Order(service.OrderBy)
-	}
-	for k, v := range service.Conditions {
-		tx = tx.Where(k+" =? ", v)
-	}
-	if len(service.Searches) > 0 {
-		search := ""
-		for k, v := range service.Searches {
-			search += k + " like '%" + v + "%' OR "
-		}
-		search = strings.TrimSuffix(search, " OR ")
-		tx = tx.Where(search)
-	}
+
 	tx.Count(&total)
 	tx.Limit(service.PageSize).Offset((service.Page - 1) * service.PageSize).Find(&res)
+	for _, d := range res {
+		rtu = append(rtu, vo.DeviceDoToVo(&d))
+	}
+
 	return serializer.Response{Data: map[string]interface{}{
 		"total": total,
-		"items": res,
+		"items": rtu,
 	}}
 }
 
@@ -74,8 +66,8 @@ func (service DeviceRegisterService) Register() (uint, error) {
 type DeviceCreateService struct {
 	Code     string `json:"code"`
 	Name     string `json:"name"`
-	ConnType string `json:"conn_type"`
-	RegionID int    `json:"region_id"`
+	ConnType string `json:"connType,default=link"`
+	RegionID int    `json:"regionId"`
 }
 
 func (service DeviceCreateService) Create() serializer.Response {
@@ -147,6 +139,6 @@ func (service DeviceGetService) Get() serializer.Response {
 		return serializer.Err(serializer.CodeNotFindDeviceErr, "没有找到指定的设备", err)
 	}
 	return serializer.Response{
-		Data: device,
+		Data: vo.DeviceDoToVo(device),
 	}
 }

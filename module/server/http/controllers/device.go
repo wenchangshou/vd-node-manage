@@ -2,9 +2,11 @@ package controllers
 
 import (
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/wenchangshou2/vd-node-manage/common/serializer"
 	"github.com/wenchangshou2/vd-node-manage/module/server/service"
+	"io/ioutil"
 	"strconv"
 )
 
@@ -12,7 +14,7 @@ func ListDevice(c *gin.Context) {
 	var (
 		listService service.DeviceListService
 	)
-	if err := c.ShouldBindJSON(&listService); err == nil {
+	if err := c.ShouldBindQuery(&listService); err == nil {
 		res := listService.List()
 		c.JSON(200, res)
 	} else {
@@ -83,7 +85,14 @@ func AddDeviceResource(c *gin.Context) {
 
 func ListDeviceResource(c *gin.Context) {
 	s := service.DeviceResourceListService{}
-	if err := c.BindUri(&s); err == nil {
+	if err := c.ShouldBindQuery(&s); err == nil {
+		id := c.Param("id")
+		_id, err := strconv.Atoi(id)
+		if err != nil {
+			c.JSON(200, serializer.ErrorResponse(err))
+			return
+		}
+		s.ID = uint(_id)
 		res := s.List()
 		c.JSON(200, res)
 	} else {
@@ -93,7 +102,25 @@ func ListDeviceResource(c *gin.Context) {
 }
 
 func GetDeviceLayout(c *gin.Context) {
-	//s := service.DeviceLayoutOpenService{}
+	s := service.DeviceLayoutGetService{}
+	if err := c.ShouldBindUri(&s); err == nil {
+		res := s.Get()
+		c.JSON(200, res)
+	} else {
+		c.JSON(200, serializer.ErrorResponse(err))
+	}
+}
+func GetDeviceLayoutWindow(c *gin.Context) {
+	s := service.DeviceLayoutGetService{}
+	if err := c.ShouldBindUri(&s); err == nil {
+		wid := c.Param("wid")
+		s.Wid = wid
+		res := s.GetWindow()
+		fmt.Println("wid", wid)
+		c.JSON(200, res)
+	} else {
+		c.JSON(200, serializer.ErrorResponse(err))
+	}
 }
 func SetDeviceLayout(c *gin.Context) {
 	s := service.DeviceLayoutOpenService{}
@@ -104,6 +131,8 @@ func SetDeviceLayout(c *gin.Context) {
 			c.JSON(200, serializer.Err(serializer.CodeDBError, "id错误", err))
 			return
 		}
+		layoutId := c.Param("layout_id")
+		s.LayoutID = layoutId
 		s.ID = uint(_id)
 		res := s.Open()
 		c.JSON(200, res)
@@ -113,10 +142,13 @@ func SetDeviceLayout(c *gin.Context) {
 }
 func ControlLayout(c *gin.Context) {
 	s := service.DeviceLayoutControlService{}
-	if err := c.ShouldBindJSON(&s); err == nil {
-		id := c.Param("id")
-		_id, _ := strconv.Atoi(id)
-		s.ID = uint(_id)
+	if err := c.ShouldBindUri(&s); err == nil {
+		b, err := ioutil.ReadAll(c.Request.Body)
+		if err != nil {
+			c.JSON(200, serializer.ErrorResponse(err))
+			return
+		}
+		s.Body = string(b)
 		res := s.Control()
 		c.JSON(200, res)
 	} else {

@@ -67,13 +67,15 @@ func (schedule *Schedule) loop() {
 
 }
 func (schedule *Schedule) reportPlayerRunInfo() {
+	if schedule.layoutManage.GetLayoutID() == "" {
+		return
+	}
 	res, err := schedule.layoutManage.GetLayoutRunInfo()
 	if err != nil {
 		return
 	}
-	for k, w := range res {
-		cache.Set(fmt.Sprintf("device-%d-%s", schedule.ID, k), w, 60)
-	}
+	b, _ := json.Marshal(res)
+	cache.Set(fmt.Sprintf("device-%d-%s", schedule.ID, schedule.layoutManage.GetLayoutID()), string(b), 5)
 }
 func (schedule *Schedule) openLayout(req model.EventRequest) model.EventReply {
 	var (

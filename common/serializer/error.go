@@ -49,6 +49,7 @@ const (
 	CodeNotFindFile             = 50007
 	CodeRedisError              = 60001
 	CodeGenerateUUIDFail        = 60002
+	CodeGetLayoutInfoFail       = 60003
 	//CodeParamErr 各种奇奇怪怪的参数错误
 	CodeParamErr = 40001
 	// CodeCheckLogin 未登录

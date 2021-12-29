@@ -1,7 +1,6 @@
 package layout
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/wenchangshou2/vd-node-manage/common/model"
@@ -20,23 +19,17 @@ type WindowRunInfo struct {
 	Info   string `json:"info"`
 	Source *Window
 }
-type ActiveWindowInfo struct {
-	ID   string `json:"id"`
-	Code int    `json:"code"`
-	Msg  string `json:"msg"`
-	Info string `json:"info"`
-	Run  bool   `json:"run"`
-}
+
 type ActiveLayoutInfo struct {
 	ID      string `json:"active_id"`
 	Status  bool   `json:"status"`
-	Windows map[string]ActiveWindowInfo
+	Windows map[string]*model.ActiveWindowInfo
 }
 
 type WindowMap map[string]WindowRunInfo
 type IManage interface {
 	GetLayoutID() string
-	GetLayoutRunInfo() (map[string]string, error)
+	GetLayoutRunInfo() ([]*model.ActiveWindowInfo, error)
 	OpenLayout(params model.OpenLayoutCmdParams) error
 	Control(params model.ControlWindowCmdParams, reply bool) error
 	CloseLayout() error
@@ -48,16 +41,14 @@ type layoutManage struct {
 	wSync    *sync.RWMutex
 }
 
-func (manage *layoutManage) GetLayoutRunInfo() (map[string]string, error) {
-	result := make(map[string]string)
+func (manage *layoutManage) GetLayoutRunInfo() (result []*model.ActiveWindowInfo, err error) {
+	result = make([]*model.ActiveWindowInfo, 0)
 	for wid, win := range manage.windows {
 		var (
 			info   string
-			err    error
 			status bool
 		)
-		sid := fmt.Sprintf("%s-%s", manage.layoutID, wid)
-		aWindow := ActiveWindowInfo{ID: wid, Code: 0, Msg: "success"}
+		aWindow := model.ActiveWindowInfo{ID: wid}
 		if info, err = win.Source.Get(); err != nil {
 			continue
 		}
@@ -66,11 +57,7 @@ func (manage *layoutManage) GetLayoutRunInfo() (map[string]string, error) {
 			continue
 		}
 		aWindow.Run = status
-		b, err := json.Marshal(aWindow)
-		if err != nil {
-			continue
-		}
-		result[sid] = string(b)
+		result = append(result, &aWindow)
 	}
 	return result, nil
 }

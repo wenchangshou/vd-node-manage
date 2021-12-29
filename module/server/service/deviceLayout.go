@@ -14,7 +14,7 @@ import (
 // DeviceLayoutOpenService 打开设备布局服务
 type DeviceLayoutOpenService struct {
 	ID       uint                   `json:"id" uri:"id"`
-	LayoutID string                 `json:"layout_id" binding:"required"`
+	LayoutID string                 `uri:"layout_id" json:"layout_id"`
 	Kill     bool                   `json:"kill" binding:"required"`
 	Style    map[string]interface{} `json:"style"`
 	Windows  []model.Window         `json:"windows"`
@@ -113,9 +113,9 @@ func (service DeviceLayoutCloseService) Close() serializer.Response {
 }
 
 type DeviceLayoutControlService struct {
-	ID   uint   `json:"id"`
-	Lid  string `json:"layout_id"`
-	Wid  string `json:"window_id"`
+	ID   uint   `json:"id" uri:"id"`
+	Lid  string `json:"layout_id" uri:"layout_id"`
+	Wid  string `json:"window_id" uri:"window_id"`
 	Body string `json:"body"`
 }
 
@@ -136,8 +136,39 @@ func (service DeviceLayoutControlService) Control() serializer.Response {
 type DeviceLayoutGetService struct {
 	ID       int    `json:"id" uri:"id"`
 	LayoutID string `json:"layout_id" uri:"layout_id"`
+	Wid      string `json:"wid" uri:"window_id"`
 }
 
-func (service DeviceLayoutGetService) Get() {
-	cache.Get()
+func (service DeviceLayoutGetService) Get() serializer.Response {
+	val, exists := cache.Get(fmt.Sprintf("device-%d-%s", service.ID, service.LayoutID))
+	obj := make([]model.ActiveWindowInfo, 0)
+	if !exists || val == nil {
+		return serializer.Err(serializer.CodeGetLayoutInfoFail, "没有找到指定的布局信息", nil)
+	}
+	err := json.Unmarshal([]byte(val.(string)), &obj)
+	if err != nil {
+		return serializer.Err(serializer.CodeGetLayoutInfoFail, "实时数据异常", err)
+	}
+	return serializer.Response{
+		Data: obj,
+	}
+}
+func (service DeviceLayoutGetService) GetWindow() serializer.Response {
+	val, exists := cache.Get(fmt.Sprintf("device-%d-%s", service.ID, service.LayoutID))
+	obj := make(map[string]model.ActiveWindowInfo)
+	if !exists || val == nil {
+		return serializer.Err(serializer.CodeGetLayoutInfoFail, "没有找到指定的布局信息", nil)
+	}
+	err := json.Unmarshal([]byte(val.(string)), &obj)
+	if err != nil {
+		return serializer.Err(serializer.CodeGetLayoutInfoFail, "实时数据异常", err)
+	}
+	for _, v := range obj {
+		if v.ID == service.Wid {
+			return serializer.Response{
+				Data: v,
+			}
+		}
+	}
+	return serializer.Err(serializer.CodeGetLayoutInfoFail, "没有找到指定的容器", nil)
 }
