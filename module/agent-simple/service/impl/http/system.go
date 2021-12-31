@@ -3,13 +3,14 @@ package http
 import (
 	"github.com/go-resty/resty/v2"
 	"github.com/pkg/errors"
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/pkg2/e"
+	"github.com/wenchangshou/vd-node-manage/common/model"
 	"net/http"
 )
 
 // GetExternIp  获取当前的计算机ip
 func GetExternIp() (ip string, err error) {
-	rtu := e.HttpBaseData{}
+	//rtu := e.HttpBaseData{}
+	rtu := model.HttpBaseData{}
 	fullUrl := GetFullUrl("system/extranet")
 	client := resty.New()
 	resp, err := client.R().SetResult(&rtu).Get(fullUrl)

@@ -11,7 +11,7 @@ type Resource struct {
 	Service  string `json:"service"`
 	Category string `gorm:"category" json:"category"`
 	Uri      string `json:"uri"`
-	Status   uint   `json:"status"`
+	Status   int    `json:"status"`
 }
 
 func (resources *Resource) TableName() string {
@@ -50,7 +50,7 @@ func GetResources(Page int, size int, orderBy string, conditions map[string]stri
 	if len(searches) > 0 {
 		search := ""
 		for k, v := range searches {
-			search += (k + " like '%" + v + "%' OR ")
+			search += k + " like '%" + v + "%' OR "
 		}
 		search = strings.TrimSuffix(search, " OR ")
 		tx = tx.Where(search)
@@ -79,12 +79,12 @@ func ListResource(Page int, size int, orderBy string, conditions map[string]stri
 	if len(searches) > 0 {
 		search := ""
 		for k, v := range searches {
-			search += (k + " like '%" + v + "%' OR ")
+			search += k + " like '%" + v + "%' OR "
 		}
 		search = strings.TrimSuffix(search, " OR ")
 		tx = tx.Where(search)
 	}
 	tx.Count(&total)
-	tx.Debug().Limit(size).Offset((Page - 1) * size).Preload("Computers").Find(&resources)
+	tx.Limit(size).Offset((Page - 1) * size).Preload("Computers").Find(&resources)
 	return
 }

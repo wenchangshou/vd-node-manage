@@ -2,7 +2,7 @@ package http
 
 import (
 	"github.com/julienschmidt/httprouter"
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/buff"
+	"github.com/wenchangshou/vd-node-manage/module/agent-simple/buff"
 	"io/ioutil"
 	"net/http"
 )

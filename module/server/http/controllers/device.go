@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/wenchangshou2/vd-node-manage/common/serializer"
-	"github.com/wenchangshou2/vd-node-manage/module/server/service"
+	"github.com/wenchangshou/vd-node-manage/common/serializer"
+	"github.com/wenchangshou/vd-node-manage/module/server/service"
 	"io/ioutil"
 	"strconv"
 )
@@ -85,14 +85,7 @@ func AddDeviceResource(c *gin.Context) {
 
 func ListDeviceResource(c *gin.Context) {
 	s := service.DeviceResourceListService{}
-	if err := c.ShouldBindQuery(&s); err == nil {
-		id := c.Param("id")
-		_id, err := strconv.Atoi(id)
-		if err != nil {
-			c.JSON(200, serializer.ErrorResponse(err))
-			return
-		}
-		s.ID = uint(_id)
+	if err := c.ShouldBindJSON(&s); err == nil {
 		res := s.List()
 		c.JSON(200, res)
 	} else {

@@ -1,7 +1,7 @@
 package g
 
 import (
-	"github.com/wenchangshou2/vd-node-manage/common/Event"
+	"github.com/wenchangshou/vd-node-manage/common/Event"
 	"runtime"
 )
 

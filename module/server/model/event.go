@@ -1,18 +1,20 @@
 package model
 
 import (
-	"github.com/wenchangshou2/vd-node-manage/common/model"
+	"github.com/wenchangshou/vd-node-manage/common/model"
 	"gorm.io/gorm"
 )
 
 type Event struct {
 	gorm.Model
-	Name     string            `json:"name" gorm:"name"`
-	Active   bool              `gorm:"active" json:"active"`
-	DeviceID uint              `json:"deviceID" gorm:"deviceID"`
-	Action   model.EventAction `json:"action" gorm:"action"`
-	Status   model.EventStatus `json:"status" gorm:"status"`
-	Params   string            `json:"params" gorm:"params"`
+	Name       string            `json:"name" gorm:"name"`
+	Active     bool              `gorm:"active" json:"active"`
+	DeviceID   uint              `json:"deviceID" gorm:"deviceID"`
+	Action     model.EventAction `json:"action" gorm:"action"`
+	Status     model.EventStatus `json:"status" gorm:"status"`
+	ResourceId uint              `json:"resourceId" gorm:"resource"`
+	ProjectId  uint              `json:"projectID" gorm:"project_id"`
+	//Params   string            `json:"params" gorm:"params"`
 }
 
 func (e Event) TableName() string {

@@ -7,7 +7,6 @@ import (
 
 	"github.com/jinzhu/inflection"
 	"gorm.io/gorm/clause"
-	"gorm.io/gorm/utils"
 )
 
 // RelationshipType relationship type
@@ -78,6 +77,8 @@ func (schema *Schema) parseRelation(field *Field) *Relationship {
 		schema.buildPolymorphicRelation(relation, field, polymorphic)
 	} else if many2many := field.TagSettings["MANY2MANY"]; many2many != "" {
 		schema.buildMany2ManyRelation(relation, field, many2many)
+	} else if belongsTo := field.TagSettings["BELONGSTO"]; belongsTo != "" {
+		schema.guessRelation(relation, field, guessBelongs)
 	} else {
 		switch field.IndirectFieldType.Kind() {
 		case reflect.Struct:
@@ -85,7 +86,7 @@ func (schema *Schema) parseRelation(field *Field) *Relationship {
 		case reflect.Slice:
 			schema.guessRelation(relation, field, guessHas)
 		default:
-			schema.err = fmt.Errorf("unsupported data type %v for %v on field %v", relation.FieldSchema, schema, field.Name)
+			schema.err = fmt.Errorf("unsupported data type %v for %v on field %s", relation.FieldSchema, schema, field.Name)
 		}
 	}
 
@@ -143,11 +144,11 @@ func (schema *Schema) buildPolymorphicRelation(relation *Relationship, field *Fi
 	}
 
 	if relation.Polymorphic.PolymorphicType == nil {
-		schema.err = fmt.Errorf("invalid polymorphic type %v for %v on field %v, missing field %v", relation.FieldSchema, schema, field.Name, polymorphic+"Type")
+		schema.err = fmt.Errorf("invalid polymorphic type %v for %v on field %s, missing field %s", relation.FieldSchema, schema, field.Name, polymorphic+"Type")
 	}
 
 	if relation.Polymorphic.PolymorphicID == nil {
-		schema.err = fmt.Errorf("invalid polymorphic type %v for %v on field %v, missing field %v", relation.FieldSchema, schema, field.Name, polymorphic+"ID")
+		schema.err = fmt.Errorf("invalid polymorphic type %v for %v on field %s, missing field %s", relation.FieldSchema, schema, field.Name, polymorphic+"ID")
 	}
 
 	if schema.err == nil {
@@ -159,7 +160,7 @@ func (schema *Schema) buildPolymorphicRelation(relation *Relationship, field *Fi
 		primaryKeyField := schema.PrioritizedPrimaryField
 		if len(relation.foreignKeys) > 0 {
 			if primaryKeyField = schema.LookUpField(relation.foreignKeys[0]); primaryKeyField == nil || len(relation.foreignKeys) > 1 {
-				schema.err = fmt.Errorf("invalid polymorphic foreign keys %+v for %v on field %v", relation.foreignKeys, schema, field.Name)
+				schema.err = fmt.Errorf("invalid polymorphic foreign keys %+v for %v on field %s", relation.foreignKeys, schema, field.Name)
 			}
 		}
 
@@ -203,7 +204,7 @@ func (schema *Schema) buildMany2ManyRelation(relation *Relationship, field *Fiel
 			if field := schema.LookUpField(foreignKey); field != nil {
 				ownForeignFields = append(ownForeignFields, field)
 			} else {
-				schema.err = fmt.Errorf("invalid foreign key: %v", foreignKey)
+				schema.err = fmt.Errorf("invalid foreign key: %s", foreignKey)
 				return
 			}
 		}
@@ -215,7 +216,7 @@ func (schema *Schema) buildMany2ManyRelation(relation *Relationship, field *Fiel
 			if field := relation.FieldSchema.LookUpField(foreignKey); field != nil {
 				refForeignFields = append(refForeignFields, field)
 			} else {
-				schema.err = fmt.Errorf("invalid foreign key: %v", foreignKey)
+				schema.err = fmt.Errorf("invalid foreign key: %s", foreignKey)
 				return
 			}
 		}
@@ -238,7 +239,7 @@ func (schema *Schema) buildMany2ManyRelation(relation *Relationship, field *Fiel
 	}
 
 	for idx, relField := range refForeignFields {
-		joinFieldName := relation.FieldSchema.Name + relField.Name
+		joinFieldName := strings.Title(relation.FieldSchema.Name) + relField.Name
 		if len(joinReferences) > idx {
 			joinFieldName = strings.Title(joinReferences[idx])
 		}
@@ -379,7 +380,7 @@ func (schema *Schema) guessRelation(relation *Relationship, field *Field, cgl gu
 			schema.guessRelation(relation, field, guessEmbeddedHas)
 		// case guessEmbeddedHas:
 		default:
-			schema.err = fmt.Errorf("invalid field found for struct %v's field %v, need to define a valid foreign key for relations or it need to implement the Valuer/Scanner interface", schema, field.Name)
+			schema.err = fmt.Errorf("invalid field found for struct %v's field %s: define a valid foreign key for relations or implement the Valuer/Scanner interface", schema, field.Name)
 		}
 	}
 
@@ -405,14 +406,11 @@ func (schema *Schema) guessRelation(relation *Relationship, field *Field, cgl gu
 
 	if len(relation.foreignKeys) > 0 {
 		for _, foreignKey := range relation.foreignKeys {
-			ff := foreignSchema.LookUpField(foreignKey)
-			pf := primarySchema.LookUpField(foreignKey)
-			isKeySame := utils.ExistsIn(foreignKey, &relation.primaryKeys)
-			if ff == nil || (pf != nil && ff != nil && schema == primarySchema && primarySchema != foreignSchema && !isKeySame) {
+			if f := foreignSchema.LookUpField(foreignKey); f != nil {
+				foreignFields = append(foreignFields, f)
+			} else {
 				reguessOrErr()
 				return
-			} else {
-				foreignFields = append(foreignFields, ff)
 			}
 		}
 	} else {
@@ -521,7 +519,7 @@ func (rel *Relationship) ParseConstraint() *Constraint {
 
 	if rel.Type == BelongsTo {
 		for _, r := range rel.FieldSchema.Relationships.Relations {
-			if r.FieldSchema == rel.Schema && len(rel.References) == len(r.References) {
+			if r != rel && r.FieldSchema == rel.Schema && len(rel.References) == len(r.References) {
 				matched := true
 				for idx, ref := range r.References {
 					if !(rel.References[idx].PrimaryKey == ref.PrimaryKey && rel.References[idx].ForeignKey == ref.ForeignKey &&

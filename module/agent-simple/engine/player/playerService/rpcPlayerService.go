@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	playerRpc "github.com/wenchangshou2/vd-node-manage/module/agent-simple/engine/player/rpc"
+	playerRpc "github.com/wenchangshou/vd-node-manage/module/agent-simple/engine/player/rpc"
 	"google.golang.org/grpc"
 	"time"
 )

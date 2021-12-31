@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"github.com/denisbrodbeck/machineid"
 	"github.com/toolkits/file"
-	"github.com/wenchangshou2/vd-node-manage/common/safety"
+	"github.com/wenchangshou/vd-node-manage/common/safety"
 	"log"
 	"sync"
 )
@@ -41,7 +41,7 @@ func ParseHardware(cfg string) {
 	}
 	HardwareFile = cfg
 	hardwareContent, err := file.ToString(cfg)
-	hardwareContent= safety.Decrypt(key, string(hardwareContent))
+	hardwareContent = safety.Decrypt(key, string(hardwareContent))
 
 	if err != nil {
 		log.Fatalln("read hardware file:", cfg, "fail:", err)

@@ -3,8 +3,8 @@ package layout
 import (
 	"errors"
 	"fmt"
-	"github.com/wenchangshou2/vd-node-manage/common/model"
-	model2 "github.com/wenchangshou2/vd-node-manage/module/agent-simple/g/model"
+	"github.com/wenchangshou/vd-node-manage/common/model"
+	model2 "github.com/wenchangshou/vd-node-manage/module/agent-simple/g/model"
 	"github.com/wenchangshou2/zutil"
 	"sync"
 )

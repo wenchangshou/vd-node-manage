@@ -1,6 +1,6 @@
 package IService
 
-import "github.com/wenchangshou2/vd-node-manage/common/model"
+import "github.com/wenchangshou/vd-node-manage/common/model"
 
 type EventService interface {
 	QueryDeviceEvent(status model.EventStatus) ([]model.Event, error)

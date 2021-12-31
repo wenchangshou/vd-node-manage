@@ -4,11 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/wenchangshou2/vd-node-manage/common/cache"
-	"github.com/wenchangshou2/vd-node-manage/common/model"
-	"github.com/wenchangshou2/vd-node-manage/common/serializer"
-	"github.com/wenchangshou2/vd-node-manage/module/server/event"
-	model2 "github.com/wenchangshou2/vd-node-manage/module/server/model"
+	"github.com/wenchangshou/vd-node-manage/common/cache"
+	"github.com/wenchangshou/vd-node-manage/common/model"
+	"github.com/wenchangshou/vd-node-manage/common/serializer"
+	"github.com/wenchangshou/vd-node-manage/module/server/event"
+	model2 "github.com/wenchangshou/vd-node-manage/module/server/model"
 )
 
 // DeviceLayoutOpenService 打开设备布局服务

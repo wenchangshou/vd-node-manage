@@ -1,7 +1,7 @@
 package engine
 
 import (
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/dto"
+	"github.com/wenchangshou/vd-node-manage/module/agent-simple/dto"
 	"sync"
 )
 

@@ -7,11 +7,11 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/wenchangshou2/vd-node-manage/common/logging"
-	"github.com/wenchangshou2/vd-node-manage/common/model"
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/dto"
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/engine/executor"
-	IService "github.com/wenchangshou2/vd-node-manage/module/agent-simple/service"
+	"github.com/wenchangshou/vd-node-manage/common/logging"
+	"github.com/wenchangshou/vd-node-manage/common/model"
+	"github.com/wenchangshou/vd-node-manage/module/agent-simple/dto"
+	"github.com/wenchangshou/vd-node-manage/module/agent-simple/engine/executor"
+	IService "github.com/wenchangshou/vd-node-manage/module/agent-simple/service"
 )
 
 var ActionGroup map[int]*executor.IExecute

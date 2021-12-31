@@ -1,10 +1,9 @@
 package service
 
 import (
-	"encoding/json"
-	model2 "github.com/wenchangshou2/vd-node-manage/common/model"
-	"github.com/wenchangshou2/vd-node-manage/common/serializer"
-	"github.com/wenchangshou2/vd-node-manage/module/server/model"
+	model2 "github.com/wenchangshou/vd-node-manage/common/model"
+	"github.com/wenchangshou/vd-node-manage/common/serializer"
+	"github.com/wenchangshou/vd-node-manage/module/server/model"
 )
 
 // ResourceAddService 资源添加服务
@@ -68,18 +67,13 @@ func (service DeviceResourceAddService) Add() serializer.Response {
 		if rid, err = resource.Add(); err != nil {
 			return serializer.Err(serializer.CodeDBError, "添加资源失败", err)
 		}
-		params := make(map[string]interface{})
-		params["resource_id"] = rid
-		params["uri"] = resource.Uri
-		params["name"] = resource.Name
 		m := model.Event{
 			DeviceID: service.ID,
 			Active:   false,
 			Action:   model2.InstallResourceAction,
 			Status:   model2.Initializes,
 		}
-		b, _ := json.Marshal(params)
-		m.Params = string(b)
+		m.ResourceId = rid
 		if err = m.Add(); err != nil {
 			return serializer.Err(serializer.CodeDBError, "添加资源分发事件失败", err)
 		}

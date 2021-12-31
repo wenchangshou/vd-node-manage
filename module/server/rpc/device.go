@@ -2,11 +2,11 @@ package rpc
 
 import (
 	"fmt"
-	"github.com/wenchangshou2/vd-node-manage/common/cache"
-	"github.com/wenchangshou2/vd-node-manage/common/model"
-	"github.com/wenchangshou2/vd-node-manage/module/server/g"
-	model2 "github.com/wenchangshou2/vd-node-manage/module/server/model"
-	"github.com/wenchangshou2/vd-node-manage/module/server/service"
+	"github.com/wenchangshou/vd-node-manage/common/cache"
+	"github.com/wenchangshou/vd-node-manage/common/model"
+	"github.com/wenchangshou/vd-node-manage/module/server/g"
+	model2 "github.com/wenchangshou/vd-node-manage/module/server/model"
+	"github.com/wenchangshou/vd-node-manage/module/server/service"
 )
 
 // Register 设备注册
@@ -66,4 +66,8 @@ func (device *Device) AddDeviceResource(args *model.DeviceAddResourceRequest, _ 
 		ResourceID: args.ResourceID,
 	}
 	return dr.Add()
+}
+func (device Device) DeleteDeviceResource(args *model.DeviceDeleteResourceRequest, _ *model.SimpleRpcResponse) error {
+	err := model2.DeleteResourceByDeviceIdAndResourceId(args.ID, args.ResourceID)
+	return err
 }

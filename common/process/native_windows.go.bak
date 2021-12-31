@@ -8,7 +8,7 @@ import (
 	"syscall"
 	"unsafe"
 
-	"github.com/wenchangshou2/vd-client/src/pkg/logging"
+	"github.com/wenchangshou/vd-client/src/pkg/logging"
 
 	"github.com/pkg/errors"
 

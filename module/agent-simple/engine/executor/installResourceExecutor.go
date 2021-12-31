@@ -1,24 +1,26 @@
 package executor
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-	"path"
-
+	"github.com/cavaliercoder/grab"
 	"github.com/mitchellh/mapstructure"
-	"github.com/wenchangshou2/vd-node-manage/common/file"
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/g"
-	IService "github.com/wenchangshou2/vd-node-manage/module/agent-simple/service"
+	"github.com/wenchangshou/vd-node-manage/common/model"
+	"github.com/wenchangshou/vd-node-manage/module/agent-simple/g"
+	IService "github.com/wenchangshou/vd-node-manage/module/agent-simple/service"
+	"github.com/wenchangshou2/zutil"
+	"path"
+	"time"
 )
 
 type InstallResourceExecutor struct {
-	Option         InstallResourceOption
-	HttpRequestUri string
-	eventService   IService.EventService
-	DeviceService  IService.DeviceService
-	Mac            string
-	taskID         uint
+	HttpRequestUri  string
+	eventService    IService.EventService
+	DeviceService   IService.DeviceService
+	Mac             string
+	taskID          uint
+	ResourceService IService.ResourceService
+	Resource        *model.ResourceInfo
 }
 type InstallResourceOption struct {
 	ResourceID uint   `json:"resource_id"`
@@ -26,31 +28,42 @@ type InstallResourceOption struct {
 	Uri        string `json:"uri"`
 }
 
+func (executor *InstallResourceExecutor) download(uri, dstPath string) error {
+	client := grab.NewClient()
+	req, _ := grab.NewRequest(dstPath, uri)
+	resp := client.Do(req)
+	t := time.NewTicker(500 * time.Millisecond)
+loop:
+	for {
+		select {
+		case <-t.C:
+			fmt.Printf("  transferred %v / %v bytes (%.2f%%)\n",
+				resp.BytesComplete(),
+				resp.Size,
+				100*resp.Progress())
+		case <-resp.Done:
+			break loop
+		}
+	}
+	if err := resp.Err(); err != nil {
+		return err
+	}
+	fmt.Printf("Download saved to ./%v \n", resp.Filename)
+	return nil
+}
 func (executor *InstallResourceExecutor) Execute() error {
 	cfg := g.Config()
-	//requestUrl := "http://" + executor.HttpRequestUri + "/" + executor.Option.Uri
+
 	dstPath := path.Join(cfg.Resource.Directory, "resource/")
-	err := file.DownloadFile(executor.Option.Uri, dstPath, fmt.Sprintf("%d-%s", executor.Option.ResourceID, executor.Option.Name), func(length, downLen int64) {
-		fmt.Printf("download:len:%d,downLen:%d\n", length, downLen)
-	})
+	dstPath = path.Join(dstPath, fmt.Sprintf("%d-%s", executor.Resource.ID, executor.Resource.Name))
+	zutil.IsExistDelete(dstPath)
+	err := executor.download(executor.Resource.Uri, dstPath)
 	if err != nil {
 		return fmt.Errorf("%s:%v", "下载文件失败", err)
 	}
-	if err = executor.DeviceService.AddComputerResource(executor.Option.ResourceID); err != nil {
+	if err = executor.DeviceService.AddComputerResource(executor.Resource.ID); err != nil {
 		return errors.New("添加设备资源失败:" + err.Error())
 	}
-	fmt.Println("err", err)
-	//if err != nil {
-	//executor.eventService.SetTaskItemStatus([]uint{executor.taskID}, ERROR)
-	//executor.NotifyEvent(executor.TaskID, ERROR, "下载文件失败")
-	//return err
-	//}
-	//err = executor.computerService.AddDeviceResource(executor.Option.ID)
-	//if err != nil {
-	//executor.eventService.SetTaskItemStatus([]uint{executor.taskID}, ERROR)
-	//return err
-	//}
-	//executor.eventService.SetTaskItemStatus([]uint{executor.taskID}, DONE)
 	return nil
 }
 
@@ -58,8 +71,7 @@ func (executor *InstallResourceExecutor) Cancel() error {
 	return nil
 }
 func (executor *InstallResourceExecutor) Verification(option string) bool {
-	err := json.Unmarshal([]byte(option), &executor.Option)
-	return err == nil
+	return true
 }
 
 // BindOption  检验任务参数
@@ -75,6 +87,5 @@ func (executor *InstallResourceExecutor) BindOption(option interface{}) error {
 	if err != nil {
 		return err
 	}
-	executor.Option = output
 	return nil
 }

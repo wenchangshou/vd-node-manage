@@ -3,8 +3,8 @@ package engine
 import (
 	"context"
 
-	"github.com/wenchangshou2/vd-node-manage/common/model"
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/engine/executor"
+	"github.com/wenchangshou/vd-node-manage/common/model"
+	"github.com/wenchangshou/vd-node-manage/module/agent-simple/engine/executor"
 )
 
 type EventExecuteManage struct {
@@ -24,21 +24,18 @@ func NewEventExecuteManage(event model.Event, ctx context.Context, exec executor
 	return t
 }
 func (task *EventExecuteManage) loop() {
-	select {
-	case <-task.ctx.Done():
-		task.statusChan <- executor.CANCEL
-	}
+	<-task.ctx.Done()
+	task.statusChan <- executor.CANCEL
 }
 func (task *EventExecuteManage) execute() {
 	e := task.event
-	execFunc, err := task.generator(e.Action, e.ID, e.Params)
+	execFunc, err := task.generator(e)
 	if err != nil {
 		task.statusChan <- model.Error
 		return
 	}
 	if err = execFunc.Execute(); err != nil {
 		task.statusChan <- model.Error
-
 		return
 	}
 	task.statusChan <- model.Done

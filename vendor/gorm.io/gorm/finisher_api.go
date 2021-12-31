@@ -79,7 +79,7 @@ func (db *DB) Save(value interface{}) (tx *DB) {
 		if _, ok := tx.Statement.Clauses["ON CONFLICT"]; !ok {
 			tx = tx.Clauses(clause.OnConflict{UpdateAll: true})
 		}
-		tx = tx.callbacks.Create().Execute(tx.InstanceSet("gorm:update_track_time", true))
+		tx = tx.callbacks.Create().Execute(tx.Set("gorm:update_track_time", true))
 	case reflect.Struct:
 		if err := tx.Statement.Parse(value); err == nil && tx.Statement.Schema != nil {
 			for _, pf := range tx.Statement.Schema.PrimaryFields {
@@ -101,7 +101,7 @@ func (db *DB) Save(value interface{}) (tx *DB) {
 
 		if tx.Error == nil && tx.RowsAffected == 0 && !tx.DryRun && !selectedUpdate {
 			result := reflect.New(tx.Statement.Schema.ModelType).Interface()
-			if err := tx.Session(&Session{}).First(result).Error; errors.Is(err, ErrRecordNotFound) {
+			if err := tx.Session(&Session{}).Take(result).Error; errors.Is(err, ErrRecordNotFound) {
 				return tx.Create(value)
 			}
 		}
@@ -190,16 +190,17 @@ func (db *DB) FindInBatches(dest interface{}, batchSize int, fc func(tx *DB, bat
 
 		if tx.Error != nil || int(result.RowsAffected) < batchSize {
 			break
-		} else {
-			resultsValue := reflect.Indirect(reflect.ValueOf(dest))
-			if result.Statement.Schema.PrioritizedPrimaryField == nil {
-				tx.AddError(ErrPrimaryKeyRequired)
-				break
-			} else {
-				primaryValue, _ := result.Statement.Schema.PrioritizedPrimaryField.ValueOf(resultsValue.Index(resultsValue.Len() - 1))
-				queryDB = tx.Clauses(clause.Gt{Column: clause.Column{Table: clause.CurrentTable, Name: clause.PrimaryKey}, Value: primaryValue})
-			}
 		}
+
+		// Optimize for-break
+		resultsValue := reflect.Indirect(reflect.ValueOf(dest))
+		if result.Statement.Schema.PrioritizedPrimaryField == nil {
+			tx.AddError(ErrPrimaryKeyRequired)
+			break
+		}
+
+		primaryValue, _ := result.Statement.Schema.PrioritizedPrimaryField.ValueOf(resultsValue.Index(resultsValue.Len() - 1))
+		queryDB = tx.Clauses(clause.Gt{Column: clause.Column{Table: clause.CurrentTable, Name: clause.PrimaryKey}, Value: primaryValue})
 	}
 
 	tx.RowsAffected = rowsAffected
@@ -284,44 +285,44 @@ func (db *DB) FirstOrCreate(dest interface{}, conds ...interface{}) (tx *DB) {
 	queryTx := db.Limit(1).Order(clause.OrderByColumn{
 		Column: clause.Column{Table: clause.CurrentTable, Name: clause.PrimaryKey},
 	})
-
-	if tx = queryTx.Find(dest, conds...); queryTx.RowsAffected == 0 {
-		if c, ok := tx.Statement.Clauses["WHERE"]; ok {
-			if where, ok := c.Expression.(clause.Where); ok {
-				tx.assignInterfacesToValue(where.Exprs)
-			}
-		}
-
-		// initialize with attrs, conds
-		if len(tx.Statement.attrs) > 0 {
-			tx.assignInterfacesToValue(tx.Statement.attrs...)
-		}
-
-		// initialize with attrs, conds
-		if len(tx.Statement.assigns) > 0 {
-			tx.assignInterfacesToValue(tx.Statement.assigns...)
-		}
-
-		return tx.Create(dest)
-	} else if len(db.Statement.assigns) > 0 {
-		exprs := tx.Statement.BuildCondition(tx.Statement.assigns[0], tx.Statement.assigns[1:]...)
-		assigns := map[string]interface{}{}
-		for _, expr := range exprs {
-			if eq, ok := expr.(clause.Eq); ok {
-				switch column := eq.Column.(type) {
-				case string:
-					assigns[column] = eq.Value
-				case clause.Column:
-					assigns[column.Name] = eq.Value
-				default:
+	if tx = queryTx.Find(dest, conds...); tx.Error == nil {
+		if tx.RowsAffected == 0 {
+			if c, ok := tx.Statement.Clauses["WHERE"]; ok {
+				if where, ok := c.Expression.(clause.Where); ok {
+					tx.assignInterfacesToValue(where.Exprs)
 				}
 			}
+
+			// initialize with attrs, conds
+			if len(tx.Statement.attrs) > 0 {
+				tx.assignInterfacesToValue(tx.Statement.attrs...)
+			}
+
+			// initialize with attrs, conds
+			if len(tx.Statement.assigns) > 0 {
+				tx.assignInterfacesToValue(tx.Statement.assigns...)
+			}
+
+			return tx.Create(dest)
+		} else if len(db.Statement.assigns) > 0 {
+			exprs := tx.Statement.BuildCondition(db.Statement.assigns[0], db.Statement.assigns[1:]...)
+			assigns := map[string]interface{}{}
+			for _, expr := range exprs {
+				if eq, ok := expr.(clause.Eq); ok {
+					switch column := eq.Column.(type) {
+					case string:
+						assigns[column] = eq.Value
+					case clause.Column:
+						assigns[column.Name] = eq.Value
+					default:
+					}
+				}
+			}
+
+			return tx.Model(dest).Updates(assigns)
 		}
-
-		return tx.Model(dest).Updates(assigns)
 	}
-
-	return db
+	return tx
 }
 
 // Update update attributes with callbacks, refer: https://gorm.io/docs/update.html#Update-Changed-Fields
@@ -375,21 +376,21 @@ func (db *DB) Count(count *int64) (tx *DB) {
 
 	if selectClause, ok := db.Statement.Clauses["SELECT"]; ok {
 		defer func() {
-			db.Statement.Clauses["SELECT"] = selectClause
+			tx.Statement.Clauses["SELECT"] = selectClause
 		}()
 	} else {
 		defer delete(tx.Statement.Clauses, "SELECT")
 	}
 
 	if len(tx.Statement.Selects) == 0 {
-		tx.Statement.AddClause(clause.Select{Expression: clause.Expr{SQL: "count(1)"}})
+		tx.Statement.AddClause(clause.Select{Expression: clause.Expr{SQL: "count(*)"}})
 	} else if !strings.HasPrefix(strings.TrimSpace(strings.ToLower(tx.Statement.Selects[0])), "count(") {
-		expr := clause.Expr{SQL: "count(1)"}
+		expr := clause.Expr{SQL: "count(*)"}
 
 		if len(tx.Statement.Selects) == 1 {
 			dbName := tx.Statement.Selects[0]
 			fields := strings.FieldsFunc(dbName, utils.IsValidDBNameChar)
-			if len(fields) == 1 || (len(fields) == 3 && strings.ToUpper(fields[1]) == "AS") {
+			if len(fields) == 1 || (len(fields) == 3 && (strings.ToUpper(fields[1]) == "AS" || fields[1] == ".")) {
 				if tx.Statement.Parse(tx.Statement.Model) == nil {
 					if f := tx.Statement.Schema.LookUpField(dbName); f != nil {
 						dbName = f.DBName
@@ -398,7 +399,7 @@ func (db *DB) Count(count *int64) (tx *DB) {
 
 				if tx.Statement.Distinct {
 					expr = clause.Expr{SQL: "COUNT(DISTINCT(?))", Vars: []interface{}{clause.Column{Name: dbName}}}
-				} else {
+				} else if dbName != "*" {
 					expr = clause.Expr{SQL: "COUNT(?)", Vars: []interface{}{clause.Column{Name: dbName}}}
 				}
 			}
@@ -409,23 +410,25 @@ func (db *DB) Count(count *int64) (tx *DB) {
 
 	if orderByClause, ok := db.Statement.Clauses["ORDER BY"]; ok {
 		if _, ok := db.Statement.Clauses["GROUP BY"]; !ok {
-			delete(db.Statement.Clauses, "ORDER BY")
+			delete(tx.Statement.Clauses, "ORDER BY")
 			defer func() {
-				db.Statement.Clauses["ORDER BY"] = orderByClause
+				tx.Statement.Clauses["ORDER BY"] = orderByClause
 			}()
 		}
 	}
 
 	tx.Statement.Dest = count
 	tx = tx.callbacks.Query().Execute(tx)
-	if tx.RowsAffected != 1 {
+
+	if _, ok := db.Statement.Clauses["GROUP BY"]; ok || tx.RowsAffected != 1 {
 		*count = tx.RowsAffected
 	}
+
 	return
 }
 
 func (db *DB) Row() *sql.Row {
-	tx := db.getInstance().InstanceSet("rows", false)
+	tx := db.getInstance().Set("rows", false)
 	tx = tx.callbacks.Row().Execute(tx)
 	row, ok := tx.Statement.Dest.(*sql.Row)
 	if !ok && tx.DryRun {
@@ -435,7 +438,7 @@ func (db *DB) Row() *sql.Row {
 }
 
 func (db *DB) Rows() (*sql.Rows, error) {
-	tx := db.getInstance().InstanceSet("rows", true)
+	tx := db.getInstance().Set("rows", true)
 	tx = tx.callbacks.Row().Execute(tx)
 	rows, ok := tx.Statement.Dest.(*sql.Rows)
 	if !ok && tx.DryRun && tx.Error == nil {
@@ -453,9 +456,7 @@ func (db *DB) Scan(dest interface{}) (tx *DB) {
 	tx = db.getInstance()
 	tx.Config = &config
 
-	if rows, err := tx.Rows(); err != nil {
-		tx.AddError(err)
-	} else {
+	if rows, err := tx.Rows(); err == nil {
 		defer rows.Close()
 		if rows.Next() {
 			tx.ScanRows(rows, dest)
@@ -473,7 +474,7 @@ func (db *DB) Scan(dest interface{}) (tx *DB) {
 
 // Pluck used to query single column from a model as a map
 //     var ages []int64
-//     db.Find(&users).Pluck("age", &ages)
+//     db.Model(&users).Pluck("age", &ages)
 func (db *DB) Pluck(column string, dest interface{}) (tx *DB) {
 	tx = db.getInstance()
 	if tx.Statement.Model != nil {
@@ -482,8 +483,6 @@ func (db *DB) Pluck(column string, dest interface{}) (tx *DB) {
 				column = f.DBName
 			}
 		}
-	} else if tx.Statement.Table == "" {
-		tx.AddError(ErrModelValueRequired)
 	}
 
 	if len(tx.Statement.Selects) != 1 {
@@ -505,9 +504,14 @@ func (db *DB) ScanRows(rows *sql.Rows, dest interface{}) error {
 	tx.Statement.Dest = dest
 	tx.Statement.ReflectValue = reflect.ValueOf(dest)
 	for tx.Statement.ReflectValue.Kind() == reflect.Ptr {
-		tx.Statement.ReflectValue = tx.Statement.ReflectValue.Elem()
+		elem := tx.Statement.ReflectValue.Elem()
+		if !elem.IsValid() {
+			elem = reflect.New(tx.Statement.ReflectValue.Type().Elem())
+			tx.Statement.ReflectValue.Set(elem)
+		}
+		tx.Statement.ReflectValue = elem
 	}
-	Scan(rows, tx, true)
+	Scan(rows, tx, ScanInitialized)
 	return tx.Error
 }
 

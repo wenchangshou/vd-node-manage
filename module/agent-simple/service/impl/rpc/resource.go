@@ -1,11 +1,31 @@
 package rpc
 
-import "github.com/wenchangshou2/vd-node-manage/common/model"
+import (
+	"github.com/wenchangshou/vd-node-manage/common/model"
+	"github.com/wenchangshou/vd-node-manage/module/agent-simple/g"
+)
 
 type ResourceRpcService struct {
+	ID     uint
+	Client *g.SingleConnRpcClient
 }
 
-func (resource ResourceRpcService) QueryResource(_ uint) (*model.ResourceInfo, error) {
-	return nil, nil
+func (service ResourceRpcService) QueryResource(id uint) (*model.ResourceInfo, error) {
+	var (
+		err error
+	)
+	req := model.ResourceQueryRequest{ID: id}
+	reply := model.ResourceQueryResponse{}
+	if err = service.Client.Call("Resource.Query", &req, &reply); err != nil {
+		return nil, err
+	}
 
+	return &reply.Resource, nil
+
+}
+func NewResourceRpcService(id uint, client *g.SingleConnRpcClient) *ResourceRpcService {
+	return &ResourceRpcService{
+		ID:     id,
+		Client: client,
+	}
 }

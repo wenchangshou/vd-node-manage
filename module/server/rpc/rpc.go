@@ -1,7 +1,7 @@
 package rpc
 
 import (
-	"github.com/wenchangshou2/vd-node-manage/module/server/g"
+	"github.com/wenchangshou/vd-node-manage/module/server/g"
 	"log"
 	"net"
 	"net/rpc"

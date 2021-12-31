@@ -1,8 +1,8 @@
 package rpc
 
 import (
-	"github.com/wenchangshou2/vd-node-manage/common/model"
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/g"
+	"github.com/wenchangshou/vd-node-manage/common/model"
+	"github.com/wenchangshou/vd-node-manage/module/agent-simple/g"
 )
 
 type EventRpcService struct {

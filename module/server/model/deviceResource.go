@@ -5,9 +5,9 @@ import "gorm.io/gorm"
 // DeviceResource 设备资源
 type DeviceResource struct {
 	gorm.Model
-	DeviceID   uint     `json:"device_id"`
-	ResourceID uint     `json:"_"`
-	Resource   Resource `gorm:"ForeignKey:ResourceID;AssociationForeignKey:ID"`
+	DeviceID   uint `json:"device_id"`
+	ResourceID uint `json:"_"`
+	Resource   Resource
 }
 
 func (dr DeviceResource) TableName() string {
@@ -36,6 +36,13 @@ func GetDeviceResources(deviceID uint, resourceIDS []uint) ([]DeviceResource, er
 	return res, err
 }
 
+// GetDeviceResource 通过设备id和资源id来检索资源
+func GetDeviceResource(deviceID uint, resourceId uint) (DeviceResource, error) {
+	var res DeviceResource
+	err := DB.Model(&DeviceResource{}).Where("device_id=? AND resource_id =? ", deviceID, resourceId).Preload("Resource").First(&res).Error
+	return res, err
+}
+
 func GetDeviceResourcesByDeviceID(deviceID uint) ([]DeviceResource, error) {
 	var res []DeviceResource
 	err := DB.Model(&DeviceResource{}).Where("device_id=?", deviceID).Preload("Resource").Find(&res).Error
@@ -46,4 +53,7 @@ func GetDeviceResourcesByDeviceID(deviceID uint) ([]DeviceResource, error) {
 func DeleteDeviceResource(deviceID uint) error {
 	r := DeviceResource{}
 	return DB.Delete(&r, "device_id=?", deviceID).Error
+}
+func DeleteResourceByDeviceIdAndResourceId(deviceID uint, resourceID uint) error {
+	return DB.Where("device_id = ? and resource_id = ?", deviceID, resourceID).Delete(&DeviceResource{}).Error
 }

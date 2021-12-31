@@ -2,15 +2,14 @@ package logging
 
 import (
 	"fmt"
-	"net/url"
-	"os"
-	"path"
-	"time"
-
 	"github.com/wenchangshou2/zutil"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
+	"net/url"
+	"os"
+	"path"
+	"time"
 )
 
 type logging struct {

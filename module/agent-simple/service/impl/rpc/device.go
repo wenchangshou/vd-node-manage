@@ -1,8 +1,8 @@
 package rpc
 
 import (
-	"github.com/wenchangshou2/vd-node-manage/common/model"
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/g"
+	"github.com/wenchangshou/vd-node-manage/common/model"
+	"github.com/wenchangshou/vd-node-manage/module/agent-simple/g"
 )
 
 type DeviceRpcService struct {
@@ -48,7 +48,14 @@ func (service DeviceRpcService) AddComputerResource(resourceID uint) error {
 	}
 	return nil
 }
-func (service DeviceRpcService) DeleteComputerResource(_ uint) error {
+func (service DeviceRpcService) DeleteComputerResource(id uint) error {
+
+	req := model.DeviceDeleteResourceRequest{ResourceID: id, ID: service.ID}
+	reply := model.SimpleRpcResponse{}
+	err := service.Client.Call("Device.DeleteDeviceResource", &req, &reply)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

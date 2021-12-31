@@ -6,12 +6,12 @@ import (
 )
 
 func TestControlPlayer(t *testing.T) {
-	s := RpcPlayerService{port: 14318}
-	payload, err := s.Control("{\"Action\":\"play\"}")
+	s := RpcPlayerService{port: 8888}
+	payload, err := s.Control("{\"Action\":\"goPage\"}")
 	fmt.Println(payload, err)
 }
 func TestGetPlayerArguments(t *testing.T) {
-	s := RpcPlayerService{port: 1190}
+	s := RpcPlayerService{port: 8888}
 	payload, err := s.Get()
 	fmt.Println(payload, err)
 }

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/go-resty/resty/v2"
 	"github.com/pkg/errors"
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/dto"
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/pkg2/e"
+	"github.com/wenchangshou/vd-node-manage/common/model"
+	"github.com/wenchangshou/vd-node-manage/module/agent-simple/dto"
 	"net/http"
 )
 
@@ -16,7 +16,7 @@ type TaskHttpService struct {
 }
 
 func (t TaskHttpService) SetTaskItemStatus(ids []uint, status int) error {
-	rtu := e.HttpBaseData{}
+	rtu := model.HttpBaseData{}
 	client := resty.New()
 	requestUri := t.GetUrl(t.Address, "task")
 	resp, err := client.R().SetBody(map[string]interface{}{
@@ -34,7 +34,7 @@ func (t TaskHttpService) SetTaskItemStatus(ids []uint, status int) error {
 
 // SetTaskStatus 设置任务状态
 func (t TaskHttpService) SetTaskStatus(ids []uint, status int) error {
-	rtu := e.HttpBaseData{}
+	rtu := model.HttpBaseData{}
 	client := resty.New()
 	requestUri := t.GetUrl(t.Address, "task")
 	resp, err := client.R().SetBody(map[string]interface{}{

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	model2 "github.com/wenchangshou2/vd-node-manage/common/model"
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/dto"
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/g"
+	model2 "github.com/wenchangshou/vd-node-manage/common/model"
+	"github.com/wenchangshou/vd-node-manage/module/agent-simple/dto"
+	"github.com/wenchangshou/vd-node-manage/module/agent-simple/g"
 )
 
 type TaskRpcService struct {

@@ -126,13 +126,11 @@ func writeStack(w io.Writer) {
 			break
 		}
 		fmt.Fprint(w, prefixf(prefix, "%s:%d", frame.File, frame.Line))
-		if strings.HasSuffix(frame.File, ".go") {
-			stmt, err := sg.Get(frame.File, frame.Line)
-			if err != nil {
-				fmt.Fprint(w, prefixf(prefix+prefix, "<%s>", err))
-			} else {
-				fmt.Fprint(w, prefixf(prefix+prefix, "%s", stmt))
-			}
+		stmt, err := sg.Get(frame.File, frame.Line)
+		if err != nil {
+			fmt.Fprint(w, prefixf(prefix+prefix, "<%s>", err))
+		} else {
+			fmt.Fprint(w, prefixf(prefix+prefix, "%s", stmt))
 		}
 		if !more {
 			// There are no more callers.

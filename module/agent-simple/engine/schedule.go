@@ -4,16 +4,16 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/wenchangshou2/vd-node-manage/common/cache"
+	"github.com/wenchangshou/vd-node-manage/common/cache"
 	"time"
 
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/engine/layout"
+	"github.com/wenchangshou/vd-node-manage/module/agent-simple/engine/layout"
 
-	"github.com/wenchangshou2/vd-node-manage/common/Event"
-	"github.com/wenchangshou2/vd-node-manage/common/logging"
-	"github.com/wenchangshou2/vd-node-manage/common/model"
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/g"
-	IService "github.com/wenchangshou2/vd-node-manage/module/agent-simple/service"
+	"github.com/wenchangshou/vd-node-manage/common/Event"
+	"github.com/wenchangshou/vd-node-manage/common/logging"
+	"github.com/wenchangshou/vd-node-manage/common/model"
+	"github.com/wenchangshou/vd-node-manage/module/agent-simple/g"
+	IService "github.com/wenchangshou/vd-node-manage/module/agent-simple/service"
 )
 
 // Schedule 全局执行
@@ -33,7 +33,7 @@ type Schedule struct {
 	layoutManage   layout.IManage
 }
 
-// 查询是否有新的分发任务
+// queryTask 查询是否有新的分发任务
 func (schedule Schedule) queryTask() {
 	var (
 		events []model.Event
@@ -147,7 +147,7 @@ func (schedule *Schedule) DeviceEvent(_ string, message []byte) (err error) {
 		return nil
 	}
 	b, _ := json.Marshal(reply)
-	schedule.redisClient.Publish(fmt.Sprintf("server"), string(b))
+	schedule.redisClient.Publish("server", string(b))
 	return nil
 }
 func (schedule *Schedule) Start() {

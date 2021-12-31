@@ -1,20 +1,27 @@
 package executor
 
 import (
+	"fmt"
+	"github.com/wenchangshou/vd-node-manage/common/model"
+	IService "github.com/wenchangshou/vd-node-manage/module/agent-simple/service"
 	"path"
 
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/g"
+	"github.com/wenchangshou/vd-node-manage/module/agent-simple/g"
 	"github.com/wenchangshou2/zutil"
 )
 
 type DeleteResourceExecutor struct {
-	Option DeleteOption
+	Resource        *model.ResourceInfo
+	DeviceService   IService.DeviceService
+	eventService    IService.EventService
+	ResourceService IService.ResourceService
 }
 
 func (executor *DeleteResourceExecutor) Execute() error {
 	cfg := g.Config()
-	resourcePath := path.Join(cfg.Resource.Directory, "resource", executor.Option.File.GetResourcePath())
+	resourcePath := path.Join(cfg.Resource.Directory, "resource", fmt.Sprintf("%d-%s", executor.Resource.ID, executor.Resource.Name))
 	zutil.IsExistDelete(resourcePath)
+	executor.DeviceService.DeleteComputerResource(executor.Resource.ID)
 	return nil
 	//return executor.ComputerService.DeleteComputerResource(executor.Option.ID)
 }

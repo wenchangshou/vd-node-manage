@@ -1,6 +1,6 @@
 package dto
 
-import "github.com/wenchangshou2/vd-node-manage/common/model"
+import "github.com/wenchangshou/vd-node-manage/common/model"
 
 //Task 任务栏
 type Task struct {

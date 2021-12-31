@@ -1,6 +1,6 @@
 package vo
 
-import "github.com/wenchangshou2/vd-node-manage/module/server/model"
+import "github.com/wenchangshou/vd-node-manage/module/server/model"
 
 type DeviceVo struct {
 	ID       uint   `json:"id"`

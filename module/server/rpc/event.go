@@ -1,11 +1,10 @@
 package rpc
 
 import (
-	"encoding/json"
 	"errors"
 
-	"github.com/wenchangshou2/vd-node-manage/common/model"
-	model2 "github.com/wenchangshou2/vd-node-manage/module/server/model"
+	"github.com/wenchangshou/vd-node-manage/common/model"
+	model2 "github.com/wenchangshou/vd-node-manage/module/server/model"
 )
 
 // Query 检测事件
@@ -23,16 +22,16 @@ func (event Event) Query(args *model.QueryDeviceEventRequest, reply *model.Query
 	}
 	events2 := make([]model.Event, 0)
 	for _, event := range events {
-		p := make(map[string]interface{})
-		json.Unmarshal([]byte(event.Params), &p)
+
 		_e := model.Event{
-			ID:       event.ID,
-			Name:     event.Name,
-			Active:   event.Active,
-			DeviceID: event.DeviceID,
-			Action:   event.Action,
-			Status:   event.Status,
-			Params:   p,
+			ID:         event.ID,
+			Name:       event.Name,
+			Active:     event.Active,
+			DeviceID:   event.DeviceID,
+			Action:     event.Action,
+			Status:     event.Status,
+			ResourceId: event.ResourceId,
+			ProjectId:  event.ProjectId,
 		}
 		events2 = append(events2, _e)
 	}

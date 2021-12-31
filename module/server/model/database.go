@@ -3,7 +3,7 @@ package model
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/wenchangshou2/vd-node-manage/module/server/g"
+	"github.com/wenchangshou/vd-node-manage/module/server/g"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -39,7 +39,7 @@ func InitDatabase() {
 	if err != nil {
 		log.Fatalln("Unable to connect to the database", "err", err)
 	}
-	DB = db
+	DB = db.Debug()
 	err = migration()
 	if err != nil {
 		log.Fatalln("migration db error", "error", err)

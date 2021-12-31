@@ -12,21 +12,23 @@ const (
 	WAITING
 )
 const (
-	InstallProjectAction EventAction = iota
+	UnknownAction EventAction = iota
 	InstallResourceAction
+	InstallProjectAction
 	UpgradeProjectAction
 	DeleteResource
 	DeleteProject
 )
 
 type Event struct {
-	ID       uint                   `json:"id"`
-	Name     string                 `json:"name"`
-	Active   bool                   `json:"active"`
-	DeviceID uint                   `json:"deviceID"`
-	Action   EventAction            `json:"action" `
-	Status   EventStatus            `json:"status" `
-	Params   map[string]interface{} `json:"params" `
+	ID         uint        `json:"id"`
+	Name       string      `json:"name"`
+	Active     bool        `json:"active"`
+	DeviceID   uint        `json:"deviceID"`
+	Action     EventAction `json:"action" `
+	Status     EventStatus `json:"status" `
+	ProjectId  uint        `json:"projectId"`
+	ResourceId uint        `json:"resourceId"`
 }
 
 type QueryDeviceEventRequest struct {

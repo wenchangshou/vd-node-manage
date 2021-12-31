@@ -3,9 +3,9 @@ package http
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/wenchangshou2/vd-node-manage/common/model"
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/g"
-	model2 "github.com/wenchangshou2/vd-node-manage/module/agent-simple/g/model"
+	"github.com/wenchangshou/vd-node-manage/common/model"
+	"github.com/wenchangshou/vd-node-manage/module/agent-simple/g"
+	model2 "github.com/wenchangshou/vd-node-manage/module/agent-simple/g/model"
 	"io/ioutil"
 	"log"
 	"net/http"

@@ -1,5 +1,0 @@
-package layout
-
-func init() {
-
-}

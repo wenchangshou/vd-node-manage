@@ -3,18 +3,15 @@ package service
 import (
 	"errors"
 	"github.com/google/uuid"
-	model2 "github.com/wenchangshou2/vd-node-manage/common/model"
-	"github.com/wenchangshou2/vd-node-manage/common/serializer"
-	"github.com/wenchangshou2/vd-node-manage/module/server/model"
-	"github.com/wenchangshou2/vd-node-manage/module/server/vo"
+	model2 "github.com/wenchangshou/vd-node-manage/common/model"
+	"github.com/wenchangshou/vd-node-manage/common/serializer"
+	"github.com/wenchangshou/vd-node-manage/module/server/model"
+	"github.com/wenchangshou/vd-node-manage/module/server/vo"
 )
 
 type DeviceListService struct {
 	Page     int `json:"page" binding:"min=1,required" form:"page"`
 	PageSize int `json:"pageSize" binding:"min=1,required" form:"pageSize"`
-	//OrderBy    string            `json:"order_by"`
-	//Conditions map[string]string `form:"conditions"`
-	//Searches   map[string]string `form:"searches"`
 }
 
 func (service *DeviceListService) List() serializer.Response {
@@ -28,7 +25,6 @@ func (service *DeviceListService) List() serializer.Response {
 	for _, d := range res {
 		rtu = append(rtu, vo.DeviceDoToVo(&d))
 	}
-
 	return serializer.Response{Data: map[string]interface{}{
 		"total": total,
 		"items": rtu,

@@ -1,8 +1,8 @@
 package layout
 
 import (
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/engine/player"
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/g/model"
+	"github.com/wenchangshou/vd-node-manage/module/agent-simple/engine/player"
+	"github.com/wenchangshou/vd-node-manage/module/agent-simple/g/model"
 	"sync"
 )
 

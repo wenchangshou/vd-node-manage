@@ -2,15 +2,15 @@ package player
 
 import (
 	"fmt"
-	"github.com/wenchangshou2/vd-node-manage/common/logging"
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/engine/player/playerService"
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/g/model"
+	"github.com/wenchangshou/vd-node-manage/common/logging"
+	"github.com/wenchangshou/vd-node-manage/module/agent-simple/engine/player/playerService"
+	"github.com/wenchangshou/vd-node-manage/module/agent-simple/g/model"
 	"path"
 	"sync"
 	"time"
 
-	"github.com/wenchangshou2/vd-node-manage/common/process"
-	"github.com/wenchangshou2/vd-node-manage/module/agent-simple/g"
+	"github.com/wenchangshou/vd-node-manage/common/process"
+	"github.com/wenchangshou/vd-node-manage/module/agent-simple/g"
 	"github.com/wenchangshou2/zutil"
 )
 
@@ -37,10 +37,10 @@ func (player *ResourcePlayer) Control(body string) (string, error) {
 	return player.service.Control(body)
 }
 func (player *ResourcePlayer) Loop() {
-	d := time.Tick(time.Second)
+	d := time.NewTicker(time.Second)
 	for {
 		select {
-		case <-d:
+		case <-d.C:
 			if info, err := player.service.Get(); err == nil {
 				player.info = info
 			}

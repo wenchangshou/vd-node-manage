@@ -8,8 +8,8 @@ import (
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	"github.com/julienschmidt/httprouter"
-	"github.com/wenchangshou2/vd-node-manage/module/server/g"
-	"github.com/wenchangshou2/vd-node-manage/module/server/http/controllers"
+	"github.com/wenchangshou/vd-node-manage/module/server/g"
+	"github.com/wenchangshou/vd-node-manage/module/server/http/controllers"
 )
 
 var router *httprouter.Router
@@ -34,8 +34,7 @@ func InitRouter() *gin.Engine {
 			device.GET("/:id", controllers.GetDevice)
 			device.POST("/register", controllers.RegisterDevice)
 			device.POST("/:id/resource", controllers.AddDeviceResource)
-			device.GET("/:id/resource", controllers.ListDeviceResource)
-
+			device.DELETE("/:id/resource/:resource_id", controllers.DeleteDeviceResource)
 		}
 		layout := v1.Group("/layout")
 		{
@@ -49,6 +48,11 @@ func InitRouter() *gin.Engine {
 		{
 			resource.POST("/upload", controllers.UploadFile)
 			resource.POST("", controllers.AddResource)
+			resource.POST("/list", controllers.ListDeviceResource)
+		}
+		event := v1.Group("/event")
+		{
+			event.POST("/list", controllers.ListEvent)
 		}
 	}
 	return r
