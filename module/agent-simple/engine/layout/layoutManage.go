@@ -6,6 +6,7 @@ import (
 	"github.com/wenchangshou/vd-node-manage/common/model"
 	model2 "github.com/wenchangshou/vd-node-manage/module/agent-simple/g/model"
 	"github.com/wenchangshou2/zutil"
+	bolt "go.etcd.io/bbolt"
 	"sync"
 )
 
@@ -39,6 +40,7 @@ type layoutManage struct {
 	layoutID string
 	windows  map[string]WindowRunInfo
 	wSync    *sync.RWMutex
+	db       *bolt.DB
 }
 
 func (manage *layoutManage) GetLayoutRunInfo() (result []*model.ActiveWindowInfo, err error) {
@@ -130,14 +132,13 @@ func (manage *layoutManage) OpenLayout(params model.OpenLayoutCmdParams) error {
 		)
 		if win, err = MakeWindow(w.ID, w.X, w.Y, w.Width, w.Height,
 			w.Z, w.Service, w.Arguments, w.Source); err != nil {
-			fmt.Println("open error")
+			return err
 		}
 		win.Open(&wg, ports[k])
 		manage.setWindow(win.ID, win)
 	}
 	manage.setLayout(params.ID)
 	wg.Wait()
-	//manage.setLayout(id, windows)
 	return nil
 }
 func (manage *layoutManage) setLayout(id string) {
@@ -152,12 +153,18 @@ func (manage *layoutManage) CloseLayout() error {
 	}
 	return nil
 }
+func (manage *layoutManage) check() error {
+	return nil
+}
 
-func InitLayoutManage() IManage {
-	return &layoutManage{
+func InitLayoutManage(db *bolt.DB) IManage {
+	m := &layoutManage{
+		db:      db,
 		windows: make(map[string]WindowRunInfo),
 		wSync:   new(sync.RWMutex),
 	}
+	m.check()
+	return m
 }
 
 // Info 当前布局信息
@@ -172,11 +179,4 @@ type ApplicationStatusChangeMsg struct {
 	ProcessId int
 	Result    model2.PlayerArgumentInfo
 	Type      string
-}
-
-func (w *WindowMap) Iterator(handle func(model2.Win) error) {
-	//for _, win := range *w {
-	//handle(win)
-	//}
-
 }

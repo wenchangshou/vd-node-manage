@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"errors"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/wenchangshou/vd-node-manage/common/serializer"
 	"github.com/wenchangshou/vd-node-manage/module/server/service"
@@ -14,7 +13,7 @@ func ListDevice(c *gin.Context) {
 	var (
 		listService service.DeviceListService
 	)
-	if err := c.ShouldBindQuery(&listService); err == nil {
+	if err := c.ShouldBindJSON(&listService); err == nil {
 		res := listService.List()
 		c.JSON(200, res)
 	} else {
@@ -109,7 +108,6 @@ func GetDeviceLayoutWindow(c *gin.Context) {
 		wid := c.Param("wid")
 		s.Wid = wid
 		res := s.GetWindow()
-		fmt.Println("wid", wid)
 		c.JSON(200, res)
 	} else {
 		c.JSON(200, serializer.ErrorResponse(err))

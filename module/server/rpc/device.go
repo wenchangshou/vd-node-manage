@@ -1,12 +1,14 @@
 package rpc
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/wenchangshou/vd-node-manage/common/cache"
 	"github.com/wenchangshou/vd-node-manage/common/model"
 	"github.com/wenchangshou/vd-node-manage/module/server/g"
 	model2 "github.com/wenchangshou/vd-node-manage/module/server/model"
 	"github.com/wenchangshou/vd-node-manage/module/server/service"
+	"time"
 )
 
 // Register 设备注册
@@ -21,9 +23,18 @@ func (device *Device) Register(args *model.DeviceRegisterRequest, reply *model.D
 		reply.Code = -1
 		reply.Msg = err.Error()
 	} else {
-		reply.HttpAddress = g.Config().Http.Listen
-		reply.RpcAddress = g.Config().Listen
-		reply.RedisAddress = g.Config().Redis.Addr
+
+		conf := model.ServerConfig{
+			Http: model.ServerHttpConfig{
+				Enable:  true,
+				Address: g.Config().Http.Listen,
+			},
+			Redis: model.ServerRedisConfig{
+				Address: g.Config().Redis.Addr,
+			},
+		}
+
+		reply.Config = conf
 		reply.Code = 0
 		reply.ID = id
 	}
@@ -47,8 +58,12 @@ func (device *Device) ReportStatus(args *model.DeviceReportRequest, reply *model
 		reply.Code = 1
 		return nil
 	}
-	cache.Set(fmt.Sprintf("device-%d", args.ID), args.Info, 60)
-	//cache.Devices.Put(args)
+	m := make(map[string]interface{})
+	msec := time.Now().UnixNano() / 1000000
+	m["last_online_time"] = msec
+	m["body"] = args.Info
+	b, _ := json.Marshal(m)
+	cache.Set(fmt.Sprintf("device-%d", args.ID), string(b), 60)
 	return nil
 }
 func (device *Device) QueryTask(_ *model.DeviceReportRequest, _ *model.DeviceQueryStatusResponse) error {

@@ -155,7 +155,7 @@ func (service DeviceLayoutGetService) Get() serializer.Response {
 }
 func (service DeviceLayoutGetService) GetWindow() serializer.Response {
 	val, exists := cache.Get(fmt.Sprintf("device-%d-%s", service.ID, service.LayoutID))
-	obj := make(map[string]model.ActiveWindowInfo)
+	obj := make([]model.ActiveWindowInfo, 0)
 	if !exists || val == nil {
 		return serializer.Err(serializer.CodeGetLayoutInfoFail, "没有找到指定的布局信息", nil)
 	}

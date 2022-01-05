@@ -37,10 +37,10 @@ func GetDeviceResources(deviceID uint, resourceIDS []uint) ([]DeviceResource, er
 }
 
 // GetDeviceResource 通过设备id和资源id来检索资源
-func GetDeviceResource(deviceID uint, resourceId uint) (DeviceResource, error) {
+func GetDeviceResource(deviceID uint, resourceId uint) (*DeviceResource, error) {
 	var res DeviceResource
 	err := DB.Model(&DeviceResource{}).Where("device_id=? AND resource_id =? ", deviceID, resourceId).Preload("Resource").First(&res).Error
-	return res, err
+	return &res, err
 }
 
 func GetDeviceResourcesByDeviceID(deviceID uint) ([]DeviceResource, error) {

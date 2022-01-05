@@ -6,6 +6,7 @@ type ResourceInfo struct {
 	Uri     string `json:"uri"`
 	Service string `json:"service"`
 	Status  int    `json:"status"`
+	Md5     string `json:"md5"`
 }
 
 type ResourceQueryRequest struct {

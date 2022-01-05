@@ -19,13 +19,14 @@ type DeviceRegisterRequest struct {
 	HardwareCode string `json:"hardwareCode"`
 }
 type DeviceRegisterResponse struct {
-	ID           uint   `json:"id"`
-	Status       int    `json:"status"`
-	Code         int    `json:"code"`
-	Msg          string `json:"msg"`
-	RpcAddress   string `json:"rpcAddress"`
-	HttpAddress  string `json:"httpAddress"`
-	RedisAddress string `json:"redis_address"`
+	ID     uint         `json:"id"`
+	Status int          `json:"status"`
+	Code   int          `json:"code"`
+	Msg    string       `json:"msg"`
+	Config ServerConfig `json:"config"`
+	//RpcAddress   string `json:"rpcAddress"`
+	//HttpAddress  string `json:"httpAddress"`
+	//RedisAddress string `json:"redis_address"`
 }
 type DeviceSyncConfResponse struct {
 	//ID           uint   `json:"id"`

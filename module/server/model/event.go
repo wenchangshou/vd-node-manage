@@ -14,7 +14,6 @@ type Event struct {
 	Status     model.EventStatus `json:"status" gorm:"status"`
 	ResourceId uint              `json:"resourceId" gorm:"resource"`
 	ProjectId  uint              `json:"projectID" gorm:"project_id"`
-	//Params   string            `json:"params" gorm:"params"`
 }
 
 func (e Event) TableName() string {

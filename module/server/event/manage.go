@@ -74,17 +74,14 @@ func (manage *Manage) PublishEvent(ctx context.Context, action string, topic str
 	}
 	if reply {
 		c := make(chan string)
-		fmt.Println("store id", msg.EventID)
 		manage.messageReplyIdChannel.Store(msg.EventID, c)
 		d := time.After(5 * time.Second)
 		for {
 			select {
 			case r := <-c:
-				fmt.Println("delete", msg.EventID)
 				manage.messageReplyIdChannel.Delete(msg.EventID)
 				return r, nil
 			case <-ctx.Done():
-				fmt.Println("delete", msg.EventID)
 				manage.messageReplyIdChannel.Delete(msg.EventID)
 				return "", nil
 			case <-d:
@@ -99,10 +96,6 @@ func (manage *Manage) PublishEvent(ctx context.Context, action string, topic str
 var (
 	GManage *Manage
 )
-
-//func InitRedisClient(cfg *CacheConfig) {
-//	GRedis = Event.NewRedisClient(cfg.Addr, cfg.DB, cfg.Passwd)
-//}
 
 func InitEvent(cfg *g.CacheConfig) {
 	c := Event.NewRedisClient(cfg.Addr, cfg.DB, cfg.Passwd)

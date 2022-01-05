@@ -21,6 +21,7 @@ func (resource Resource) Query(request *model.ResourceQueryRequest, response *mo
 		Uri:     r.Uri,
 		Service: r.Service,
 		Status:  r.Status,
+		Md5:     r.Md5,
 	}
 	return nil
 }

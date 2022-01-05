@@ -10,16 +10,16 @@ import (
 var Store Driver
 
 // InitCache 创建新的
-func InitCache(provider string, address string, password string, db int) error {
+func InitCache(provider string, address string, password string, db int) (*Driver, error) {
 	if provider == "mem" {
 		Store = NewMemoStore()
-		return nil
+		return &Store, nil
 	} else if provider == "redis" {
 		s := strconv.Itoa(db)
 		Store = NewRedisStore(10, "tcp", address, password, s)
-		return nil
+		return &Store, nil
 	}
-	return errors.New("未找到相应的cache提供者")
+	return nil, errors.New("未找到相应的cache提供者")
 
 }
 
@@ -47,7 +47,12 @@ func GetSettings(keys []string, prefix string) (map[string]string, []string) {
 	raw, miss := Store.Gets(keys, prefix)
 	res := make(map[string]string, len(raw))
 	for k, v := range raw {
-		res[k] = v.(string)
+		switch v.(type) {
+		case []uint8:
+			res[k] = string(v.([]uint8))
+		case string:
+			res[k] = v.(string)
+		}
 	}
 	return res, miss
 }

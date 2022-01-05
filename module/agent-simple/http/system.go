@@ -70,11 +70,6 @@ func configSystemRoutes() {
 		}
 		info.Detailed.Communication = true
 		info.Detailed.Server = true
-		//rtu["register"] = cfg.Server.Register
-		//rtu["address"] = cfg.Server.Address
-		//rtu["expired"] = -1
-		//rtu["detailed"] = struc
-
 		RenderDataJson(w, info)
 	})
 	http.HandleFunc("/reset", func(w http.ResponseWriter, r *http.Request) {

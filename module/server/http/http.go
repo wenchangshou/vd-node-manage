@@ -28,7 +28,7 @@ func InitRouter() *gin.Engine {
 		v1.GET("/health", controllers.Health)
 		device := v1.Group("/device")
 		{
-			device.GET("", controllers.ListDevice)
+			device.POST("/list", controllers.ListDevice)
 			device.POST("", controllers.AddDevice)
 			device.DELETE("/:id", controllers.DeleteDevice)
 			device.GET("/:id", controllers.GetDevice)

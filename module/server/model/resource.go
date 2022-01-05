@@ -12,6 +12,7 @@ type Resource struct {
 	Category string `gorm:"category" json:"category"`
 	Uri      string `json:"uri"`
 	Status   int    `json:"status"`
+	Md5      string `json:"md5"`
 }
 
 func (resources *Resource) TableName() string {
@@ -34,6 +35,11 @@ func (resources *Resource) Add() (uint, error) {
 func GetResourceById(id uint) (*Resource, error) {
 	var resource *Resource
 	result := DB.Model(&Resource{}).Where("id=?", id).First(&resource)
+	return resource, result.Error
+}
+func GetResourceByMd5(md5 string) (*Resource, error) {
+	var resource *Resource
+	result := DB.Model(&Resource{}).Where("md5=?", md5).First(&resource)
 	return resource, result.Error
 }
 

@@ -2,22 +2,15 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"fyne.io/fyne/v2/app"
-	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/widget"
-	"github.com/getlantern/systray"
 	"github.com/wenchangshou/vd-node-manage/common/cache"
 	"github.com/wenchangshou/vd-node-manage/common/logging"
 	"github.com/wenchangshou/vd-node-manage/module/agent-simple/buff"
 	"github.com/wenchangshou/vd-node-manage/module/agent-simple/cron"
 	"github.com/wenchangshou/vd-node-manage/module/agent-simple/engine"
 	"github.com/wenchangshou/vd-node-manage/module/agent-simple/g"
-	"github.com/wenchangshou/vd-node-manage/module/agent-simple/g/gui/icon"
 	"github.com/wenchangshou/vd-node-manage/module/agent-simple/http"
 	"github.com/wenchangshou2/zutil"
 	"log"
-	"os"
 	"path"
 	"time"
 )
@@ -28,23 +21,6 @@ var (
 	uninstallFlag bool
 )
 
-//// waitRegister 等待注册
-//func waitRegister() <-chan bool {
-//	result := make(chan bool)
-//	go func() {
-//		timeTicker := time.NewTicker(time.Millisecond * 500)
-//		for {
-//			select {
-//			case <-timeTicker.C:
-//				if g.Config().Server.Register {
-//					result <- true
-//				}
-//			}
-//		}
-//	}()
-//
-//	return result
-//}
 func first() chan bool {
 	r := make(chan bool)
 	go func() {
@@ -61,14 +37,8 @@ func first() chan bool {
 	return r
 }
 
-func InitSystemInfo(cfg *string, hardware *string) {
-	var (
-		err error
-	)
-	buff.InitGlobalBuffer()
-	g.InitApplication()
-	g.ParseConfig(*cfg)
-	conf := g.Config()
+// mkdirWorkDir 创建工作目录
+func mkdirWorkDir(conf *g.GlobalConfig) {
 	logging.InitLogging(conf.Log.Path, conf.Log.Level)
 	// 创建工作目录
 	ap := path.Join(conf.Resource.Directory, "application")
@@ -77,43 +47,32 @@ func InitSystemInfo(cfg *string, hardware *string) {
 	zutil.IsNotExistMkDir(conf.Resource.Tmp)
 	zutil.IsNotExistMkDir(ap)
 	zutil.IsNotExistMkDir(rp)
+}
+func InitSystemInfo(cfg *string, hardware *string) {
+	var (
+		err error
+	)
+	buff.InitGlobalBuffer()
+	g.InitApplication()
+	g.ParseConfig(*cfg)
+	conf := g.Config()
+	mkdirWorkDir(conf)
 	g.ParseHardware(*hardware)
 	go http.Start()
 	<-first()
 	g.InitLocalIp()
 	g.InitRpcClients()
-	cache.InitCache("redis", g.Config().Server.RedisAddress, "", 0)
+	cDriver, err := cache.InitCache("redis", g.Config().Server.RedisAddress, "", 0)
+	if err != nil {
+		log.Fatalln("初始化cache模块失败:" + err.Error())
+	}
 	cron.ReportDeviceStatus()
-	if err = engine.InitSchedule(conf); err != nil {
+	if err = engine.InitSchedule(conf, cDriver); err != nil {
 		log.Fatalln("初始化调度失败")
 	}
 }
-func InitUi() {
-	a := app.New()
-	w := a.NewWindow("Hello")
-	hello := widget.NewLabel("Hello Fyne!")
-	w.SetContent(container.NewVBox(
-		hello,
-		widget.NewButton("Hi!", func() {
-			hello.SetText("Welcome :)")
-		}),
-	))
-	fmt.Println("end")
 
-}
-func onReady() {
-	systray.SetTemplateIcon(icon.Data, icon.Data)
-	systray.SetTitle("vd 播控系统")
-	systray.SetTooltip("Lantern")
-	mQuitOrig := systray.AddMenuItem("Quit", "Quit the whole app")
-	go func() {
-		<-mQuitOrig.ClickedCh
-		systray.Quit()
-	}()
-	go func() {
-		systray.SetTemplateIcon(icon.Data, icon.Data)
-	}()
-
+type service struct {
 }
 
 func main() {
@@ -124,12 +83,6 @@ func main() {
 	flag.BoolVar(&uninstallFlag, "u", false, "uninstall program")
 	flag.Parse()
 	InitSystemInfo(cfg, hardware)
-	onExit := func() {
-		os.Exit(0)
-	}
-	go systray.Run(onReady, onExit)
-	fmt.Println("icon init")
-	InitUi()
 	select {}
 	// Init
 }

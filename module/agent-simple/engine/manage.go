@@ -3,13 +3,14 @@ package engine
 import (
 	"context"
 	"fmt"
+	"github.com/wenchangshou/vd-node-manage/common/cache"
+	bolt "go.etcd.io/bbolt"
 	"sync"
 	"sync/atomic"
 	"time"
 
 	"github.com/wenchangshou/vd-node-manage/common/logging"
 	"github.com/wenchangshou/vd-node-manage/common/model"
-	"github.com/wenchangshou/vd-node-manage/module/agent-simple/dto"
 	"github.com/wenchangshou/vd-node-manage/module/agent-simple/engine/executor"
 	IService "github.com/wenchangshou/vd-node-manage/module/agent-simple/service"
 )
@@ -24,16 +25,15 @@ type TaskChangeEventInfo struct {
 	Status uint
 }
 
-// NewTaskManage @title NewTaskManage
+// NewEventManage @title NewEventManage
 // @description 初始化任务执行
 // @param maxExecutorCount 允许同时执行任务数
 // @param httpRequestUri http请求地址
 // @param rpcRequestUri rpc请求地址
-func NewTaskManage(count int32, httpRequest string, service *IService.ServiceFactory) (*EventManage, error) {
-	g := executor.GenerateExecutorFactoryFunc(service, httpRequest)
+func NewEventManage(count int32, driver *cache.Driver, db *bolt.DB, httpRequest string, service *IService.ServiceFactory) (*EventManage, error) {
+	g := executor.GenerateExecutorFactoryFunc(service, httpRequest, driver, db)
 	GTaskExecute = &EventManage{
 		maxExecutorCount:    count,
-		taskAddNotify:       make(chan dto.Task),
 		ServerFactory:       service,
 		notifyExecuteChange: make(chan TaskChangeEventInfo),
 		EventStatusList:     NewTaskList(),
@@ -54,7 +54,6 @@ type EventManage struct {
 	processTask         sync.Map //正在处理的任务列表
 	waitTask            sync.Map //等待任务队列
 	errorTask           sync.Map //错误队列
-	taskAddNotify       chan dto.Task
 	notifyExecuteChange chan TaskChangeEventInfo
 	cancelFuncMap       sync.Map //用来处理取消任务使用
 	EventStatusList     *EventList
@@ -169,10 +168,6 @@ func (manage *EventManage) wake() {
 	event = tmp.(model.Event)
 	manage.processTask.Store(id, event)
 	go manage.execute(event)
-}
-func (manage *EventManage) AddTaskByExecuteList(_ []dto.Task) {
-	manage.Lock()
-	defer manage.Unlock()
 }
 
 // AddWaitExecuteEvent 添加任务到等待列表中

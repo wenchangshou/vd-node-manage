@@ -31,11 +31,6 @@ type LogConfig struct {
 	MaxMsgSize int    `json:"maxMsgSize"`
 }
 
-// RpcConfig rpc配置
-type RpcConfig struct {
-	Address string `json:"address"`
-}
-
 // ResourceConfig 资源配置
 type ResourceConfig struct {
 	Directory string `json:"directory"`
@@ -62,13 +57,16 @@ type PlayerConfig struct {
 	Version    string `json:"version"`
 	UpdateTime int64  `json:"update_time"`
 }
+type EventConfig struct {
+	Provider  string            `json:"provider"`
+	Arguments map[string]string `json:"arguments"`
+}
 type GlobalConfig struct {
 	Debug     bool             `json:"debug"`
 	Hostname  string           `json:"hostname"`
 	IP        string           `json:"ip"`
 	Log       *LogConfig       `json:"log"`
 	Server    *ServerConfig    `json:"server"`
-	Rpc       *RpcConfig       `json:"rpc-old"`
 	Resource  *ResourceConfig  `json:"resource"`
 	Task      *TaskConfig      `json:"task"`
 	Heartbeat *HeartbeatConfig `json:"heartbeat"`

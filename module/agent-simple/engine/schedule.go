@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/wenchangshou/vd-node-manage/common/cache"
+	"github.com/wenchangshou/vd-node-manage/module/agent-simple/g/db"
+	bolt "go.etcd.io/bbolt"
 	"time"
 
 	"github.com/wenchangshou/vd-node-manage/module/agent-simple/engine/layout"
@@ -31,6 +33,8 @@ type Schedule struct {
 	serverFactory  *IService.ServiceFactory
 	redisClient    *Event.RedisClient
 	layoutManage   layout.IManage
+	cacheDriver    *cache.Driver
+	db             *bolt.DB
 }
 
 // queryTask 查询是否有新的分发任务
@@ -108,6 +112,9 @@ func (schedule *Schedule) closeLayout(req model.EventRequest) model.EventReply {
 	return model.GenerateSimpleSuccessEventReply(req.EventID)
 }
 
+func (schedule Schedule) CheckResourceExists(req model.EventRequest) model.EventReply {
+	return model.GenerateSimpleSuccessEventReply(req.EventID)
+}
 func (schedule *Schedule) control(req model.EventRequest) model.EventReply {
 	reply := model.EventReply{
 		EventID: req.EventID,
@@ -142,6 +149,8 @@ func (schedule *Schedule) DeviceEvent(_ string, message []byte) (err error) {
 		reply = schedule.closeLayout(req)
 	} else if req.Action == "control" {
 		reply = schedule.control(req)
+	} else if req.Action == "checkResourceExists" {
+		reply = schedule.CheckResourceExists(req)
 	}
 	if !req.Reply {
 		return nil
@@ -156,7 +165,7 @@ func (schedule *Schedule) Start() {
 }
 
 // InitSchedule 初始化调度程序
-func InitSchedule(conf *g.GlobalConfig) error {
+func InitSchedule(conf *g.GlobalConfig, driver *cache.Driver) error {
 	var (
 		err           error
 		serverFactory *IService.ServiceFactory
@@ -165,11 +174,15 @@ func InitSchedule(conf *g.GlobalConfig) error {
 		RpcServer: fmt.Sprintf(conf.Server.RpcAddress),
 		Timeout:   time.Second,
 	}
+	if err = db.InitDB("my.db"); err != nil {
+		return err
+	}
+
 	if serverFactory, err = IService.NewServiceFactory("rpc", conf.Server.ID, rpcClient); err != nil {
 		return err
 	}
 	redisClient := Event.NewRedisClient(conf.Server.RedisAddress, 0, "")
-	eventManage, _ := NewTaskManage(int32(conf.Task.Count), conf.Server.HttpAddress, serverFactory)
+	eventManage, _ := NewEventManage(int32(conf.Task.Count), driver, db.GDB, conf.Server.HttpAddress, serverFactory)
 	eventManage.Start()
 	schedule := &Schedule{
 		ID:            conf.Server.ID,
@@ -177,8 +190,10 @@ func InitSchedule(conf *g.GlobalConfig) error {
 		rpcAddress:    conf.Server.RpcAddress,
 		serverFactory: serverFactory,
 		redisClient:   redisClient,
-		layoutManage:  layout.InitLayoutManage(),
+		layoutManage:  layout.InitLayoutManage(db.GDB),
 		eventManage:   eventManage,
+		cacheDriver:   driver,
+		db:            db.GDB,
 	}
 
 	schedule.Start()

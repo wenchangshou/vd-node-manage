@@ -35,19 +35,15 @@ func (service DeviceRpcService) IsRegister() (bool, error) {
 	return true, nil
 }
 func (service DeviceRpcService) AddComputerResource(resourceID uint) error {
-	var (
-		err error
-	)
 	req := model.DeviceAddResourceRequest{
 		ID:         service.ID,
 		ResourceID: resourceID,
 	}
 	reply := model.SimpleRpcResponse{}
-	if err = service.Client.Call("Device.AddDeviceResource", &req, &reply); err != nil {
-		return err
-	}
-	return nil
+	return service.Client.Call("Device.AddDeviceResource", &req, &reply)
 }
+
+// DeleteComputerResource 删除计算机资源
 func (service DeviceRpcService) DeleteComputerResource(id uint) error {
 
 	req := model.DeviceDeleteResourceRequest{ResourceID: id, ID: service.ID}

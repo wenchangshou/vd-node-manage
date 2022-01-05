@@ -2,12 +2,14 @@ package executor
 
 import (
 	"errors"
+	"github.com/wenchangshou/vd-node-manage/common/cache"
 	"github.com/wenchangshou/vd-node-manage/common/model"
 	IService "github.com/wenchangshou/vd-node-manage/module/agent-simple/service"
+	bolt "go.etcd.io/bbolt"
 )
 
 // GenerateExecutorFactoryFunc 生成执行器工厂函数
-func GenerateExecutorFactoryFunc(serviceFactory *IService.ServiceFactory, httpRequestUri string) GeneratorFunction {
+func GenerateExecutorFactoryFunc(serviceFactory *IService.ServiceFactory, httpRequestUri string, driver *cache.Driver, db *bolt.DB) GeneratorFunction {
 	return func(event model.Event) (IExecute, error) {
 		//var err error
 		switch event.Action {
@@ -23,6 +25,8 @@ func GenerateExecutorFactoryFunc(serviceFactory *IService.ServiceFactory, httpRe
 				HttpRequestUri:  httpRequestUri,
 				ResourceService: serviceFactory.Resource,
 				Resource:        resource,
+				cache:           driver,
+				db:              db,
 			}
 			return e, nil
 		case model.DeleteResource:

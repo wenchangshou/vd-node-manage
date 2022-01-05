@@ -1,12 +1,16 @@
 package service
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/google/uuid"
+	"github.com/wenchangshou/vd-node-manage/common/cache"
 	model2 "github.com/wenchangshou/vd-node-manage/common/model"
 	"github.com/wenchangshou/vd-node-manage/common/serializer"
 	"github.com/wenchangshou/vd-node-manage/module/server/model"
 	"github.com/wenchangshou/vd-node-manage/module/server/vo"
+	"strconv"
 )
 
 type DeviceListService struct {
@@ -16,14 +20,30 @@ type DeviceListService struct {
 
 func (service *DeviceListService) List() serializer.Response {
 	var res []model.Device
+	var ids []string
 	rtu := make([]*vo.DeviceVo, 0)
 	var total int64 = 0
 	tx := model.DB.Model(&model.Device{})
-
 	tx.Count(&total)
 	tx.Limit(service.PageSize).Offset((service.Page - 1) * service.PageSize).Find(&res)
 	for _, d := range res {
-		rtu = append(rtu, vo.DeviceDoToVo(&d))
+		i := strconv.Itoa(int(d.ID))
+		ids = append(ids, i)
+	}
+	m, _ := cache.GetSettings(ids, "device-")
+	for _, d := range res {
+		o := vo.DeviceDoToVo(&d)
+		_id := strconv.Itoa(int(d.ID))
+		e, exists := m[_id]
+		o.Online = false
+		if exists {
+			m := make(map[string]interface{})
+			json.Unmarshal([]byte(e), &m)
+			o.LastOnlineTime = int64(m["last_online_time"].(float64))
+			o.Detailed = m["body"].(string)
+			o.Online = true
+		}
+		rtu = append(rtu, o)
 	}
 	return serializer.Response{Data: map[string]interface{}{
 		"total": total,
@@ -134,7 +154,17 @@ func (service DeviceGetService) Get() serializer.Response {
 	if device == nil {
 		return serializer.Err(serializer.CodeNotFindDeviceErr, "没有找到指定的设备", err)
 	}
+	c, exists := cache.Get(fmt.Sprintf("device-%d", service.ID))
+	rtu := vo.DeviceDoToVo(device)
+	rtu.Online = false
+	if exists {
+		rtu.Online = true
+		m := make(map[string]interface{})
+		json.Unmarshal([]byte(c.(string)), &m)
+		rtu.LastOnlineTime = int64(m["last_online_time"].(float64))
+		rtu.Detailed = m["body"].(string)
+	}
 	return serializer.Response{
-		Data: vo.DeviceDoToVo(device),
+		Data: rtu,
 	}
 }

@@ -1,11 +1,9 @@
 package http
 
 import (
-	"fmt"
 	"github.com/go-resty/resty/v2"
 	"github.com/pkg/errors"
 	"github.com/wenchangshou/vd-node-manage/common/model"
-	"github.com/wenchangshou/vd-node-manage/module/agent-simple/dto"
 	"net/http"
 )
 
@@ -51,31 +49,12 @@ func (t TaskHttpService) SetTaskStatus(ids []uint, status int) error {
 }
 
 type GetComputerTaskResultDataForm struct {
-	Total int        `json:"total"`
-	Items []dto.Task `json:"items"`
+	Total int `json:"total"`
 }
 type GetComputerTaskResultForm struct {
 	Msg  string `json:"msg"`
 	Code int    `json:"code"`
 	Data GetComputerTaskResultDataForm
-}
-
-func (t TaskHttpService) GetTasks(status int, count int) ([]dto.Task, error) {
-	var rtu GetComputerTaskResultForm
-	client := resty.New()
-	requestUrl := t.GetUrl(t.Address, fmt.Sprintf("computer/%s/task", t.ID))
-	resp, err := client.R().SetBody(map[string]interface{}{
-		"status": status,
-		"count":  count,
-	}).SetResult(&rtu).Get(requestUrl)
-	if err != nil {
-		return nil, errors.Wrap(err, "请示获取计算机任务失败")
-	}
-	if resp.StatusCode() != http.StatusOK {
-		return nil, errors.New(fmt.Sprintf("获取计算机任务失败,返回的id:%d\n", resp.StatusCode()))
-	}
-	fmt.Println(rtu)
-	return rtu.Data.Items, nil
 }
 
 // NewTaskHttpService 创建新的http任务服务

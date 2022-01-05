@@ -21,8 +21,7 @@ func (executor *DeleteResourceExecutor) Execute() error {
 	cfg := g.Config()
 	resourcePath := path.Join(cfg.Resource.Directory, "resource", fmt.Sprintf("%d-%s", executor.Resource.ID, executor.Resource.Name))
 	zutil.IsExistDelete(resourcePath)
-	executor.DeviceService.DeleteComputerResource(executor.Resource.ID)
-	return nil
+	return executor.DeviceService.DeleteComputerResource(executor.Resource.ID)
 	//return executor.ComputerService.DeleteComputerResource(executor.Option.ID)
 }
 func (executor *DeleteResourceExecutor) Cancel() error {
