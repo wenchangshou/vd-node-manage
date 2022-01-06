@@ -55,17 +55,19 @@ func configSystemRoutes() {
 			RenderCustomMsgJson(w, 400, "注册失败:"+resp.Msg)
 			return
 		}
-		g.SetRegisterStatus(true, server.(string), resp.ID, resp.HttpAddress, resp.RpcAddress, resp.RedisAddress)
+		resp.Config.Server = server.(string)
+		resp.Config.ID = resp.ID
+		g.StoreServerInfo(&resp.Config)
 		RenderCustomMsgJson(w, 0, "success")
 	})
 
 	http.HandleFunc("/get", func(w http.ResponseWriter, r *http.Request) {
+		serverInfo := g.GetServerInfo()
 		setupHeader(w, r)
-		cfg := g.Config()
 		info := model2.ServerInfo{
 			Name:     "主机",
-			Register: cfg.Server.Register,
-			Address:  cfg.Server.Address,
+			Register: serverInfo.Register,
+			Address:  serverInfo.Server,
 			Expired:  -1,
 		}
 		info.Detailed.Communication = true
@@ -74,7 +76,8 @@ func configSystemRoutes() {
 	})
 	http.HandleFunc("/reset", func(w http.ResponseWriter, r *http.Request) {
 		setupHeader(w, r)
-		g.SetRegisterStatus(false, "", 0, "", "", "")
+		g.GetServerInfo()
+		g.ResetServerInfo()
 		RenderCustomMsgJson(w, 0, "success")
 	})
 }

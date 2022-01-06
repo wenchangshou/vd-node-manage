@@ -25,12 +25,18 @@ func (device *Device) Register(args *model.DeviceRegisterRequest, reply *model.D
 	} else {
 
 		conf := model.ServerConfig{
+			ID:       id,
+			Register: true,
 			Http: model.ServerHttpConfig{
 				Enable:  true,
 				Address: g.Config().Http.Listen,
 			},
 			Redis: model.ServerRedisConfig{
 				Address: g.Config().Redis.Addr,
+			},
+			Rpc: model.ServerRpcConfig{
+				Enable:  true,
+				Address: g.Config().Listen,
 			},
 		}
 
@@ -81,6 +87,14 @@ func (device *Device) AddDeviceResource(args *model.DeviceAddResourceRequest, _ 
 		ResourceID: args.ResourceID,
 	}
 	return dr.Add()
+}
+func (device *Device) GetDeviceStartup(args *model.NormalIdRequest, reply *model.DeviceGetStartupResponse) error {
+	d, err := model2.GetDeviceByID(args.ID)
+	if err != nil {
+		return err
+	}
+	reply.Startup = d.Startup
+	return nil
 }
 func (device Device) DeleteDeviceResource(args *model.DeviceDeleteResourceRequest, _ *model.SimpleRpcResponse) error {
 	err := model2.DeleteResourceByDeviceIdAndResourceId(args.ID, args.ResourceID)

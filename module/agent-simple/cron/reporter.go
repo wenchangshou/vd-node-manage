@@ -14,9 +14,10 @@ var reportFlag int64 = 0
 
 // ReportDeviceStatus 上传设备状态
 func ReportDeviceStatus() {
-	if reportFlag != 1 && g.Config().Server.Register && g.Config().Server.RpcAddress != "" {
+
+	if reportFlag != 1 && g.GetServerInfo().Rpc.Address != "" {
 		atomic.StoreInt64(&reportFlag, 1)
-		go reportAgentStatus(time.Duration(g.Config().Server.ReportInterval) * time.Second)
+		go reportAgentStatus(time.Second)
 	}
 }
 
@@ -25,7 +26,7 @@ func reportAgentStatus(interval time.Duration) {
 	for {
 		r := make(map[string]interface{})
 		hostname, err := g.Hostname()
-		hid := g.Config().Server.ID
+		hid := g.GetServerInfo().ID
 		if err != nil {
 			hostname = fmt.Sprintf("error:%s", err.Error())
 		}
@@ -41,7 +42,6 @@ func reportAgentStatus(interval time.Duration) {
 		if err != nil || resp.Code != 0 {
 			log.Println("Call Device.ReportStatus fail", err, "Request:", req, "Response:", resp)
 		}
-		fmt.Println("req", req)
 		time.Sleep(interval)
 	}
 }

@@ -113,7 +113,7 @@ func GetDeviceLayoutWindow(c *gin.Context) {
 		c.JSON(200, serializer.ErrorResponse(err))
 	}
 }
-func SetDeviceLayout(c *gin.Context) {
+func OpenDeviceLayout(c *gin.Context) {
 	s := service.DeviceLayoutOpenService{}
 	if err := c.ShouldBindJSON(&s); err == nil {
 		id := c.Param("id")

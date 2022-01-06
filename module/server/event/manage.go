@@ -33,7 +33,6 @@ func (manage *Manage) ReplyMessage(id string, msg string) error {
 		return true
 	})
 	c, ok := manage.messageReplyIdChannel.Load(id)
-	fmt.Println("load id", id, ok)
 	if !ok {
 		return nil
 	}

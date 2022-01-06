@@ -59,6 +59,6 @@ func (r RpcPlayerService) Get() (string, error) {
 	if err != nil {
 		return "", errors.New("call remote control cmd fail:" + err.Error())
 	}
-	fmt.Println(res.Msg)
+	//fmt.Println(res.Msg)
 	return res.Payload, nil
 }

@@ -18,7 +18,10 @@ type ServerEventConfig struct {
 	Arguments map[string]string `json:"arguments"`
 }
 type ServerConfig struct {
-	Redis ServerRedisConfig `json:"redis"`
-	Http  ServerHttpConfig  `json:"http"`
-	Rpc   ServerRpcConfig   `json:"rpc"`
+	Register bool              `json:"register"`
+	Server   string            `json:"server"`
+	ID       uint              `json:"id"`
+	Redis    ServerRedisConfig `json:"redis"`
+	Http     ServerHttpConfig  `json:"http"`
+	Rpc      ServerRpcConfig   `json:"rpc"`
 }

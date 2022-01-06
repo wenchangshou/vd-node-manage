@@ -59,6 +59,9 @@ const (
 	Device_Disable
 )
 
+type NormalIdRequest struct {
+	ID uint `json:"id"`
+}
 type DeviceAddResourceRequest struct {
 	ID         uint `json:"id"`
 	ResourceID uint `json:"resource_id"`
@@ -66,4 +69,11 @@ type DeviceAddResourceRequest struct {
 type DeviceDeleteResourceRequest struct {
 	ID         uint `json:"id"`
 	ResourceID uint `json:"resource_id"`
+}
+
+type DeviceGetStartupResponse struct {
+	ID      uint   `json:"id"`
+	Code    int    `json:"code"`
+	Msg     string `json:"msg"`
+	Startup string `json:"startup"`
 }

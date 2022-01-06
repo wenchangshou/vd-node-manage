@@ -159,7 +159,23 @@ func (schedule *Schedule) DeviceEvent(_ string, message []byte) (err error) {
 	schedule.redisClient.Publish("server", string(b))
 	return nil
 }
+func (schedule *Schedule) Startup() error {
+	cmd := model.OpenLayoutCmdParams{}
+	startup, err := schedule.serverFactory.Device.GetDeviceStartup(schedule.ID)
+	if err != nil {
+		logging.GLogger.Warn("请求开机启动项失败:" + err.Error())
+		return err
+	}
+	if startup == "" {
+		return nil
+	}
+	if err := json.Unmarshal([]byte(startup), &cmd); err != nil {
+		logging.GLogger.Warn("解析开机命令失败:" + err.Error())
+	}
+	return schedule.layoutManage.OpenLayout(cmd)
+}
 func (schedule *Schedule) Start() {
+	schedule.Startup()
 	go schedule.redisClient.Subscribe(context.TODO(), schedule.DeviceEvent, fmt.Sprintf("device-%d", schedule.ID))
 	go schedule.loop()
 }
@@ -170,24 +186,22 @@ func InitSchedule(conf *g.GlobalConfig, driver *cache.Driver) error {
 		err           error
 		serverFactory *IService.ServiceFactory
 	)
+	serverInfo := g.GetServerInfo()
 	rpcClient := &g.SingleConnRpcClient{
-		RpcServer: fmt.Sprintf(conf.Server.RpcAddress),
+		RpcServer: fmt.Sprintf(serverInfo.Rpc.Address),
 		Timeout:   time.Second,
 	}
-	if err = db.InitDB("my.db"); err != nil {
-		return err
-	}
 
-	if serverFactory, err = IService.NewServiceFactory("rpc", conf.Server.ID, rpcClient); err != nil {
+	if serverFactory, err = IService.NewServiceFactory("rpc", serverInfo.ID, rpcClient); err != nil {
 		return err
 	}
-	redisClient := Event.NewRedisClient(conf.Server.RedisAddress, 0, "")
-	eventManage, _ := NewEventManage(int32(conf.Task.Count), driver, db.GDB, conf.Server.HttpAddress, serverFactory)
+	redisClient := Event.NewRedisClient(serverInfo.Redis.Address, 0, "")
+	eventManage, _ := NewEventManage(int32(conf.Task.Count), driver, db.GDB, serverInfo.Http.Address, serverFactory)
 	eventManage.Start()
 	schedule := &Schedule{
-		ID:            conf.Server.ID,
-		httpAddress:   conf.Server.HttpAddress,
-		rpcAddress:    conf.Server.RpcAddress,
+		ID:            serverInfo.ID,
+		httpAddress:   serverInfo.Http.Address,
+		rpcAddress:    serverInfo.Rpc.Address,
 		serverFactory: serverFactory,
 		redisClient:   redisClient,
 		layoutManage:  layout.InitLayoutManage(db.GDB),
@@ -195,8 +209,6 @@ func InitSchedule(conf *g.GlobalConfig, driver *cache.Driver) error {
 		cacheDriver:   driver,
 		db:            db.GDB,
 	}
-
 	schedule.Start()
-
 	return nil
 }

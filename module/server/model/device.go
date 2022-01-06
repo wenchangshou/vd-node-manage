@@ -16,6 +16,7 @@ type Device struct {
 	Status         int    `gorm:"status" json:"status"`
 	LastOnlineTime int64  `gorm:"last_online_time" json:"last_online_time"`
 	RegionId       int    `gorm:"region_id" json:"region_id"`
+	Startup        string `json:"startup" gorm:"startup"`
 }
 
 func (Device) TableName() string {
@@ -33,6 +34,7 @@ func (device *Device) Create() error {
 	fmt.Println(err)
 	return err
 }
+
 func (device Device) Delete() error {
 	return DB.Delete(&Device{}, device.ID).Error
 }
@@ -40,6 +42,9 @@ func GetDeviceByID(id uint) (*Device, error) {
 	var device *Device
 	result := DB.Where("id=?", id).First(&device)
 	return device, result.Error
+}
+func SetDeviceStartup(id uint, args []byte) error {
+	return DB.Model(&Device{}).Where("id=?", id).Update("startup", args).Error
 }
 func DeleteDevice(id uint) error {
 	return DB.Delete(&Device{}, id).Error

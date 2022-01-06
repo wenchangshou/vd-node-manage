@@ -14,6 +14,7 @@ import (
 // DeviceLayoutOpenService 打开设备布局服务
 type DeviceLayoutOpenService struct {
 	ID       uint                   `json:"id" uri:"id"`
+	Startup  bool                   `json:"startup"`
 	LayoutID string                 `uri:"layout_id" json:"layout_id"`
 	Kill     bool                   `json:"kill" binding:"required"`
 	Style    map[string]interface{} `json:"style"`
@@ -85,13 +86,17 @@ func (service DeviceLayoutOpenService) Open() serializer.Response {
 		windows = append(windows, w)
 	}
 	c.Windows = windows
-	//msg := model.EventRequest{}
-	//msg.Action = "openLayout"
 	b1, _ := json.Marshal(c)
 	ctx := context.TODO()
 	reply, err := event.GManage.PublishEvent(ctx, "openLayout", fmt.Sprintf("device-%d", service.ID), b1, true)
 	if err != nil {
 		return serializer.Err(serializer.CodeRedisError, "redis publish event error", err)
+	}
+	if service.Startup {
+		err := model2.SetDeviceStartup(service.ID, b1)
+		if err != nil {
+			return serializer.Err(serializer.CodeDBError, "设置默认启动失败", err)
+		}
 	}
 	return serializer.Response{
 		Data: reply,

@@ -42,6 +42,14 @@ func (service DeviceRpcService) AddComputerResource(resourceID uint) error {
 	reply := model.SimpleRpcResponse{}
 	return service.Client.Call("Device.AddDeviceResource", &req, &reply)
 }
+func (service DeviceRpcService) GetDeviceStartup(id uint) (string, error) {
+	req := model.NormalIdRequest{ID: id}
+
+	reply := model.DeviceGetStartupResponse{}
+	err := service.Client.Call("Device.GetDeviceStartup", &req, &reply)
+	return reply.Startup, err
+
+}
 
 // DeleteComputerResource 删除计算机资源
 func (service DeviceRpcService) DeleteComputerResource(id uint) error {

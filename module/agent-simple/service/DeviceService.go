@@ -9,4 +9,5 @@ type DeviceService interface {
 	Heartbeat() error
 	AddComputerProject(id uint) error
 	DeleteComputerProject(id uint) error
+	GetDeviceStartup(id uint) (string, error)
 }

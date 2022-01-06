@@ -11,8 +11,9 @@ var LocalIp string
 
 // InitLocalIp 初始化本地ip
 func InitLocalIp() {
-	if Config().Server.Register {
-		conn, err := net.DialTimeout("tcp", Config().Server.HttpAddress, time.Second*10)
+	serverInfo := GetServerInfo()
+	if serverInfo.Register {
+		conn, err := net.DialTimeout("tcp", serverInfo.Http.Address, time.Second*10)
 		if err != nil {
 			log.Println("get local addr failed!")
 		} else {

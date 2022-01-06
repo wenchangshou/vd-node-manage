@@ -15,15 +15,18 @@ type SingleConnRpcClient struct {
 	RpcServer string
 	Timeout   time.Duration
 }
+
 var (
 	ServerRpcClient *SingleConnRpcClient
 )
+
 func InitRpcClients() {
-	if Config().Server.Register{
-		ServerRpcClient=&SingleConnRpcClient{
+	serverInfo := GetServerInfo()
+	if serverInfo.Register {
+		ServerRpcClient = &SingleConnRpcClient{
 			rpcClient: nil,
-			RpcServer: Config().Server.RpcAddress,
-			Timeout:   time.Duration(Config().Heartbeat.Timeout)*time.Millisecond,
+			RpcServer: serverInfo.Rpc.Address,
+			Timeout:   time.Duration(Config().Heartbeat.Timeout) * time.Millisecond,
 		}
 	}
 }

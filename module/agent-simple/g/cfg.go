@@ -11,15 +11,15 @@ import (
 
 // ServerConfig 服务配置
 type ServerConfig struct {
-	Address           string `json:"address"`
-	Mode              string `json:"mode"`
-	HttpAddress       string `json:"httpAddress"`
-	RpcAddress        string `json:"rpcAddress"`
-	Register          bool   `json:"register"`
-	ID                uint   `json:"id"`
-	ReportInterval    int    `json:"reportInterval"`
-	QueryTaskInterval int    `json:"queryTaskInterval"`
-	RedisAddress      string `json:"redis_address"`
+	//Address string `json:"address"`
+	//Mode    string `json:"mode"`
+	//HttpAddress       string `json:"httpAddress"`
+	//RpcAddress        string `json:"rpcAddress"`
+	//Register          bool   `json:"register"`
+	//ID                uint   `json:"id"`
+	//ReportInterval    int `json:"reportInterval"`
+	//QueryTaskInterval int `json:"queryTaskInterval"`
+	//RedisAddress      string `json:"redis_address"`
 }
 
 // LogConfig 日志配置
@@ -97,17 +97,7 @@ func (g *GlobalConfig) Save() {
 	}
 	ioutil.WriteFile(ConfigFile, b, 0755)
 }
-func SetRegisterStatus(status bool, server string, id uint, httpAddress, rpcAddress, redisAddress string) {
-	configLock.Lock()
-	config.Server.Register = status
-	config.Server.ID = id
-	config.Server.HttpAddress = httpAddress
-	config.Server.RpcAddress = rpcAddress
-	config.Server.RedisAddress = redisAddress
-	config.Server.Address = server
-	configLock.Unlock()
-	config.Save()
-}
+
 func reload() {
 	ParseConfig(ConfigFile)
 }

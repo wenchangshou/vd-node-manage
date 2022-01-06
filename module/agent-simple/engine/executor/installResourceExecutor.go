@@ -151,7 +151,7 @@ func (executor *InstallResourceExecutor) BindOption(option interface{}) error {
 //reportDownloadProcess 上报下载进度
 func (executor *InstallResourceExecutor) reportDownloadProcess(resp *grab.Response) {
 	if executor.cache != nil {
-		key := fmt.Sprintf("device-task-%d-%d", g.Config().Server.ID, executor.taskID)
+		key := fmt.Sprintf("device-task-%d-%d", g.GetServerInfo().ID, executor.taskID)
 		body := model.TaskDownloadInfo{
 			BytesComplete: resp.BytesComplete(),
 			Size:          resp.Size,
