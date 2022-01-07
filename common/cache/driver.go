@@ -47,11 +47,11 @@ func GetSettings(keys []string, prefix string) (map[string]string, []string) {
 	raw, miss := Store.Gets(keys, prefix)
 	res := make(map[string]string, len(raw))
 	for k, v := range raw {
-		switch v.(type) {
+		switch v := v.(type) {
 		case []uint8:
-			res[k] = string(v.([]uint8))
+			res[k] = string(v)
 		case string:
-			res[k] = v.(string)
+			res[k] = v
 		}
 	}
 	return res, miss

@@ -168,3 +168,35 @@ func (service DeviceGetService) Get() serializer.Response {
 		Data: rtu,
 	}
 }
+
+type DeviceGetOnlineService struct {
+	IDS []uint `json:"id" uri:"id" form:"id"`
+}
+type DeviceGetOnlineRtu struct {
+	ID     uint `json:"id"`
+	Online bool `json:"online"`
+}
+
+func (service DeviceGetOnlineService) Get() serializer.Response {
+	arr := make([]string, 0)
+	for _, v := range service.IDS {
+		tmp := strconv.Itoa(int(v))
+		arr = append(arr, tmp)
+	}
+	rtu := make([]DeviceGetOnlineRtu, 0)
+	for ids := range arr {
+		id, _ := strconv.Atoi(arr[ids])
+		r := DeviceGetOnlineRtu{Online: false, ID: uint(id)}
+		rtu = append(rtu, r)
+	}
+	k, _ := cache.GetSettings(arr, "device-")
+	for k2 := range rtu {
+		_id := strconv.Itoa(int(rtu[k2].ID))
+		if _, exists := k[_id]; exists {
+			rtu[k2].Online = true
+		}
+	}
+	return serializer.Response{
+		Data: rtu,
+	}
+}

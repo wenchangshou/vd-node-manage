@@ -157,3 +157,12 @@ func CloseDeviceLayout(c *gin.Context) {
 	}
 
 }
+
+func GetDeviceOnline(c *gin.Context) {
+	s := service.DeviceGetOnlineService{}
+	if err := c.ShouldBindJSON(&s); err == nil {
+		res := s.Get()
+		c.JSON(200, res)
+	}
+
+}

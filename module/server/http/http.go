@@ -29,13 +29,13 @@ func InitRouter() *gin.Engine {
 		device := v1.Group("/device")
 		{
 			device.POST("/list", controllers.ListDevice)
+			device.POST("/online", controllers.GetDeviceOnline)
 			device.POST("", controllers.AddDevice)
 			device.DELETE("/:id", controllers.DeleteDevice)
 			device.GET("/:id", controllers.GetDevice)
 			device.POST("/register", controllers.RegisterDevice)
 			device.POST("/:id/resource", controllers.AddDeviceResource)
 			device.DELETE("/:id/resource/:resource_id", controllers.DeleteDeviceResource)
-			device.POST("/:id/")
 		}
 		layout := v1.Group("/layout")
 		{

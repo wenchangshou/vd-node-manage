@@ -98,24 +98,24 @@ func (executor *InstallResourceExecutor) storeResourceData() {
 	})
 }
 func (executor *InstallResourceExecutor) Execute() error {
+	var (
+		_md5 string
+		err  error
+	)
 	cfg := g.Config()
 	dstPath := path.Join(cfg.Resource.Directory, "resource/")
 	dstPath = path.Join(dstPath, fmt.Sprintf("%d-%s", executor.Resource.ID, executor.Resource.Name))
-	exists := executor.localFileExists(dstPath)
-	// 防止重复下载
-	if exists {
+	if executor.localFileExists(dstPath) {
 		return nil
 	}
 	zutil.IsExistDelete(dstPath)
-	err := executor.download(executor.Resource.Uri, dstPath)
-	if err != nil {
+	if executor.download(executor.Resource.Uri, dstPath); err != nil {
 		return fmt.Errorf("%s:%v", "下载文件失败", err)
 	}
-	_md5, err := zutil.GetFileMd5(dstPath)
-	if err != nil {
+	if _md5, err = zutil.GetFileMd5(dstPath); err != nil {
 		return errors.New("计算文件md5错误:" + err.Error())
 	}
-	if strings.ToLower(_md5) != strings.ToLower(executor.Resource.Md5) {
+	if strings.EqualFold(_md5, executor.Resource.Md5) {
 		return fmt.Errorf("md5错误,期望的md5:%s,实际文件的md5:%s", executor.Resource.Md5, _md5)
 	}
 	if err = executor.DeviceService.AddComputerResource(executor.Resource.ID); err != nil {

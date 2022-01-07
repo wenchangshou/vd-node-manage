@@ -32,6 +32,7 @@ func first() chan bool {
 				if g.GetServerInfo().Register {
 					r <- true
 				}
+			default:
 			}
 		}
 	}()
