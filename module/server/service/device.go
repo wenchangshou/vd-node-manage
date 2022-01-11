@@ -80,10 +80,13 @@ func (service DeviceRegisterService) Register() (uint, error) {
 }
 
 type DeviceCreateService struct {
+	ID       uint   `json:"id"`
 	Code     string `json:"code"`
 	Name     string `json:"name"`
 	ConnType string `json:"connType,default=link"`
 	RegionID int    `json:"regionId"`
+	Expired  uint64 `json:"expired"`
+	Mode     int    `json:"mode"`
 }
 
 func (service DeviceCreateService) Create() serializer.Response {
@@ -91,13 +94,12 @@ func (service DeviceCreateService) Create() serializer.Response {
 		uid uuid.UUID
 		err error
 	)
-	//if model.IsExistsCode(service.Code) {
-	//	return serializer.Err(serializer.CodeDeviceCodeRepeatErr, "授权id已存在", nil)
-	//}
 	device := model.Device{
 		ConnType: service.ConnType,
 		Name:     service.Name,
 		Status:   0,
+		Expired:  service.Expired,
+		Mode:     service.Mode,
 	}
 	if uid, err = uuid.NewUUID(); err != nil {
 		return serializer.Err(serializer.CodeRedisError, "生成授权码失败", err)
@@ -199,4 +201,27 @@ func (service DeviceGetOnlineService) Get() serializer.Response {
 	return serializer.Response{
 		Data: rtu,
 	}
+}
+
+type UpdateDeviceStruct struct {
+	ID      []uint `json:"id" uri:"id" form:"id"`
+	Mode    int    `json:"mode" form:"mode"`
+	Expired uint64 `json:"expired"`
+}
+
+func (service *UpdateDeviceStruct) SetLease() serializer.Response {
+	var (
+		err error
+	)
+	maps := make(map[string]interface{})
+	if service.Mode == model2.LEASE_ENABLE && service.Expired == 0 {
+		return serializer.Err(serializer.CodeParamErr, "enable lease,expired不能為空", nil)
+	}
+	maps["expired"] = service.Expired
+	maps["mode"] = service.Mode
+	err = model.SetDevices(service.ID, maps)
+	if err != nil {
+		return serializer.Err(serializer.CodeDBError, "'设置设备失败", err)
+	}
+	return serializer.Response{}
 }

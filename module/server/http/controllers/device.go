@@ -3,6 +3,7 @@ package controllers
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/cast"
 	"github.com/wenchangshou/vd-node-manage/common/serializer"
 	"github.com/wenchangshou/vd-node-manage/module/server/service"
 	"io/ioutil"
@@ -32,10 +33,20 @@ func GetDevice(c *gin.Context) {
 
 	}
 }
+
+func SetDeviceExpired(c *gin.Context) {
+	s := service.UpdateDeviceStruct{}
+	if err := c.BindJSON(&s); err == nil {
+		res := s.SetLease()
+		c.JSON(200, res)
+	} else {
+		c.JSON(200, serializer.ErrorResponse(err))
+	}
+}
 func AddDevice(c *gin.Context) {
-	ser := &service.DeviceCreateService{}
-	if err := c.BindJSON(&ser); err == nil {
-		res := ser.Create()
+	s := &service.DeviceCreateService{}
+	if err := c.BindJSON(&s); err == nil {
+		res := s.Create()
 		c.JSON(200, res)
 	} else {
 		c.JSON(200, serializer.ErrorResponse(err))
@@ -69,9 +80,7 @@ func RegisterDevice(c *gin.Context) {
 func AddDeviceResource(c *gin.Context) {
 	s := &service.DeviceResourceAddService{}
 	if err := c.BindJSON(&s); err == nil {
-		id := c.Param("id")
-		_id, err := strconv.Atoi(id)
-		s.ID = uint(_id)
+		s.ID = cast.ToUint(c.Param("id"))
 		if err != nil {
 			c.JSON(200, serializer.ErrorResponse(errors.New("id类型错误")))
 		}
@@ -163,6 +172,8 @@ func GetDeviceOnline(c *gin.Context) {
 	if err := c.ShouldBindJSON(&s); err == nil {
 		res := s.Get()
 		c.JSON(200, res)
+	} else {
+		c.JSON(200, serializer.ErrorResponse(err))
 	}
 
 }

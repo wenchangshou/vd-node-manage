@@ -5,11 +5,11 @@ import (
 	"github.com/wenchangshou/vd-node-manage/common/logging"
 	"github.com/wenchangshou/vd-node-manage/module/agent-simple/engine/player/playerService"
 	"github.com/wenchangshou/vd-node-manage/module/agent-simple/g/model"
+	"github.com/wenchangshou/vd-node-manage/module/agent-simple/g/process"
 	"path"
 	"sync"
 	"time"
 
-	"github.com/wenchangshou/vd-node-manage/common/process"
 	"github.com/wenchangshou/vd-node-manage/module/agent-simple/g"
 	"github.com/wenchangshou2/zutil"
 )
@@ -18,7 +18,7 @@ type ResourcePlayer struct {
 	model.Window
 	Source    string
 	Arguments map[string]interface{}
-	Pid       int
+	Pid       uint32
 	port      int
 	PlayPath  string
 	service   playerService.IPlayerService
@@ -50,7 +50,7 @@ func (player *ResourcePlayer) Loop() {
 		time.Sleep(time.Second)
 	}
 }
-func (player *ResourcePlayer) GetThreadId() int {
+func (player *ResourcePlayer) GetThreadId() uint32 {
 	return player.Pid
 }
 func (_ *ResourcePlayer) Check() (bool, error) {
@@ -58,9 +58,8 @@ func (_ *ResourcePlayer) Check() (bool, error) {
 }
 
 // Open 打开一个播放器
-func (player *ResourcePlayer) Open(wg *sync.WaitGroup, p int) (pid int, err error) {
+func (player *ResourcePlayer) Open(wg *sync.WaitGroup, p int) (pid uint32, err error) {
 	var (
-		e       process.StandardApplicationControl
 		service playerService.IPlayerService
 	)
 	defer wg.Done()
@@ -75,7 +74,7 @@ func (player *ResourcePlayer) Open(wg *sync.WaitGroup, p int) (pid int, err erro
 	params += fmt.Sprintf(" -p %d", p)
 	player.port = p
 	logging.GLogger.Info(fmt.Sprintf("player path:%s,arguments:%s", player.PlayPath, params))
-	player.Pid, err = e.StartProcessAsCurrentUser(player.PlayPath, params, "", false)
+	player.Pid, err = process.GProcess.StartProcessAsCurrentUser(player.PlayPath, params, "", false)
 	if service, err = playerService.GeneratePlayerService("rpc", p); err != nil {
 		return 0, err
 	}

@@ -3,7 +3,6 @@ module github.com/wenchangshou/vd-node-manage
 go 1.17
 
 require (
-	github.com/alexbrainman/ps v0.0.0-20171229230509-b3e1b4a15894
 	github.com/cavaliercoder/grab v2.0.0+incompatible
 	github.com/denisbrodbeck/machineid v1.0.1
 	github.com/gin-contrib/cors v1.3.1
@@ -18,6 +17,7 @@ require (
 	github.com/kardianos/service v1.2.0
 	github.com/mitchellh/mapstructure v1.4.3
 	github.com/pkg/errors v0.9.1
+	github.com/spf13/cast v1.4.1
 	github.com/tealeg/xlsx/v3 v3.2.4
 	github.com/toolkits/file v0.0.0-20160325033739-a5b3c5147e07
 	github.com/toolkits/net v0.0.0-20160910085801-3f39ab6fe3ce
@@ -35,6 +35,7 @@ require (
 
 require (
 	github.com/BurntSushi/toml v0.4.1 // indirect
+	github.com/alexbrainman/ps v0.0.0-20171229230509-b3e1b4a15894 // indirect
 	github.com/frankban/quicktest v1.11.2 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect

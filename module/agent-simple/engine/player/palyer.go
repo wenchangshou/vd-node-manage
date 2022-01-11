@@ -7,8 +7,8 @@ import (
 )
 
 type IPlayer interface {
-	Open(*sync.WaitGroup, int) (int, error)
-	GetThreadId() int
+	Open(*sync.WaitGroup, int) (uint32, error)
+	GetThreadId() uint32
 	Close() error
 	// Check  error
 	Check() (bool, error)

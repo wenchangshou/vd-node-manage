@@ -1,5 +1,11 @@
 package model
 
+const (
+	LEASE_NOT_ENABLED = iota
+	LEASE_ENABLE
+	LEASE_UNLIMITED
+)
+
 // DeviceSetStatusRequest 设置任务状态
 type DeviceSetStatusRequest struct {
 	ID     []uint      `json:"id"`
@@ -24,9 +30,6 @@ type DeviceRegisterResponse struct {
 	Code   int          `json:"code"`
 	Msg    string       `json:"msg"`
 	Config ServerConfig `json:"config"`
-	//RpcAddress   string `json:"rpcAddress"`
-	//HttpAddress  string `json:"httpAddress"`
-	//RedisAddress string `json:"redis_address"`
 }
 type DeviceSyncConfResponse struct {
 	//ID           uint   `json:"id"`

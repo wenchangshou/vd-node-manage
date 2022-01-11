@@ -17,6 +17,8 @@ type Device struct {
 	LastOnlineTime int64  `gorm:"last_online_time" json:"last_online_time"`
 	RegionId       int    `gorm:"region_id" json:"region_id"`
 	Startup        string `json:"startup" gorm:"startup"`
+	Expired        uint64 `json:"expired" gorm:"expired"`
+	Mode           int    `json:"mode" gorm:"mode"`
 }
 
 func (Device) TableName() string {
@@ -45,6 +47,9 @@ func GetDeviceByID(id uint) (*Device, error) {
 }
 func SetDeviceStartup(id uint, args []byte) error {
 	return DB.Model(&Device{}).Where("id=?", id).Update("startup", args).Error
+}
+func SetDevices(id []uint, maps map[string]interface{}) error {
+	return DB.Model(&Device{}).Where("id in ?", id).Updates(maps).Error
 }
 func DeleteDevice(id uint) error {
 	return DB.Delete(&Device{}, id).Error

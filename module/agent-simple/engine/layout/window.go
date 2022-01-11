@@ -30,7 +30,7 @@ type Window struct {
 	player    player.IPlayer
 }
 
-func (window *Window) Open(wg *sync.WaitGroup, port int) (int, error) {
+func (window *Window) Open(wg *sync.WaitGroup, port int) (uint32, error) {
 	return window.player.Open(wg, port)
 }
 func (window *Window) Close() error {

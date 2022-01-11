@@ -13,6 +13,8 @@ type DeviceVo struct {
 	Online         bool   `json:"online"`
 	Detailed       string `json:"detailed"`
 	LastOnlineTime int64  `json:"lastOnlineTime"`
+	Expired        uint64 `json:"expired"`
+	Mode           int    `json:"mode"`
 }
 
 func DeviceDoToVo(d *model.Device) *DeviceVo {
@@ -27,6 +29,8 @@ func DeviceDoToVo(d *model.Device) *DeviceVo {
 		HostName: d.HostName,
 		Status:   d.Status,
 		RegionID: d.RegionId,
+		Expired:  d.Expired,
+		Mode:     d.Mode,
 	}
 
 }

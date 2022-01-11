@@ -31,6 +31,7 @@ func InitRouter() *gin.Engine {
 			device.POST("/list", controllers.ListDevice)
 			device.POST("/online", controllers.GetDeviceOnline)
 			device.POST("", controllers.AddDevice)
+			device.POST("/lease", controllers.SetDeviceExpired)
 			device.DELETE("/:id", controllers.DeleteDevice)
 			device.GET("/:id", controllers.GetDevice)
 			device.POST("/register", controllers.RegisterDevice)
