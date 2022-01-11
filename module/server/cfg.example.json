@@ -1,5 +1,6 @@
 {
   "debug": true,
+  "mode":"system",
   "database": "",
   "hosts": "",
   "maxConns": 20,

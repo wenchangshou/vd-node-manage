@@ -2,9 +2,10 @@ package g
 
 import (
 	"encoding/json"
-	"github.com/toolkits/file"
 	"log"
 	"sync"
+
+	"github.com/toolkits/file"
 )
 
 type HttpConfig struct {
@@ -39,6 +40,7 @@ type RedisConfig struct {
 }
 type GlobalConfig struct {
 	Debug    bool            `json:"debug"`
+	Mode     string          `json:"mode"`
 	Hosts    string          `json:"hosts"`
 	MaxCons  int             `json:"maxCons"`
 	MaxIdle  int             `json:"maxIdle"`

@@ -3,6 +3,7 @@ package http
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/gzip"
@@ -64,10 +65,15 @@ func Start() {
 	if !g.Config().Http.Enabled {
 		return
 	}
+
 	addr := g.Config().Http.Listen
+	if g.Config().Mode == "docker" {
+		addr = os.Getenv("LISTEN_ADDR") + ":6031"
+	}
 	if addr == "" {
 		return
 	}
+
 	r := InitRouter()
 	if err := r.Run(addr); err != nil {
 		log.Fatalln("start http", "err", err.Error())
