@@ -4,10 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
+
 	"github.com/wenchangshou/vd-node-manage/common/cache"
 	"github.com/wenchangshou/vd-node-manage/module/agent-simple/g/db"
 	bolt "go.etcd.io/bbolt"
-	"time"
 
 	"github.com/wenchangshou/vd-node-manage/module/agent-simple/engine/layout"
 
@@ -137,7 +138,7 @@ func (schedule *Schedule) control(req model.EventRequest) model.EventReply {
 }
 
 // DeviceEvent 接收服务端事件
-func (schedule *Schedule) DeviceEvent(_ string, message []byte) (err error) {
+func (schedule *Schedule) DeviceEvent(_ string, message []byte) (r []byte, err error) {
 	req := model.EventRequest{}
 	reply := model.EventReply{}
 	if err = json.Unmarshal(message, &req); err != nil {
@@ -153,11 +154,10 @@ func (schedule *Schedule) DeviceEvent(_ string, message []byte) (err error) {
 		reply = schedule.CheckResourceExists(req)
 	}
 	if !req.Reply {
-		return nil
+		return nil, nil
 	}
 	b, _ := json.Marshal(reply)
-	schedule.redisClient.Publish("server", b)
-	return nil
+	return b, nil
 }
 func (schedule *Schedule) Startup() error {
 	cmd := model.OpenLayoutCmdParams{}

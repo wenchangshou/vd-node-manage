@@ -3,11 +3,12 @@ package Event
 import (
 	"context"
 	"fmt"
-	"github.com/gomodule/redigo/redis"
 	"time"
+
+	"github.com/gomodule/redigo/redis"
 )
 
-type ConsumeFunc func(channel string, message []byte) error
+type ConsumeFunc func(channel string, message []byte) ([]byte, error)
 type RedisClient struct {
 	pool *redis.Pool
 }
@@ -62,9 +63,17 @@ func (r *RedisClient) Subscribe(ctx context.Context, consume ConsumeFunc, channe
 				done <- fmt.Errorf("redis pubsub receive err:%v", msg)
 				return
 			case redis.Message:
-				if err := consume(msg.Channel, msg.Data); err != nil {
+				var (
+					reply []byte
+					err   error
+				)
+
+				if reply, err = consume(msg.Channel, msg.Data); err != nil {
 					done <- err
 					return
+				}
+				if reply != nil {
+					r.Publish("server", reply)
 				}
 			case redis.Subscription:
 				if msg.Count == 0 {
@@ -91,5 +100,4 @@ func (r *RedisClient) Subscribe(ctx context.Context, consume ConsumeFunc, channe
 			}
 		}
 	}
-	return nil
 }
