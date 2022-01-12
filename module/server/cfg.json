@@ -4,7 +4,7 @@
     "type": "mysql",
     "User": "root",
     "Password": "123.com",
-    "Host": "192.168.0.222",
+    "Host": "mysql-server",
     "Port": 3306,
     "Name": "vd"
   },
@@ -18,7 +18,7 @@
   },
   "redis": {
     "passwd": "",
-    "addr": "192.168.0.222:6379",
+    "addr": "redis-server:6379",
     "db": 0,
     "maxIdle": 5
   }
