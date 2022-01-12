@@ -91,12 +91,7 @@ func (store *RedisStore) Set(key string, value interface{}, ttl int) error {
 	} else {
 		_, err = rc.Do("SET", key, serialized)
 	}
-
-	if err != nil {
-		return err
-	}
-	return nil
-
+	return err
 }
 
 // Get 取值

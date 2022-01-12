@@ -7,6 +7,7 @@ import (
 	"github.com/cavaliercoder/grab"
 	"github.com/mitchellh/mapstructure"
 	"github.com/wenchangshou/vd-node-manage/common/cache"
+	"github.com/wenchangshou/vd-node-manage/common/logging"
 	"github.com/wenchangshou/vd-node-manage/common/model"
 	"github.com/wenchangshou/vd-node-manage/module/agent-simple/g"
 	IService "github.com/wenchangshou/vd-node-manage/module/agent-simple/service"
@@ -55,7 +56,7 @@ loop:
 	if err := resp.Err(); err != nil {
 		return err
 	}
-	fmt.Printf("Download saved to ./%v \n", resp.Filename)
+	logging.GLogger.Info(fmt.Sprintf("eventid:%d download success,save to ./%v", executor.taskID, resp.Filename))
 	return nil
 }
 func (executor *InstallResourceExecutor) localFileExists(rPath string) bool {
@@ -113,9 +114,10 @@ func (executor *InstallResourceExecutor) Execute() error {
 		return fmt.Errorf("%s:%v", "下载文件失败", err)
 	}
 	if _md5, err = zutil.GetFileMd5(dstPath); err != nil {
+		logging.GLogger.Warn(fmt.Sprintf("校验文件md5失败,失败原因:%s", err.Error()))
 		return errors.New("计算文件md5错误:" + err.Error())
 	}
-	if strings.EqualFold(_md5, executor.Resource.Md5) {
+	if !strings.EqualFold(_md5, executor.Resource.Md5) {
 		return fmt.Errorf("md5错误,期望的md5:%s,实际文件的md5:%s", executor.Resource.Md5, _md5)
 	}
 	if err = executor.DeviceService.AddComputerResource(executor.Resource.ID); err != nil {

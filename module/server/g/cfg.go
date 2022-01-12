@@ -38,6 +38,10 @@ type RedisConfig struct {
 	HighQueues []string `json:"highQueues"`
 	LowQueues  []string `json:"lowQueues"`
 }
+type EventConfig struct {
+	Provider  string                 `json:"provider"`
+	Arguments map[string]interface{} `json:"arguments"`
+}
 type GlobalConfig struct {
 	Debug    bool            `json:"debug"`
 	Mode     string          `json:"mode"`
@@ -49,6 +53,7 @@ type GlobalConfig struct {
 	Database *DatabaseConfig `json:"database"`
 	Cache    *CacheConfig    `json:"cache"`
 	Redis    *RedisConfig    `json:"redis"`
+	Event    *EventConfig    `json:"event"`
 }
 
 var (

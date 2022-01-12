@@ -66,7 +66,8 @@ func (service DeviceResourceAddService) CheckRemoteDeviceResource(deviceId uint,
 	if dr == nil || dr.ResourceID <= 0 {
 		return false
 	}
-	reply, err := event.GManage.PublishEvent(context.TODO(), "checkResourceExists", fmt.Sprintf("device-%d", service.ID), b, true)
+	req, _ := event.GetEventCmd("checkResourceExists", service.ID, b, true)
+	reply, err := event.GEvent.PublishEvent(context.TODO(), fmt.Sprintf("device-%d", service.ID), req, true)
 	if err != nil {
 		return false
 	}

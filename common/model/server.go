@@ -14,8 +14,8 @@ type ServerRpcConfig struct {
 	Address string `json:"address"`
 }
 type ServerEventConfig struct {
-	Provider  string            `json:"provider"`
-	Arguments map[string]string `json:"arguments"`
+	Provider  string                 `json:"provider"`
+	Arguments map[string]interface{} `json:"arguments"`
 }
 type ServerConfig struct {
 	Register bool              `json:"register"`
@@ -24,4 +24,5 @@ type ServerConfig struct {
 	Redis    ServerRedisConfig `json:"redis"`
 	Http     ServerHttpConfig  `json:"http"`
 	Rpc      ServerRpcConfig   `json:"rpc"`
+	Event    ServerEventConfig `json:"event"`
 }

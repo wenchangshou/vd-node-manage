@@ -58,7 +58,7 @@ func (schedule Schedule) queryTask() {
 func (schedule *Schedule) loop() {
 	heartbeatTick := time.NewTicker(3 * time.Second)
 	resourceDistributionTick := time.NewTicker(5 * time.Second)
-	playerActiveInfoTick := time.NewTicker(time.Second)
+	playerActiveInfoTick := time.NewTicker(500 * time.Millisecond)
 	for {
 		select {
 		case <-heartbeatTick.C:
@@ -79,7 +79,7 @@ func (schedule *Schedule) reportPlayerRunInfo() {
 		return
 	}
 	b, _ := json.Marshal(res)
-	cache.Set(fmt.Sprintf("device-%d-%s", schedule.ID, schedule.layoutManage.GetLayoutID()), string(b), 5)
+	cache.Set(fmt.Sprintf("device-%d-%s", schedule.ID, schedule.layoutManage.GetLayoutID()), string(b), 10)
 }
 func (schedule *Schedule) openLayout(req model.EventRequest) model.EventReply {
 	var (
@@ -156,7 +156,7 @@ func (schedule *Schedule) DeviceEvent(_ string, message []byte) (err error) {
 		return nil
 	}
 	b, _ := json.Marshal(reply)
-	schedule.redisClient.Publish("server", string(b))
+	schedule.redisClient.Publish("server", b)
 	return nil
 }
 func (schedule *Schedule) Startup() error {

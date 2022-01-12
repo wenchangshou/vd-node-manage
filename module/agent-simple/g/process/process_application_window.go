@@ -9,6 +9,10 @@ import (
 type WindowConsoleProcess struct {
 }
 
+func (w WindowConsoleProcess) GetThreadStatus(id uint32) bool {
+	return CheckThreadExists(id)
+}
+
 func (w WindowConsoleProcess) StartProcessAsCurrentUser(appPath, cmdLine, workDir string, backstage bool) (uint32, error) {
 	var (
 		result []byte
