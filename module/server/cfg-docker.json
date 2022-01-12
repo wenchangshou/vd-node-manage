@@ -1,0 +1,26 @@
+{
+  "debug": true,
+  "mdoe":"docker",
+  "database": {
+    "type": "mysql",
+    "User": "root",
+    "Password": "123.com",
+    "Host": "192.168.0.222",
+    "Port": 3306,
+    "Name": "vd"
+  },
+  "hosts": "",
+  "maxCons": 20,
+  "maxIdle": 100,
+  "listen": "192.168.10.121:6030",
+  "http": {
+    "enabled": true,
+    "listen": "192.168.10.121:6031"
+  },
+  "redis": {
+    "passwd": "",
+    "addr": "192.168.0.222:6379",
+    "db": 0,
+    "maxIdle": 5
+  }
+}

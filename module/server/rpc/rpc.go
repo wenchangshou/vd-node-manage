@@ -1,12 +1,14 @@
 package rpc
 
 import (
-	"github.com/wenchangshou/vd-node-manage/module/server/g"
 	"log"
 	"net"
 	"net/rpc"
 	"net/rpc/jsonrpc"
+	"os"
 	"time"
+
+	"github.com/wenchangshou/vd-node-manage/module/server/g"
 )
 
 type Device int
@@ -16,6 +18,9 @@ type Resource int
 
 func Start() {
 	addr := g.Config().Listen
+	if g.Config().Mode == "docker" {
+		addr = os.Getenv("LISTEN_ADDR") + ":6030"
+	}
 	server := rpc.NewServer()
 	server.Register(new(Device))
 	server.Register(new(Task))

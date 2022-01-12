@@ -36,7 +36,6 @@ require (
 
 require (
 	github.com/BurntSushi/toml v0.4.1 // indirect
-	github.com/alexbrainman/ps v0.0.0-20171229230509-b3e1b4a15894 // indirect
 	github.com/frankban/quicktest v1.11.2 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
