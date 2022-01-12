@@ -8,8 +8,7 @@
     ".NETCoreApp,Version=v6.0": {
       "Zoolon_videoplayer/1.0.0": {
         "dependencies": {
-          "CommandLineParser": "2.8.0",
-          "Control": "1.0.0",
+          "Base": "1.0.0",
           "LibVLCSharp": "3.6.4",
           "LibVLCSharp.WinForms": "3.6.4",
           "Newtonsoft.Json": "13.0.1",
@@ -119,13 +118,15 @@
       },
       "System.Memory/4.5.3": {},
       "VideoLAN.LibVLC.Windows/3.0.16": {},
-      "Control/1.0.0": {
+      "Base/1.0.0": {
         "dependencies": {
+          "CommandLineParser": "2.8.0",
           "Google.Protobuf": "3.19.1",
-          "Grpc": "2.42.0"
+          "Grpc": "2.42.0",
+          "Newtonsoft.Json": "13.0.1"
         },
         "runtime": {
-          "Control.dll": {}
+          "Base.dll": {}
         }
       }
     }
@@ -206,7 +207,7 @@
       "path": "videolan.libvlc.windows/3.0.16",
       "hashPath": "videolan.libvlc.windows.3.0.16.nupkg.sha512"
     },
-    "Control/1.0.0": {
+    "Base/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

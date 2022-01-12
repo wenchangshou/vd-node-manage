@@ -88,7 +88,8 @@ func (service DeviceLayoutOpenService) Open() serializer.Response {
 	c.Windows = windows
 	b1, _ := json.Marshal(c)
 	ctx := context.TODO()
-	reply, err := event.GManage.PublishEvent(ctx, "openLayout", fmt.Sprintf("device-%d", service.ID), b1, true)
+	r, _ := event.GetEventCmd("openLayout", service.ID, b1, true)
+	reply, err := event.GEvent.PublishEvent(ctx, fmt.Sprintf("device-%d", service.ID), r, true)
 	if err != nil {
 		return serializer.Err(serializer.CodeRedisError, "redis publish event error", err)
 	}
@@ -108,7 +109,8 @@ type DeviceLayoutCloseService struct {
 }
 
 func (service DeviceLayoutCloseService) Close() serializer.Response {
-	reply, err := event.GManage.PublishEvent(context.TODO(), "closeLayout", fmt.Sprintf("device-%d", service.ID), nil, true)
+	r, _ := event.GetEventCmd("closeLayout", service.ID, nil, true)
+	reply, err := event.GEvent.PublishEvent(context.TODO(), fmt.Sprintf("device-%d", service.ID), r, true)
 	if err != nil {
 		return serializer.Err(serializer.CodeRedisError, "redis publish event error", err)
 	}
@@ -131,7 +133,8 @@ func (service DeviceLayoutControlService) Control() serializer.Response {
 		Body: service.Body,
 	}
 	b1, _ := json.Marshal(c)
-	reply, err := event.GManage.PublishEvent(context.TODO(), "control", fmt.Sprintf("device-%d", service.ID), b1, true)
+	r, _ := event.GetEventCmd("control", service.ID, b1, true)
+	reply, err := event.GEvent.PublishEvent(context.TODO(), fmt.Sprintf("device-%d", service.ID), r, true)
 	if err != nil {
 		return serializer.Err(serializer.CodeRedisError, "redis publish event error", err)
 	}

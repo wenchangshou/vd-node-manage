@@ -3,10 +3,70 @@ package process
 import (
 	"fmt"
 	"golang.org/x/sys/windows"
+	"syscall"
 	"unsafe"
 )
 
 type WindowServiceProcess struct {
+}
+type PsInfo struct {
+	ProcessID       int    //进程id
+	ParentProcessID int    //上级进程id
+	ProcessName     string //进程名称
+}
+type PsTree map[int]PsInfo
+
+func (t PsTree) findDescendants(pid int) []int {
+	var children []int
+	for _, ps := range t {
+		if ps.ParentProcessID == pid {
+			children = append(children, ps.ProcessID)
+			children = append(children, t.findDescendants(ps.ProcessID)...)
+		}
+	}
+	return children
+}
+
+// SnapshotSysProcesses 获取当前所有的进程的信息
+func SnapshotSysProcesses() (PsTree, error) {
+	ss, err := syscall.CreateToolhelp32Snapshot(syscall.TH32CS_SNAPPROCESS, 0)
+	if err != nil {
+		return nil, err
+	}
+	defer syscall.CloseHandle(ss)
+	ps := make(PsTree)
+	var pe syscall.ProcessEntry32
+	pe.Size = uint32(unsafe.Sizeof(pe))
+	if err = syscall.Process32First(ss, &pe); err != nil {
+		return nil, err
+	}
+	for {
+		tmp := PsInfo{
+			ProcessID:       int(pe.ProcessID),
+			ParentProcessID: int(pe.ParentProcessID),
+			ProcessName:     windows.UTF16ToString(pe.ExeFile[:]),
+		}
+		ps[int(pe.ProcessID)] = tmp
+		err = syscall.Process32Next(ss, &pe)
+		if err == syscall.ERROR_NO_MORE_FILES {
+			return ps, nil
+		}
+		if err != nil {
+			return nil, err
+		}
+	}
+}
+func CheckThreadExists(id uint32) bool {
+	tree, _ := SnapshotSysProcesses()
+	for _, ps := range tree {
+		if ps.ProcessID == int(id) {
+			return true
+		}
+	}
+	return false
+}
+func (w WindowServiceProcess) GetThreadStatus(id uint32) bool {
+	return CheckThreadExists(id)
 }
 
 var (
@@ -207,6 +267,6 @@ func DuplicateUserTokenFromSessionID(sessionId windows.Handle) (windows.Token, e
 
 	return userToken, nil
 }
-func NewWindowServiceProcess() *WindowServiceProcess {
+func NewWindowServiceProcess() IProcess {
 	return &WindowServiceProcess{}
 }

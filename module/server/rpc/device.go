@@ -23,7 +23,6 @@ func (device *Device) Register(args *model.DeviceRegisterRequest, reply *model.D
 		reply.Code = -1
 		reply.Msg = err.Error()
 	} else {
-
 		conf := model.ServerConfig{
 			ID:       id,
 			Register: true,
@@ -37,6 +36,10 @@ func (device *Device) Register(args *model.DeviceRegisterRequest, reply *model.D
 			Rpc: model.ServerRpcConfig{
 				Enable:  true,
 				Address: g.Config().Listen,
+			},
+			Event: model.ServerEventConfig{
+				Provider:  g.Config().Event.Provider,
+				Arguments: g.Config().Event.Arguments,
 			},
 		}
 

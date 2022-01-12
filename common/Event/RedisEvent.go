@@ -37,12 +37,12 @@ func NewRedisClient(addr string, db int, passwd string) *RedisClient {
 	return client
 }
 
-func (r *RedisClient) Publish(channel, message string) (int, error) {
+func (r *RedisClient) Publish(channel string, msg []byte) (int, error) {
 	c := r.pool.Get()
 	defer c.Close()
-	n, err := redis.Int(c.Do("PUBLISH", channel, message))
+	n, err := redis.Int(c.Do("PUBLISH", channel, msg))
 	if err != nil {
-		return 0, fmt.Errorf("redis publish %s %s, %v", channel, message, err)
+		return 0, fmt.Errorf("redis publish %s %s, %v", channel, msg, err)
 	}
 	return n, nil
 }

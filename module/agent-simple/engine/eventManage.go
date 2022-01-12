@@ -2,6 +2,8 @@ package engine
 
 import (
 	"context"
+	"fmt"
+	"github.com/wenchangshou/vd-node-manage/common/logging"
 
 	"github.com/wenchangshou/vd-node-manage/common/model"
 	"github.com/wenchangshou/vd-node-manage/module/agent-simple/engine/executor"
@@ -35,6 +37,7 @@ func (task *EventExecuteManage) execute() {
 		return
 	}
 	if err = execFunc.Execute(); err != nil {
+		logging.GLogger.Warn(fmt.Sprintf("安装资源失败,原因:%s", err.Error()))
 		task.statusChan <- model.Error
 		return
 	}

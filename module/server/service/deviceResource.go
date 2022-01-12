@@ -4,6 +4,7 @@ import (
 	model2 "github.com/wenchangshou/vd-node-manage/common/model"
 	"github.com/wenchangshou/vd-node-manage/common/serializer"
 	"github.com/wenchangshou/vd-node-manage/module/server/model"
+	"gorm.io/gorm"
 )
 
 type DeviceResourceListService struct {
@@ -72,6 +73,9 @@ type DeviceResourceDeleteService struct {
 
 func (service DeviceResourceDeleteService) Delete() serializer.Response {
 	r, err := model.GetDeviceResource(service.ID, service.ResourceId)
+	if err == gorm.ErrRecordNotFound {
+		return serializer.Response{}
+	}
 	if err != nil {
 		return serializer.Err(serializer.CodeDBError, "查询资源失败", err)
 	}

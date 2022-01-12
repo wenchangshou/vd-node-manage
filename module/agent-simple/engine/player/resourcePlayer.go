@@ -50,11 +50,12 @@ func (player *ResourcePlayer) Loop() {
 		time.Sleep(time.Second)
 	}
 }
-func (player *ResourcePlayer) GetThreadId() uint32 {
+func (player ResourcePlayer) GetThreadId() uint32 {
 	return player.Pid
 }
-func (_ *ResourcePlayer) Check() (bool, error) {
-	return false, nil
+func (player ResourcePlayer) Check() (bool, error) {
+	exists := process.GProcess.GetThreadStatus(player.Pid)
+	return exists, nil
 }
 
 // Open 打开一个播放器

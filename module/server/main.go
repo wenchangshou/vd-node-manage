@@ -9,6 +9,7 @@ import (
 	"github.com/wenchangshou/vd-node-manage/module/server/http"
 	"github.com/wenchangshou/vd-node-manage/module/server/model"
 	"github.com/wenchangshou/vd-node-manage/module/server/rpc"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -24,7 +25,9 @@ func main() {
 	}
 	g.ParseConfig(*cfg)
 	model.InitDatabase()
-	event.InitEvent(g.Config().Cache)
+	if err := event.NewEvent(g.Config().Event.Provider, g.Config().Event.Arguments); err != nil {
+		log.Fatalf("new event fail:" + err.Error())
+	}
 	cache.InitCache("redis", g.Config().Cache.Addr, g.Config().Cache.Passwd, g.Config().Cache.DB)
 	go http.Start()
 	go rpc.Start()
