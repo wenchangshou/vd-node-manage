@@ -45,8 +45,3 @@ func reportAgentStatus(interval time.Duration) {
 		time.Sleep(interval)
 	}
 }
-func reportWindowsStatus(interval time.Duration) {
-	for {
-
-	}
-}

@@ -2,28 +2,62 @@ package Event
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
-
 	"github.com/nats-io/nats.go"
+	"github.com/wenchangshou/vd-node-manage/common/model"
+	"time"
 )
 
 type NatsEvent struct {
 	nc *nats.Conn
 }
 
+func (client NatsEvent) PublishEvent(ctx context.Context, topic string, msg *model.EventRequest, reply bool) (string, error) {
+	if client.nc.IsClosed() {
+		return "", errors.New("nats is closed")
+	}
+	b, _ := json.Marshal(msg)
+	if reply {
+		msg, err := client.nc.Request(topic, b, time.Second)
+		if err != nil {
+			return "", err
+		}
+		return string(msg.Data), nil
+	}
+	return "", client.nc.Publish(topic, b)
+}
+
+//func (client NatsEvent) publish(channel string, message []byte) (int, error) {
+//	if client.nc.IsClosed() {
+//		return "", errors.New("nats is closed")
+//	}
+//	b, _ := json.Marshal(msg)
+//	if reply {
+//		msg, err := event.nc.Request(topic, b, time.Second)
+//		if err != nil {
+//			return "", err
+//		}
+//		return string(msg.Data), nil
+//	}
+//	return "", event.nc.publish(topic, b)
+//}
+
 func (client NatsEvent) fanOut(channel []string) chan []byte {
 	c := make(chan []byte)
 	return c
 }
-func (client NatsEvent) Subscribe(ctx context.Context, consume ConsumeFunc, channel ...string) error {
 
+// Subscribe 订阅事件
+func (client NatsEvent) Subscribe(ctx context.Context, consume ConsumeFunc, channel ...string) error {
 	for _, v := range channel {
 		go func(channel string) {
 			client.nc.Subscribe(channel, func(msg *nats.Msg) {
 				reply, err := consume(channel, msg.Data)
-				if err != nil {
-					client.nc.Publish(msg.Reply, reply)
+				if err == nil && reply != nil {
+					b := reply.Body
+					client.nc.Publish(msg.Reply, []byte(b))
 				}
 			})
 		}(v)

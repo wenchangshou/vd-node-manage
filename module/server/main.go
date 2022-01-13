@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"github.com/wenchangshou/vd-node-manage/common/cache"
-	"github.com/wenchangshou/vd-node-manage/module/server/event"
 	"github.com/wenchangshou/vd-node-manage/module/server/g"
 	"github.com/wenchangshou/vd-node-manage/module/server/http"
 	"github.com/wenchangshou/vd-node-manage/module/server/model"
@@ -25,7 +24,7 @@ func main() {
 	}
 	g.ParseConfig(*cfg)
 	model.InitDatabase()
-	if err := event.NewEvent(g.Config().Event.Provider, g.Config().Event.Arguments); err != nil {
+	if err := g.InitEvent(g.Config().Event.Provider, g.Config().Event.Arguments); err != nil {
 		log.Fatalf("new event fail:" + err.Error())
 	}
 	cache.InitCache("redis", g.Config().Cache.Addr, g.Config().Cache.Passwd, g.Config().Cache.DB)

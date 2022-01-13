@@ -23,8 +23,9 @@
     "maxIdle": 5
   },
   "nats": {
-    "provider": "redis",
+    "provider": "nats",
     "arguments": {
-    },
+      "address": "192.168.10.31:42222"
+    }
   }
 }

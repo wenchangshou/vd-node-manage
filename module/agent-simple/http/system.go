@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -57,6 +58,13 @@ func configSystemRoutes() {
 		}
 		resp.Config.Server = server.(string)
 		resp.Config.ID = resp.ID
+		arr := strings.Split(server.(string), ":")
+		if strings.Contains(resp.Config.Rpc.Address, "0.0.0.0") {
+			resp.Config.Rpc.Address = strings.ReplaceAll(resp.Config.Rpc.Address, "0.0.0.0", arr[0])
+		}
+		if strings.Contains(resp.Config.Http.Address, "0.0.0.0") {
+			resp.Config.Http.Address = strings.ReplaceAll(resp.Config.Http.Address, "0.0.0.0", arr[0])
+		}
 		g.StoreServerInfo(&resp.Config)
 		RenderCustomMsgJson(w, 0, "success")
 	})

@@ -4,12 +4,29 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/google/uuid"
 	"github.com/wenchangshou/vd-node-manage/common/cache"
 	"github.com/wenchangshou/vd-node-manage/common/model"
 	"github.com/wenchangshou/vd-node-manage/common/serializer"
-	"github.com/wenchangshou/vd-node-manage/module/server/event"
+	"github.com/wenchangshou/vd-node-manage/module/server/g"
 	model2 "github.com/wenchangshou/vd-node-manage/module/server/model"
 )
+
+func GetEventCmd(action string, did uint, body []byte, reply bool) (*model.EventRequest, error) {
+	id, err := uuid.NewRandom()
+	if err != nil {
+		return nil, err
+	}
+	msg := model.EventRequest{
+		EventID:   id.String(),
+		Action:    action,
+		DeviceID:  did,
+		Arguments: body,
+		Reply:     reply,
+	}
+	return &msg, nil
+
+}
 
 // DeviceLayoutOpenService 打开设备布局服务
 type DeviceLayoutOpenService struct {
@@ -88,8 +105,8 @@ func (service DeviceLayoutOpenService) Open() serializer.Response {
 	c.Windows = windows
 	b1, _ := json.Marshal(c)
 	ctx := context.TODO()
-	r, _ := event.GetEventCmd("openLayout", service.ID, b1, true)
-	reply, err := event.GEvent.PublishEvent(ctx, fmt.Sprintf("device-%d", service.ID), r, true)
+	r, _ := GetEventCmd("openLayout", service.ID, b1, true)
+	reply, err := g.GEvent.PublishEvent(ctx, fmt.Sprintf("device-%d", service.ID), r, true)
 	if err != nil {
 		return serializer.Err(serializer.CodeRedisError, "redis publish event error", err)
 	}
@@ -109,8 +126,8 @@ type DeviceLayoutCloseService struct {
 }
 
 func (service DeviceLayoutCloseService) Close() serializer.Response {
-	r, _ := event.GetEventCmd("closeLayout", service.ID, nil, true)
-	reply, err := event.GEvent.PublishEvent(context.TODO(), fmt.Sprintf("device-%d", service.ID), r, true)
+	r, _ := GetEventCmd("closeLayout", service.ID, nil, true)
+	reply, err := g.GEvent.PublishEvent(context.TODO(), fmt.Sprintf("device-%d", service.ID), r, true)
 	if err != nil {
 		return serializer.Err(serializer.CodeRedisError, "redis publish event error", err)
 	}
@@ -133,8 +150,8 @@ func (service DeviceLayoutControlService) Control() serializer.Response {
 		Body: service.Body,
 	}
 	b1, _ := json.Marshal(c)
-	r, _ := event.GetEventCmd("control", service.ID, b1, true)
-	reply, err := event.GEvent.PublishEvent(context.TODO(), fmt.Sprintf("device-%d", service.ID), r, true)
+	r, _ := GetEventCmd("control", service.ID, b1, true)
+	reply, err := g.GEvent.PublishEvent(context.TODO(), fmt.Sprintf("device-%d", service.ID), r, true)
 	if err != nil {
 		return serializer.Err(serializer.CodeRedisError, "redis publish event error", err)
 	}

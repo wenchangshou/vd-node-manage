@@ -6,7 +6,7 @@ import (
 	"fmt"
 	model2 "github.com/wenchangshou/vd-node-manage/common/model"
 	"github.com/wenchangshou/vd-node-manage/common/serializer"
-	"github.com/wenchangshou/vd-node-manage/module/server/event"
+	"github.com/wenchangshou/vd-node-manage/module/server/g"
 	"github.com/wenchangshou/vd-node-manage/module/server/model"
 )
 
@@ -66,8 +66,8 @@ func (service DeviceResourceAddService) CheckRemoteDeviceResource(deviceId uint,
 	if dr == nil || dr.ResourceID <= 0 {
 		return false
 	}
-	req, _ := event.GetEventCmd("checkResourceExists", service.ID, b, true)
-	reply, err := event.GEvent.PublishEvent(context.TODO(), fmt.Sprintf("device-%d", service.ID), req, true)
+	req, _ := GetEventCmd("checkResourceExists", service.ID, b, true)
+	reply, err := g.GEvent.PublishEvent(context.TODO(), fmt.Sprintf("device-%d", service.ID), req, true)
 	if err != nil {
 		return false
 	}

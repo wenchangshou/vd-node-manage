@@ -138,7 +138,7 @@ func (schedule *Schedule) control(req model.EventRequest) model.EventReply {
 }
 
 // DeviceEvent 接收服务端事件
-func (schedule *Schedule) DeviceEvent(_ string, message []byte) (r []byte, err error) {
+func (schedule *Schedule) DeviceEvent(_ string, message []byte) (r *model.EventReply, err error) {
 	req := model.EventRequest{}
 	reply := model.EventReply{}
 	if err = json.Unmarshal(message, &req); err != nil {
@@ -156,8 +156,7 @@ func (schedule *Schedule) DeviceEvent(_ string, message []byte) (r []byte, err e
 	if !req.Reply {
 		return nil, nil
 	}
-	b, _ := json.Marshal(reply)
-	return b, nil
+	return &reply, nil
 }
 func (schedule *Schedule) Startup() error {
 	cmd := model.OpenLayoutCmdParams{}
@@ -176,8 +175,17 @@ func (schedule *Schedule) Startup() error {
 }
 func (schedule *Schedule) Start() {
 	schedule.Startup()
-	go schedule.redisClient.Subscribe(context.TODO(), schedule.DeviceEvent, fmt.Sprintf("device-%d", schedule.ID))
 	go schedule.loop()
+}
+func (schedule *Schedule) InitEventManage() error {
+	serverInfo := g.GetServerInfo()
+	em, err := Event.NewEvent(serverInfo.Event.Provider, serverInfo.Event.Arguments)
+	if err != nil {
+		return err
+	}
+	go em.Subscribe(context.TODO(), schedule.DeviceEvent, fmt.Sprintf("device-%d", schedule.ID))
+	return nil
+	//go schedule.redisClient.Subscribe(context.TODO(), schedule.DeviceEvent, fmt.Sprintf("device-%d", schedule.ID))
 }
 
 // InitSchedule 初始化调度程序
@@ -195,7 +203,6 @@ func InitSchedule(conf *g.GlobalConfig, driver *cache.Driver) error {
 	if serverFactory, err = IService.NewServiceFactory("rpc", serverInfo.ID, rpcClient); err != nil {
 		return err
 	}
-	redisClient := Event.NewRedisClient(serverInfo.Redis.Address, 0, "")
 	eventManage, _ := NewEventManage(int32(conf.Task.Count), driver, db.GDB, serverInfo.Http.Address, serverFactory)
 	eventManage.Start()
 	schedule := &Schedule{
@@ -203,12 +210,12 @@ func InitSchedule(conf *g.GlobalConfig, driver *cache.Driver) error {
 		httpAddress:   serverInfo.Http.Address,
 		rpcAddress:    serverInfo.Rpc.Address,
 		serverFactory: serverFactory,
-		redisClient:   redisClient,
 		layoutManage:  layout.InitLayoutManage(db.GDB),
 		eventManage:   eventManage,
 		cacheDriver:   driver,
 		db:            db.GDB,
 	}
+	schedule.InitEventManage()
 	schedule.Start()
 	return nil
 }
