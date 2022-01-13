@@ -28,6 +28,33 @@ func GetEventCmd(action string, did uint, body []byte, reply bool) (*model.Event
 
 }
 
+type DeviceLayoutOpenWindowService struct {
+	ID         uint   `json:"id" uri:"id"`
+	LayoutId   string `json:"layoutId" uri:"layoutId"`
+	WindowId   string `json:"windowId" uri:"windowId"`
+	ResourceId uint   `json:"resourceId"`
+}
+
+func (service DeviceLayoutOpenWindowService) Open() serializer.Response {
+	resource, err := model2.GetResourceById(service.ResourceId)
+	if err != nil {
+		return serializer.Err(serializer.CodeDBError, "获取资源失败", err)
+	}
+	req := model.OpenWindowCmdParams{
+		ID:       service.ID,
+		LayoutID: service.LayoutId,
+		WindowID: service.WindowId,
+		Source:   fmt.Sprintf("%d-%s", resource.ID, resource.Name),
+	}
+	b1, _ := json.Marshal(req)
+	r, _ := GetEventCmd("change", service.ID, b1, true)
+	reply, err := g.GEvent.PublishEvent(context.TODO(), fmt.Sprintf("device-%d", service.ID), r, true)
+	if err != nil {
+		return serializer.Err(serializer.CodeRedisError, "publish event error", err)
+	}
+	return serializer.Response{Data: reply}
+}
+
 // DeviceLayoutOpenService 打开设备布局服务
 type DeviceLayoutOpenService struct {
 	ID       uint                   `json:"id" uri:"id"`

@@ -32,7 +32,7 @@
   "event": {
     "provider": "nats",
     "arguments": {
-      "address": "master.54wcs.com:4222",
+      "address": "192.168.0.222:4222",
       "db": 0,
       "password": ""
     }

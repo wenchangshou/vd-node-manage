@@ -35,3 +35,10 @@ type ControlWindowCmdParams struct {
 	Wid  string `json:"wid"`
 	Body string `json:"body"`
 }
+
+type OpenWindowCmdParams struct {
+	ID       uint   `json:"id"`
+	LayoutID string `json:"layout_id"`
+	WindowID string `json:"window_id"`
+	Source   string `json:"source"`
+}

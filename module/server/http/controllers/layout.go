@@ -67,5 +67,11 @@ func CloseDeviceLayout(c *gin.Context) {
 }
 
 func OpenDeviceLayoutWindow(c *gin.Context) {
-
+	s := service.DeviceLayoutOpenWindowService{}
+	if err := c.ShouldBindJSON(&s); err == nil {
+		res := s.Open()
+		c.JSON(200, res)
+	} else {
+		c.JSON(200, serializer.ErrorResponse(err))
+	}
 }
