@@ -45,8 +45,11 @@ func InitRouter() *gin.Engine {
 			layout.DELETE("/:id/:layout_id", controllers.CloseDeviceLayout)
 			layout.GET("/:id/:layout_id", controllers.GetDeviceLayout)
 			layout.GET("/:id/:layout_id/:wid", controllers.GetDeviceLayoutWindow)
-			layout.POST("/window/change", controllers.OpenDeviceLayoutWindow)
 			layout.POST("/:id/:layout_id/:window_id/control", controllers.ControlLayout)
+		}
+		window := v1.Group("/window")
+		{
+			window.POST("", controllers.OpenDeviceLayoutWindow)
 		}
 		resource := v1.Group("/resource")
 		{

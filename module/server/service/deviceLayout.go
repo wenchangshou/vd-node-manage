@@ -36,7 +36,7 @@ type DeviceLayoutOpenWindowService struct {
 }
 
 func (service DeviceLayoutOpenWindowService) Open() serializer.Response {
-	resource, err := model2.GetResourceById(service.ResourceId)
+	deviceResource, err := model2.GetDeviceResource(service.ID, service.ResourceId)
 	if err != nil {
 		return serializer.Err(serializer.CodeDBError, "获取资源失败", err)
 	}
@@ -44,7 +44,8 @@ func (service DeviceLayoutOpenWindowService) Open() serializer.Response {
 		ID:       service.ID,
 		LayoutID: service.LayoutId,
 		WindowID: service.WindowId,
-		Source:   fmt.Sprintf("%d-%s", resource.ID, resource.Name),
+		Service:  deviceResource.Resource.Service,
+		Source:   fmt.Sprintf("%d-%s", deviceResource.ResourceID, deviceResource.Resource.Name),
 	}
 	b1, _ := json.Marshal(req)
 	r, _ := GetEventCmd("change", service.ID, b1, true)

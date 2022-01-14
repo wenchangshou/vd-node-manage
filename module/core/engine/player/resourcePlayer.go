@@ -106,7 +106,6 @@ func (player *ResourcePlayer) Open(wg *sync.WaitGroup, p int) (pid uint32, err e
 
 // Close 关闭播放器
 func (player *ResourcePlayer) Close() error {
-	fmt.Println("pid", player.Pid)
 	if player.Pid == 0 {
 		return nil
 	}

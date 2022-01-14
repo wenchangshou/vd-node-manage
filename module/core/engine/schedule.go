@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/wenchangshou/vd-node-manage/module/core/g/process"
 	"time"
 
 	"github.com/wenchangshou/vd-node-manage/common/cache"
@@ -116,9 +115,7 @@ func (schedule *Schedule) InitEventManage() error {
 }
 
 func (schedule Schedule) Exit() {
-	for _, v := range schedule.threadMap {
-		process.KillProcesses([]int{int(v)})
-	}
+	schedule.layoutManage.CloseLayout()
 }
 
 // InitSchedule 初始化调度程序

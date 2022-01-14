@@ -102,6 +102,12 @@ func (manage layoutManage) Change(params model.OpenWindowCmdParams) error {
 	if win == nil {
 		return errors.New("未找到指定窗口")
 	}
+	if win.Source.Service != params.Service {
+		_, err := win.Source.ChangePlayer(params.Service, params.Source)
+		if err != nil {
+			return err
+		}
+	}
 	return win.Source.Change(params.Source)
 }
 

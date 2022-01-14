@@ -28,9 +28,12 @@ type Window struct {
 	Arguments map[string]interface{}
 	Source    string
 	player    player.IPlayer
+	port      int
+	win       model.Window
 }
 
 func (window *Window) Open(wg *sync.WaitGroup, port int) (uint32, error) {
+	window.port = port
 	return window.player.Open(wg, port)
 }
 func (window *Window) Close() error {
@@ -41,6 +44,18 @@ func (window *Window) Control(body string) (string, error) {
 }
 func (window *Window) Change(source string) error {
 	return window.player.Change(source)
+}
+func (window *Window) ChangePlayer(service, source string) (pid uint32, err error) {
+	window.player.Close()
+	var wg sync.WaitGroup
+	if window.player, err = player.MakePlayer(window.win, "", service, source); err != nil {
+		return
+	}
+	wg.Add(1)
+	pid, err = window.Open(&wg, window.port)
+	window.Service = service
+	wg.Wait()
+	return
 }
 func (window *Window) Get() (string, error) {
 	return window.player.Get()
@@ -70,12 +85,9 @@ func MakeWindow(id string, x int, y int, width int, height int, z int,
 	}
 	return &Window{
 		ID:        id,
-		X:         x,
-		Y:         y,
-		Width:     width,
-		Height:    height,
-		Z:         z,
+		win:       windowInfo,
 		Source:    source,
+		Service:   service,
 		Arguments: Arguments,
 		player:    _player,
 	}, nil

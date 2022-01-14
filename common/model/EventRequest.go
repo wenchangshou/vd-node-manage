@@ -40,5 +40,6 @@ type OpenWindowCmdParams struct {
 	ID       uint   `json:"id"`
 	LayoutID string `json:"layout_id"`
 	WindowID string `json:"window_id"`
+	Service  string `json:"service"`
 	Source   string `json:"source"`
 }
