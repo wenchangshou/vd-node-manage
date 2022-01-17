@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/spf13/cast"
 	"time"
 
 	"github.com/wenchangshou/vd-node-manage/common/cache"
@@ -117,6 +118,33 @@ func (schedule *Schedule) InitEventManage() error {
 func (schedule Schedule) Exit() {
 	schedule.layoutManage.CloseLayout()
 }
+func (schedule Schedule) init() {
+	var (
+		player *model.Player
+	)
+	init := "false"
+	db.GDB.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte("config"))
+		if bucket == nil {
+			bucket, _ = tx.CreateBucket([]byte("config"))
+		}
+		init = cast.ToString(db.GetSetting([]byte("init")))
+		return nil
+	})
+	if init == "true" {
+		return
+	}
+
+	player = model.GeneratePlayer("Zoolon_videoPlayer.exe", "视频播放器", "app/VideoPlayer", "v1.0", time.Now().UnixMilli())
+	db.AddPlayer("video", player)
+	player = model.GeneratePlayer("Zoolon_PPTPlayer.exe", "ppt播放器", "app/PPTPlayer", "v1.0", time.Now().UnixMilli())
+	db.AddPlayer("ppt", player)
+	player = model.GeneratePlayer("Zoolon_ImagePlayer.exe", "图片播放器", "app/ImagePlayer", "v1.0", time.Now().UnixMilli())
+	db.AddPlayer("image", player)
+	player = model.GeneratePlayer("Zoolon_WebPlayer.exe", "web播放器", "app/WebPlayer", "v1.0", time.Now().UnixMilli())
+	db.AddPlayer("web", player)
+	db.SetSetting([]byte("init"), []byte("true"))
+}
 
 // InitSchedule 初始化调度程序
 func InitSchedule(conf *g.GlobalConfig, driver *cache.Driver) (*Schedule, error) {
@@ -145,6 +173,7 @@ func InitSchedule(conf *g.GlobalConfig, driver *cache.Driver) (*Schedule, error)
 		cacheDriver:   driver,
 		db:            db.GDB,
 	}
+	schedule.init()
 	schedule.InitEventManage()
 	schedule.Start()
 	return schedule, nil

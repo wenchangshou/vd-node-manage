@@ -1,6 +1,8 @@
 package db
 
-import bolt "go.etcd.io/bbolt"
+import (
+	bolt "go.etcd.io/bbolt"
+)
 
 var Store Driver
 
