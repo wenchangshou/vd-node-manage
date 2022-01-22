@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/opentracing/opentracing-go"
 	"net/http"
 )
 
@@ -14,9 +15,16 @@ import (
 //	})
 //}
 
-func Health(c *gin.Context){
-	c.String(http.StatusOK,"OK")
+func Health(c *gin.Context) {
+	//1.创建子span
+	span, _ := opentracing.StartSpanFromContext(c, "span_foo3")
+	defer func() {
+		//4.接口调用完，在tag中设置request和reply
+		span.SetTag("request", c.Request)
+		span.Finish()
+	}()
+	c.String(http.StatusOK, "OK")
 }
-func Version (c *gin.Context){
-	c.String(http.StatusOK,"v1.0")
+func Version(c *gin.Context) {
+	c.String(http.StatusOK, "v1.0")
 }

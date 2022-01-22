@@ -8,6 +8,7 @@ import (
 	"github.com/wenchangshou/vd-node-manage/common/cache"
 	"github.com/wenchangshou/vd-node-manage/common/model"
 	"github.com/wenchangshou/vd-node-manage/common/serializer"
+	"github.com/wenchangshou/vd-node-manage/common/util"
 	"github.com/wenchangshou/vd-node-manage/module/server/g"
 	model2 "github.com/wenchangshou/vd-node-manage/module/server/model"
 )
@@ -32,10 +33,11 @@ type DeviceLayoutOpenWindowService struct {
 	ID         uint   `json:"id" uri:"id"`
 	LayoutId   string `json:"layoutId" uri:"layoutId"`
 	WindowId   string `json:"windowId" uri:"windowId"`
+	Service    string `json:"service"`
 	ResourceId uint   `json:"resourceId"`
 }
 
-func (service DeviceLayoutOpenWindowService) Open() serializer.Response {
+func (service DeviceLayoutOpenWindowService) openResource() serializer.Response {
 	deviceResource, err := model2.GetDeviceResource(service.ID, service.ResourceId)
 	if err != nil {
 		return serializer.Err(serializer.CodeDBError, "获取资源失败", err)
@@ -51,9 +53,68 @@ func (service DeviceLayoutOpenWindowService) Open() serializer.Response {
 	r, _ := GetEventCmd("change", service.ID, b1, true)
 	reply, err := g.GEvent.PublishEvent(context.TODO(), fmt.Sprintf("device-%d", service.ID), r, true)
 	if err != nil {
-		return serializer.Err(serializer.CodeRedisError, "publish event error", err)
+		return serializer.Err(serializer.CodeRedisError, "change window fail", err)
 	}
 	return serializer.Response{Data: reply}
+
+}
+func (service DeviceLayoutOpenWindowService) openWeb() serializer.Response {
+	deviceResource, err := model2.GetDeviceResource(service.ID, service.ResourceId)
+	if err != nil {
+		return serializer.Err(serializer.CodeDBError, "获取资源失败", err)
+	}
+	req := model.OpenWindowCmdParams{
+		ID:       service.ID,
+		LayoutID: service.LayoutId,
+		WindowID: service.WindowId,
+		Service:  deviceResource.Resource.Service,
+		Source:   deviceResource.Resource.Uri,
+	}
+	b1, _ := json.Marshal(req)
+	r, _ := GetEventCmd("change", service.ID, b1, true)
+	reply, err := g.GEvent.PublishEvent(context.TODO(), fmt.Sprintf("device-%d", service.ID), r, true)
+	if err != nil {
+		return serializer.Err(serializer.CodeRedisError, "change window fail", err)
+	}
+	return serializer.Response{Data: reply}
+
+}
+func (service DeviceLayoutOpenWindowService) Open() serializer.Response {
+	if service.Service == "web" {
+		return service.openWeb()
+	}
+	if util.IsResourcePlayer(service.Service) {
+		return service.openResource()
+	}
+	if util.IsProjectPlayer(service.Service) {
+		return service.openProject()
+	}
+	return serializer.Err(serializer.CodeDBError, "未知service类型", nil)
+}
+
+func (service DeviceLayoutOpenWindowService) openProject() serializer.Response {
+	deviceProject, err := model2.GetDeviceProject(service.ID, service.ResourceId)
+	if err != nil {
+		return serializer.Err(serializer.CodeDBError, "获取资源失败", err)
+	}
+	source := fmt.Sprintf("%d-%s/%s", deviceProject.Project.ID, deviceProject.Project.Name, deviceProject.Project.Startup)
+
+	req := model.OpenWindowCmdParams{
+
+		ID:       service.ID,
+		LayoutID: service.LayoutId,
+		WindowID: service.WindowId,
+		Service:  deviceProject.Project.Service,
+		Source:   source,
+	}
+	b1, _ := json.Marshal(req)
+	r, _ := GetEventCmd("change", service.ID, b1, true)
+	reply, err := g.GEvent.PublishEvent(context.TODO(), fmt.Sprintf("device-%d", service.ID), r, true)
+	if err != nil {
+		return serializer.Err(serializer.CodeRedisError, "change window fail", err)
+	}
+	return serializer.Response{Data: reply}
+
 }
 
 // DeviceLayoutOpenService 打开设备布局服务
@@ -69,6 +130,7 @@ type DeviceLayoutOpenService struct {
 func (service DeviceLayoutOpenService) Open() serializer.Response {
 	var (
 		resources []model2.DeviceResource
+		projects  []model2.DeviceProject
 		err       error
 	)
 	c := model.OpenLayoutCmdParams{
@@ -81,13 +143,31 @@ func (service DeviceLayoutOpenService) Open() serializer.Response {
 	}
 	windows := make([]model.OpenWindowInfo, 0)
 	mapDeviceResource := make(map[uint]model2.DeviceResource)
-	ids := make([]uint, 0)
+	mapDeviceProject := make(map[uint]model2.DeviceProject)
+	rIDS := make([]uint, 0)
+	pIDS := make([]uint, 0)
+
 	for _, window := range service.Windows {
 		flag := true
 		if window.Source.Category != "id" {
 			continue
 		}
-		for _, v := range ids {
+
+		if window.Service == "app" || window.Service == "ue4" {
+			// 获取项目的id集合
+			for _, v := range pIDS {
+				if window.Source.ID == v {
+					flag = false
+					break
+				}
+			}
+			if flag {
+				pIDS = append(pIDS, window.Source.ID)
+			}
+			continue
+		}
+		// 获取资源id集合
+		for _, v := range rIDS {
 			if window.Source.ID == v {
 				flag = false
 				break
@@ -96,13 +176,19 @@ func (service DeviceLayoutOpenService) Open() serializer.Response {
 		if !flag {
 			continue
 		}
-		ids = append(ids, window.Source.ID)
+		rIDS = append(rIDS, window.Source.ID)
 	}
-	if resources, err = model2.GetDeviceResources(service.ID, ids); err != nil {
+	if resources, err = model2.GetDeviceResources(service.ID, rIDS); err != nil {
 		return serializer.Err(serializer.CodeDBError, "获取设备资源失败", err)
+	}
+	if projects, err = model2.GetDeviceProjects(service.ID, pIDS); err != nil {
+		return serializer.Err(serializer.CodeDBError, "获取设备项目失败", err)
 	}
 	for _, resource := range resources {
 		mapDeviceResource[resource.ResourceID] = resource
+	}
+	for _, project := range projects {
+		mapDeviceProject[project.ProjectID] = project
 	}
 	for _, window := range service.Windows {
 		w := model.OpenWindowInfo{
@@ -122,14 +208,21 @@ func (service DeviceLayoutOpenService) Open() serializer.Response {
 		if window.Arguments != nil {
 			w.Arguments = window.Arguments
 		}
+		if window.Service == "ue4" || window.Service == "app" {
+			p := mapDeviceProject[window.Source.ID]
+			w.Source = fmt.Sprintf("%d-%s/%s", p.Project.ID, p.Project.Name, p.Project.Startup)
+			windows = append(windows, w)
+			continue
+		}
 		r := mapDeviceResource[window.Source.ID]
-		if window.Service == "http" {
+		if window.Service == "web" {
 			w.Source = r.Resource.Uri
 		} else {
 			w.Source = fmt.Sprintf("%d-%s", r.ResourceID, r.Resource.Name)
 		}
 		windows = append(windows, w)
 	}
+
 	c.Windows = windows
 	b1, _ := json.Marshal(c)
 	ctx := context.TODO()

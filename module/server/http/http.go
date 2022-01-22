@@ -2,6 +2,7 @@ package http
 
 import (
 	"fmt"
+	"github.com/opentracing/opentracing-go"
 	"log"
 	"os"
 
@@ -21,8 +22,11 @@ type Dto struct {
 }
 
 func InitRouter() *gin.Engine {
+	//t, closer, err := g.NewGlobalTestTracer()
 	r := gin.Default()
 	r.Use(cors.Default())
+	r.Use(OpenTracing())
+	//r.Use(OpenTracing())
 	r.Use(gzip.Gzip(gzip.DefaultCompression, gzip.WithExcludedPaths([]string{"/api/"})))
 	v1 := r.Group("/api/v1")
 	{
@@ -37,6 +41,7 @@ func InitRouter() *gin.Engine {
 			device.GET("/:id", controllers.GetDevice)
 			device.POST("/register", controllers.RegisterDevice)
 			device.POST("/:id/resource", controllers.AddDeviceResource)
+			device.POST(":id/project", controllers.AddDeviceProject)
 			device.DELETE("/:id/resource/:resource_id", controllers.DeleteDeviceResource)
 		}
 		layout := v1.Group("/layout")
@@ -78,6 +83,11 @@ func Start() {
 		return
 	}
 
+	tracer, closer := g.TraceInit("quickex", "const", 1)
+	defer func() {
+		closer.Close()
+	}()
+	opentracing.SetGlobalTracer(tracer)
 	r := InitRouter()
 	if err := r.Run(addr); err != nil {
 		log.Fatalln("start http", "err", err.Error())

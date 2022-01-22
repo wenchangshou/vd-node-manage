@@ -22,7 +22,9 @@ func migration() error {
 	err = DB.AutoMigrate(
 		&Device{},
 		&DeviceResource{},
-		&File{},
+		&DeviceProject{},
+		//&File{},
+		&Project{},
 		&Resource{},
 		Event{},
 	)

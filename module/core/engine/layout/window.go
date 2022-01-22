@@ -2,7 +2,9 @@ package layout
 
 import (
 	"github.com/wenchangshou/vd-node-manage/module/core/engine/player"
+	"github.com/wenchangshou/vd-node-manage/module/core/g"
 	"github.com/wenchangshou/vd-node-manage/module/core/g/model"
+	"path"
 	"sync"
 )
 
@@ -48,7 +50,15 @@ func (window *Window) Change(source string) error {
 func (window *Window) ChangePlayer(service, source string) (pid uint32, err error) {
 	window.player.Close()
 	var wg sync.WaitGroup
-	if window.player, err = player.MakePlayer(window.win, "", service, source); err != nil {
+	_source := ""
+	if service == "web" {
+		_source = source
+	} else if service == "app" || service == "ue4" {
+		_source = path.Join(g.Config().Resource.Directory, "project", source)
+	} else {
+		_source = path.Join(g.Config().Resource.Directory, "resource", source)
+	}
+	if window.player, err = player.MakePlayer(window.win, "", service, _source); err != nil {
 		return
 	}
 	wg.Add(1)
@@ -63,7 +73,6 @@ func (window *Window) Get() (string, error) {
 func (window *Window) GetRunStatus() (bool, error) {
 	return window.player.Check()
 }
-
 func MakeWindow(id string, x int, y int, width int, height int, z int,
 	service string,
 	Arguments map[string]interface{},
@@ -72,6 +81,7 @@ func MakeWindow(id string, x int, y int, width int, height int, z int,
 	var (
 		_player player.IPlayer
 		err     error
+		_source string
 	)
 	windowInfo := model.Window{
 		X:      x,
@@ -80,7 +90,14 @@ func MakeWindow(id string, x int, y int, width int, height int, z int,
 		Height: height,
 		Z:      z,
 	}
-	if _player, err = player.MakePlayer(windowInfo, "", service, source); err != nil {
+	if service == "web" {
+		_source = source
+	} else if service == "app" || service == "ue4" {
+		_source = path.Join(g.Config().Resource.Directory, "project", source)
+	} else {
+		_source = path.Join(g.Config().Resource.Directory, "resource", source)
+	}
+	if _player, err = player.MakePlayer(windowInfo, "", service, _source); err != nil {
 		return nil, err
 	}
 	return &Window{

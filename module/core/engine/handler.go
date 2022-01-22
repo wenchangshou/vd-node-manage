@@ -22,8 +22,8 @@ func (schedule *Schedule) DeviceEvent(_ string, message []byte) (r *model.EventR
 	} else if req.Action == "checkResourceExists" {
 		reply = schedule.CheckResourceExists(req)
 	} else if req.Action == "change" {
-		schedule.ChangeWindowSource(req)
-		fmt.Println(req)
+		reply = schedule.ChangeWindowSource(req)
+		fmt.Println(string(req.Arguments), reply)
 	}
 	if !req.Reply {
 		return nil, nil
@@ -43,10 +43,6 @@ func (schedule *Schedule) openLayout(req model.EventRequest) model.EventReply {
 		reply.Msg = "解析json错误"
 		return reply
 	}
-	//if schedule.layoutManage.GetLayoutID() == args.ID {
-	//	schedule.layoutManage.ChangeLayout(args)
-	//	return reply
-	//}
 	if schedule.threadMap, err = schedule.layoutManage.OpenLayout(args); err != nil {
 		reply.Err = err
 		reply.Msg = "打开布局失败"
@@ -105,6 +101,5 @@ func (schedule Schedule) ChangeWindowSource(req model.EventRequest) model.EventR
 		reply.Msg = "改变窗口源失败"
 		return reply
 	}
-	//m:=schedule.layoutManage.ChangeLayout(req)
 	return model.GenerateSimpleSuccessEventReply(req.EventID)
 }

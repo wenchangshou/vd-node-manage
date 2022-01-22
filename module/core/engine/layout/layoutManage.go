@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/wenchangshou/vd-node-manage/common/model"
+	"github.com/wenchangshou/vd-node-manage/common/util"
 	model2 "github.com/wenchangshou/vd-node-manage/module/core/g/model"
 	"github.com/wenchangshou2/zutil"
 	bolt "go.etcd.io/bbolt"
@@ -102,11 +103,12 @@ func (manage layoutManage) Change(params model.OpenWindowCmdParams) error {
 	if win == nil {
 		return errors.New("未找到指定窗口")
 	}
-	if win.Source.Service != params.Service {
+	if (win.Source.Service != params.Service) || util.IsProjectPlayer(params.Service) {
 		_, err := win.Source.ChangePlayer(params.Service, params.Source)
 		if err != nil {
 			return err
 		}
+		return nil
 	}
 	return win.Source.Change(params.Source)
 }

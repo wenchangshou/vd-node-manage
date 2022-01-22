@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/opentracing/opentracing-go"
 	"github.com/spf13/cast"
 	"github.com/wenchangshou/vd-node-manage/common/serializer"
 	"github.com/wenchangshou/vd-node-manage/module/server/service"
@@ -12,6 +12,12 @@ func ListDevice(c *gin.Context) {
 	var (
 		listService service.DeviceListService
 	)
+	span, _ := opentracing.StartSpanFromContext(c, "span_foo3")
+	defer func() {
+		//4.接口调用完，在tag中设置request和reply
+		span.SetTag("request", c.Request)
+		span.Finish()
+	}()
 	if err := c.ShouldBindJSON(&listService); err == nil {
 		res := listService.List()
 		c.JSON(200, res)
@@ -79,9 +85,16 @@ func AddDeviceResource(c *gin.Context) {
 	s := &service.DeviceResourceAddService{}
 	if err := c.BindJSON(&s); err == nil {
 		s.ID = cast.ToUint(c.Param("id"))
-		if err != nil {
-			c.JSON(200, serializer.ErrorResponse(errors.New("id类型错误")))
-		}
+		res := s.Add()
+		c.JSON(200, res)
+	} else {
+		c.JSON(200, serializer.ErrorResponse(err))
+	}
+}
+func AddDeviceProject(c *gin.Context) {
+	s := &service.DeviceProjectAddService{}
+	if err := c.BindJSON(&s); err == nil {
+		s.ID = cast.ToUint(c.Param("id"))
 		res := s.Add()
 		c.JSON(200, res)
 	} else {

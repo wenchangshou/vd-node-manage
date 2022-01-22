@@ -14,12 +14,14 @@ func GetPlayerPath(service string) string {
 	switch service {
 	case "video":
 		p, _ = zutil.GetFullPath("app/VideoPlayer/ZOOLON_VideoPlayer")
-	case "http":
+	case "web":
 		p, _ = zutil.GetFullPath("app/WebPlayer/ZOOLON_WebPlayer")
 	case "pdf":
 		p, _ = zutil.GetFullPath("app/PDFPlayer/ZOOLON_PDFPlayer")
 	case "ppt":
 		p, _ = zutil.GetFullPath("app/PPTPlayer/ZOOLON_PPTPlayer")
+	case "image":
+		p, _ = zutil.GetFullPath("app/ImagePlayer/ZOOLON_ImagePlayer")
 	default:
 		return ""
 	}

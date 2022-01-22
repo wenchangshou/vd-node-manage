@@ -15,6 +15,7 @@ type Device int
 type Task int
 type Event int
 type Resource int
+type Project int
 
 func Start() {
 	addr := g.Config().Listen
@@ -26,6 +27,8 @@ func Start() {
 	server.Register(new(Task))
 	server.Register(new(Event))
 	server.Register(new(Resource))
+	server.Register(new(Project))
+
 	l, e := net.Listen("tcp", addr)
 	if e != nil {
 		log.Fatalln("listen error:", e)

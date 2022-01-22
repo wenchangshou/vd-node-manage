@@ -9,6 +9,12 @@ import (
 
 type WindowServiceProcess struct {
 }
+
+func (w WindowServiceProcess) KillUe4(pid uint32) {
+	//TODO implement me
+	panic("implement me")
+}
+
 type PsInfo struct {
 	ProcessID       int    //进程id
 	ParentProcessID int    //上级进程id

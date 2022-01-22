@@ -15,9 +15,13 @@ func (service DeviceRpcService) Heartbeat() error {
 	panic("implement me")
 }
 
-func (service DeviceRpcService) AddComputerProject(_ uint) error {
-	//TODO implement me
-	panic("implement me")
+func (service DeviceRpcService) AddComputerProject(projectID uint) error {
+	req := model.DeviceAddProjectRequest{
+		ID:        service.ID,
+		ProjectID: projectID,
+	}
+	reply := model.SimpleRpcResponse{}
+	return service.Client.Call("Device.AddDeviceProject", &req, &reply)
 }
 
 func (service DeviceRpcService) DeleteComputerProject(_ uint) error {

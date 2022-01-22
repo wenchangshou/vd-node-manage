@@ -88,9 +88,8 @@ func (player *ResourcePlayer) Open(wg *sync.WaitGroup, p int) (pid uint32, err e
 	if player.Arguments != nil && len(player.Arguments) > 0 {
 		params = zutil.MapToString(player.Arguments)
 	}
-	source := path.Join(g.Config().Resource.Directory, "resource", player.Source)
 	params = fmt.Sprintf(" %s -w %d -h %d -x %d -y %d", params, player.Width, player.Height, player.X, player.Y)
-	params += fmt.Sprintf(" -s %s", source)
+	params += fmt.Sprintf(" -s %s", player.Source)
 	//params += fmt.Sprintf(" - true -httpPort %d", p)
 	params += fmt.Sprintf(" -p %d", p)
 	player.port = p

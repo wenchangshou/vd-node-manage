@@ -29,6 +29,24 @@ func GenerateExecutorFactoryFunc(serviceFactory *IService.ServiceFactory, httpRe
 				db:              db,
 			}
 			return e, nil
+		case model.InstallProjectAction:
+			// 触发安装项目事件
+			project, err := serviceFactory.Project.QueryProject(event.ProjectId)
+			if err != nil {
+				return nil, errors.New("rpc请求资源接口失败")
+			}
+			e := &InstallProjectExecutor{
+				TaskID:         event.ID,
+				eventService:   serviceFactory.Event,
+				DeviceService:  serviceFactory.Device,
+				HttpRequestUri: httpRequestUri,
+				ProjectService: serviceFactory.Project,
+				cache:          driver,
+				Project:        project,
+				db:             db,
+			}
+			return e, nil
+
 		case model.DeleteResource:
 			resource, err := serviceFactory.Resource.QueryResource(event.ResourceId)
 			if err != nil {

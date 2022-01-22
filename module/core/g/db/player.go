@@ -9,7 +9,7 @@ import (
 func AddPlayer(service string, player *model.Player) error {
 
 	err := GDB.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte("player"))
+		bucket, _ := tx.CreateBucketIfNotExists([]byte("player"))
 		bucket.Put([]byte(service), player.Serialization())
 		return nil
 	})
@@ -24,9 +24,10 @@ func GetPlayer(service string) (player *model.Player) {
 	return
 }
 func ListPlayer() (players []*model.Player) {
-	GDB.View(func(tx *bolt.Tx) error {
-		buc
-	})
+	//GDB.View(func(tx *bolt.Tx) error {
+	//	buc
+	//})
+	return nil
 }
 func GetSetting(conf []byte) []byte {
 	var (

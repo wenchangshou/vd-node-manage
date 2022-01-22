@@ -65,6 +65,10 @@ const (
 type NormalIdRequest struct {
 	ID uint `json:"id"`
 }
+type DeviceAddProjectRequest struct {
+	ID        uint `json:"id"`
+	ProjectID uint `json:"project_id"`
+}
 type DeviceAddResourceRequest struct {
 	ID         uint `json:"id"`
 	ResourceID uint `json:"resource_id"`

@@ -91,6 +91,16 @@ func (device *Device) AddDeviceResource(args *model.DeviceAddResourceRequest, _ 
 	}
 	return dr.Add()
 }
+func (device *Device) AddDeviceProject(args *model.DeviceAddProjectRequest, _ *model.SimpleRpcResponse) error {
+	if model2.IsDeviceProject(args.ID, args.ProjectID) {
+		return nil
+	}
+	dp := model2.DeviceProject{
+		DeviceID:  args.ID,
+		ProjectID: args.ProjectID,
+	}
+	return dp.Add()
+}
 func (device *Device) GetDeviceStartup(args *model.NormalIdRequest, reply *model.DeviceGetStartupResponse) error {
 	d, err := model2.GetDeviceByID(args.ID)
 	if err != nil {
