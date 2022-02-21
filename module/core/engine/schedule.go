@@ -147,7 +147,7 @@ func (schedule Schedule) init() {
 }
 
 // InitSchedule 初始化调度程序
-func InitSchedule(conf *g.GlobalConfig, driver *cache.Driver) (*Schedule, error) {
+func InitSchedule(conf *g.GlobalConfig, driver *cache.Driver, restart chan bool) (*Schedule, error) {
 	var (
 		err           error
 		serverFactory *IService.ServiceFactory

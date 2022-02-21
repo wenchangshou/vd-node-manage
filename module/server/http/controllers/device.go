@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/opentracing/opentracing-go"
 	"github.com/spf13/cast"
 	"github.com/wenchangshou/vd-node-manage/common/serializer"
 	"github.com/wenchangshou/vd-node-manage/module/server/service"
@@ -12,12 +11,6 @@ func ListDevice(c *gin.Context) {
 	var (
 		listService service.DeviceListService
 	)
-	span, _ := opentracing.StartSpanFromContext(c, "span_foo3")
-	defer func() {
-		//4.接口调用完，在tag中设置request和reply
-		span.SetTag("request", c.Request)
-		span.Finish()
-	}()
 	if err := c.ShouldBindJSON(&listService); err == nil {
 		res := listService.List()
 		c.JSON(200, res)

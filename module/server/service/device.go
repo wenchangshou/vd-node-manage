@@ -1,21 +1,26 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
+	"github.com/opentracing/opentracing-go"
 	"github.com/wenchangshou/vd-node-manage/common/cache"
 	model2 "github.com/wenchangshou/vd-node-manage/common/model"
 	"github.com/wenchangshou/vd-node-manage/common/serializer"
 	"github.com/wenchangshou/vd-node-manage/module/server/model"
 	"github.com/wenchangshou/vd-node-manage/module/server/vo"
 	"strconv"
+	"strings"
 )
 
 type DeviceListService struct {
-	Page     int `json:"page" binding:"min=1,required" form:"page"`
-	PageSize int `json:"pageSize" binding:"min=1,required" form:"pageSize"`
+	Page       int               `json:"page" binding:"min=1,required" form:"page"`
+	PageSize   int               `json:"pageSize" binding:"min=1,required" form:"pageSize"`
+	Conditions map[string]string `form:"conditions"`
+	Searches   map[string]string `form:"searches"`
 }
 
 func (service *DeviceListService) List() serializer.Response {
@@ -23,7 +28,30 @@ func (service *DeviceListService) List() serializer.Response {
 	var ids []string
 	rtu := make([]*vo.DeviceVo, 0)
 	var total int64 = 0
-	tx := model.DB.Model(&model.Device{})
+	span := opentracing.StartSpan("list device")
+	defer span.Finish()
+	ctx := opentracing.ContextWithSpan(context.Background(), span)
+	session := model.DB.WithContext(ctx)
+	tx := session.Model(&model.Device{})
+	for k, v := range service.Conditions {
+		if k == "deviceId" {
+			k = "id"
+		}
+		arr := strings.Split(v, ",")
+		if len(arr) > 1 {
+			tx = tx.Where(k+" IN ?", arr)
+			continue
+		}
+		tx = tx.Where(k+" = ?", v)
+	}
+	if len(service.Searches) > 0 {
+		search := ""
+		for k, v := range service.Searches {
+			search += k + " like '%" + v + "%' OR "
+		}
+		search = strings.TrimSuffix(search, " OR ")
+		tx = tx.Where(search)
+	}
 	tx.Count(&total)
 	tx.Limit(service.PageSize).Offset((service.Page - 1) * service.PageSize).Find(&res)
 	for _, d := range res {

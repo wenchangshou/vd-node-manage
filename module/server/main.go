@@ -15,6 +15,9 @@ import (
 )
 
 func main() {
+	var (
+		err error
+	)
 	cfg := flag.String("c", "cfg.json", "configuration file")
 	version := flag.Bool("v", false, "show version")
 	flag.Parse()
@@ -23,7 +26,9 @@ func main() {
 		os.Exit(0)
 	}
 	g.ParseConfig(*cfg)
-	model.InitDatabase()
+	if err = model.InitDatabase(); err != nil {
+		log.Fatalf("init database error:%s", err.Error())
+	}
 	if err := g.InitEvent(g.Config().Event.Provider, g.Config().Event.Arguments); err != nil {
 		log.Fatalf("new event fail:" + err.Error())
 	}

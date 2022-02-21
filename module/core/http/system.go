@@ -67,6 +67,7 @@ func configSystemRoutes() {
 		}
 		g.StoreServerInfo(&resp.Config)
 		RenderCustomMsgJson(w, 0, "success")
+		g.Restart()
 	})
 
 	http.HandleFunc("/get", func(w http.ResponseWriter, r *http.Request) {

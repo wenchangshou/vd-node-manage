@@ -24,6 +24,7 @@ var (
 	confPath      string
 	installFlag   bool
 	uninstallFlag bool
+	restartFlag   bool
 	modeFlag      string
 	cfg           string
 	hardware      string
@@ -61,6 +62,7 @@ func mkdirWorkDir(conf *g.GlobalConfig) {
 
 type Program struct {
 	schedule *engine.Schedule
+	restart  chan bool
 }
 
 func (p *Program) start() {
@@ -73,7 +75,7 @@ func (p *Program) start() {
 		log.Fatalln("初始化cache模块失败:" + err.Error())
 	}
 	cron.ReportDeviceStatus()
-	if p.schedule, err = engine.InitSchedule(conf, cDriver); err != nil {
+	if p.schedule, err = engine.InitSchedule(conf, cDriver, p.restart); err != nil {
 		log.Fatalln("初始化调度失败")
 	}
 }
@@ -88,7 +90,7 @@ func (p *Program) Start(_ service.Service) error {
 	mkdirWorkDir(conf)
 	g.ParseHardware(hardware)
 	g.LoadServerInfoByDb()
-	go http.Start()
+	go http.Start(p.restart)
 	go p.start()
 	return nil
 }
@@ -117,7 +119,8 @@ func main() {
 		Arguments:        []string{"-m", "service"},
 		WorkingDirectory: GetCurrentPath(),
 	}
-	svc := &Program{}
+	restart := make(chan bool)
+	svc := &Program{restart: restart}
 	s, err = service.New(svc, svcConfig)
 	errs := make(chan error, 5)
 	logger, err = s.Logger(errs)
@@ -125,6 +128,7 @@ func main() {
 	flag.StringVar(&hardware, "d", "hardware.data", "hardware file")
 	flag.BoolVar(&installFlag, "i", false, "install program")
 	flag.BoolVar(&uninstallFlag, "u", false, "uninstall program")
+	flag.BoolVar(&restartFlag, "s", false, "restart program")
 	flag.StringVar(&modeFlag, "m", "console", "service model ")
 	flag.Parse()
 	if installFlag {
@@ -145,6 +149,11 @@ func main() {
 		log.Println("卸載服務成功")
 		return
 	}
+	if restartFlag {
+		s.Restart()
+		return
+	}
+
 	err = s.Run()
 	if err != nil {
 		log.Fatalln("啟動服務失敗:" + err.Error())

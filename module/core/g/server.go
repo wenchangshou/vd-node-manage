@@ -2,9 +2,15 @@ package g
 
 import (
 	"encoding/json"
+	"fmt"
+	"github.com/wenchangshou/vd-node-manage/common/logging"
 	"github.com/wenchangshou/vd-node-manage/common/model"
 	"github.com/wenchangshou/vd-node-manage/module/core/g/db"
 	bolt "go.etcd.io/bbolt"
+	"log"
+	"os"
+	"os/exec"
+	"path/filepath"
 	"sync"
 )
 
@@ -81,16 +87,13 @@ func LoadServerInfoByDb() error {
 	serverDBLock.RLock()
 	var info *model.ServerConfig
 	err := db.GDB.View(func(tx *bolt.Tx) error {
-		_server := model.ServerConfig{}
 		if bucket = tx.Bucket([]byte("config")); bucket == nil {
 			return nil
 		}
 		b := bucket.Get([]byte("server"))
-		err := json.Unmarshal(b, &_server)
-		if err != nil {
+		if err := json.Unmarshal(b, &info); err != nil {
 			return err
 		}
-		info = &_server
 		return nil
 	})
 	serverDBLock.RUnlock()
@@ -106,4 +109,25 @@ func LoadServerInfoByDb() error {
 	serverInfo = info
 	return nil
 
+}
+
+// 获取当前执行程序所在的绝对路径
+func getCurrentAbPathByExecutable() string {
+	exePath, err := os.Executable()
+	if err != nil {
+		log.Fatal(err)
+	}
+	res, _ := filepath.EvalSymlinks(filepath.Dir(exePath))
+	return res
+}
+func Restart() {
+	filename := filepath.Base(os.Args[0])
+	go func() {
+		cmd := exec.Command("cmd", "/c", filename, "-s")
+		if err := cmd.Run(); err != nil {
+			logging.GLogger.Error("restart error:" + err.Error())
+			fmt.Println("Error: ", err)
+		}
+
+	}()
 }

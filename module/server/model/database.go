@@ -7,17 +7,22 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"log"
+	"io"
 )
 
 var DB *gorm.DB
+var closer io.Closer
 
-func InitDatabase() {
+func InitDatabase() error {
 	var (
 		db  *gorm.DB
 		err error
 	)
+
 	config := g.Config()
+	if closer, err = initJaeger(); err != nil {
+		return err
+	}
 	if gin.Mode() == gin.TestMode {
 		db, err = gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
 	} else {
@@ -33,15 +38,18 @@ func InitDatabase() {
 				config.Database.Name)
 			db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 		default:
-			log.Fatalln("Unsupported database type")
+			return err
 		}
 	}
 	if err != nil {
-		log.Fatalln("Unable to connect to the database", "err", err)
+		return err
 	}
+
 	DB = db.Debug()
 	err = migration()
 	if err != nil {
-		log.Fatalln("migration db error", "error", err)
+		return err
 	}
+	db.Use(&OpentracingPlugin{})
+	return nil
 }

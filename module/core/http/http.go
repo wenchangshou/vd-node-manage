@@ -7,6 +7,10 @@ import (
 	"net/http"
 )
 
+var (
+	_restart chan bool
+)
+
 type Dto struct {
 	Code int         `json:"code"`
 	Msg  string      `json:"msg"`
@@ -63,7 +67,8 @@ func setupHeader(rw http.ResponseWriter, req *http.Request) {
 	rw.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 	rw.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 }
-func Start() {
+func Start(restart chan bool) {
+	_restart = restart
 	if !g.Config().Http.Enabled {
 		return
 	}
