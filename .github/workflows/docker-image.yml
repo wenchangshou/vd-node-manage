@@ -2,8 +2,8 @@ name: Docker Image CI
 
 on:
   push:
-    tags:
-    - '*'
+    tags:        
+      - v*
 
 jobs:
   push_to_registry:
